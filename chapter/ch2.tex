@@ -137,22 +137,123 @@ DI=\min _{1 \leqslant i \leqslant k}\left\{\min _{j \neq i}\left(\frac{d_{\min }
 
 DBI的值越小表示聚类效果越好，DI相反，其值越大表示聚类效果更好。
 
-\section{幂级数拟合}
-轨迹数据中的每条轨迹一般是由若干个点组成，有时需要通过这若干个点来拟合轨迹曲线，本文使用幂级数来实现轨迹的拟合。
+
+
+
+
+
+\section{多项式拟合}
+轨迹数据中的每条轨迹一般是由若干个点组成，有时需要通过这若干个点来拟合轨迹曲线，本文使用多项式来实现轨迹的拟合。
 \subsection{理论基础}
-在二维空间里，
-\subsection{收敛域}
+在二维空间里，一条轨迹由n个点组成：$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \dots,\left(x_{k}, y_{k}\right)\right\}$，若轨迹对应的函数为$f(x)$，多项式拟合则试图通过多项式来近似$f(x)$，n-1阶多项式的形式为$g\left( x \right) =a_0+a_1x+\cdots +a_{n-1}x^{n-1}$。\\
+若通过n-1阶多项式来对n个坐标点对应的轨迹进行拟合，则将n个点的坐标带入n-1阶多项式可得到n个等式，将这n个等式通过矩阵表示则为：
+\begin{equation}
+\label{vandermonde}
+\left[ \begin{matrix}
+	1&		x_1&		\dots&		x_{1}^{n-1}\\
+	1&		x_2&		\dots&		x_{2}^{n-1}\\
+	\vdots&		\vdots&		\ddots&		\vdots\\
+	1&		x_n&		\dots&		x_{n}^{n-1}\\
+\end{matrix} \right] \left[ \begin{array}{c}
+	a_0\\
+	a_1\\
+	\vdots\\
+	a_{n-1}\\
+\end{array} \right] =\left[ \begin{array}{c}
+	y_1\\
+	y_2\\
+	\vdots\\
+	y_n\\
+\end{array} \right] 
+\end{equation}
+
+记$A=\left[ \begin{matrix}
+	1&		x_1&		\dots&		x_{1}^{n-1}\\
+	1&		x_2&		\dots&		x_{2}^{n-1}\\
+	\vdots&		\vdots&		\ddots&		\vdots\\
+	1&		x_n&		\dots&		x_{n}^{n-1}\\
+\end{matrix} \right] $
+，$\left|A^{T}\right|$则为范德蒙德行列式，故有：
+
+\begin{equation}
+\left|A^{T}\right|=\prod_{p>q}\left(x_{p}-x_{q}\right)
+\end{equation}
+
+若x_0,x_1,…,x_n彼此不相等，故此时存在唯一一个n-1次阶多项式能够包含所有数据点，此时用n-1阶多项式拟合的函数可以经过每一个点。
+
+\subsection{麦克劳林级数及其收敛域}
+若函数f(x)在$x_0$的某一个邻域内具有任意阶导数，则幂级数$\sum_{n=0}^{\infty}{\frac{f^{\left( n \right)}\left( x_0 \right)}{n!}}\left( x-x_0 \right) ^n$称为f(x)在$x_0$处的泰勒级数；当$x_0=0$时，此幂级数则称为麦克劳林级数，即$\sum_{n=0}^{\infty}{\frac{f^{\left( n \right)}\left( 0 \right)}{n!}}\left( x \right) ^n$。\\
+假设f(x)在$x_0=0$处的麦克劳林级数收敛于f(x)，即当$n\rightarrow \infty $时，f(x)在$x_0=0$处的麦克劳林公式的余项$R_n(x)$对邻域中的点趋于0。此时，则有：
+
+\begin{equation}
+\label{maclaurin}
+f\left( x \right) =\sum_{n=0}^{\infty}{\frac{f^{\left( n \right)}\left( 0 \right)}{n!}}\left( x \right) ^n
+\end{equation}
+
+等式\ref{maclaurin}右侧是幂级数，关于幂级数的收敛半径满足阿尔贝定理。\\
+\textbf{阿贝尔定理}：如果幂级数$\sum_{n=0}^{\infty}{a_nx^n}$当$x=x_0(x_0 \ne 0)$时收敛，则对于一切满足$x<|x_0|$的x，幂级数$\sum_{n=0}^{\infty}{a_nx^n}$均绝对收敛；如果幂级数$\sum_{n=0}^{\infty}{a_nx^n}$在$x=x_1$处发散，则对于一切$x>|x_1|$的x，幂级数$\sum_{n=0}^{\infty}{a_nx^n}$均发散。\\
+因此我们依据\ref{maclaurin}和阿贝尔定理可以得到函数f(x)其麦克劳林级数的收敛域。
 
 
 
 
 
 \section{最优化理论}
+很过机器学习问题在求解过程中面对的都是在指定约束条件下的最优化问题，其一般形式如下：
 
-\subsection{经验误差与过拟合}
+\begin{equation}
+minimize \quad f_{0}(x)$ \\$s.t. \quad f_{i}(x) \leq 0, \quad i=1, \ldots, m
+\end{equation}
 
-\subsection{优化算法}
+其中$f_0(x)$称为目标函数，$f_{i}(x) \leq 0, \quad i=1, \ldots, m$称为约束函数。若优化问题没有任何约束函数，则称此优化问题为无约束优化问题。
 
+\subsection{经验误差与正则化}
+在机器学习中，优化目标一般称为代价函数，代价函数一般与所训练的模型$\hat{f}\left( x \right) $在训练集上的误差相关，学得的模型$\hat{f}\left( x \right) $在训练集上的误差称为经验误差，经验误差是模型$\hat{f}\left( x \right) $关于训练集的平均损失：
+
+\[
+R_{\text{emg}}\left( \hat{f} \right) =\frac{1}{N}\sum_{i=1}^N{L}\left( y_i,\hat{f}\left( x_i \right) \right) 
+\]
+
+其中，$L\left( y_i,\hat{f}\left( x_i \right) \right) $表示在样本$x_i$上，模型$\hat{f}\left( x_i \right)来判断输出的损失度量。\\
+
+如果只追求训练得到的模型$\hat{f}\left( x \right) $使得经验损失尽可能得小，意味着模型$\hat{f}\left( x \right) $在训练集上表现得很好，但是往往会因为模型$\hat{f}\left( x \right) $的复杂度过高而导致对未知数据的预测能力很差，即所谓的泛化能力很差，这种现象称为过拟合，为了防止过拟合现象的出现，人们往往给经验损失添加一个正则项，这种优化经验损失和正则项的方法称为正则化，正则化一般有如下形式：
+
+\begin{equation}
+\label{regularization}
+\min_{\hat{f}\in \mathcal{F}} \frac{1}{N}\sum_{i=1}^N{L}\left( y_i,\hat{f}\left( x_i \right) \right) +\lambda J\left( \hat{f} \right) 
+\end{eqaution}
+
+其中，第一项是经验风险，第二项是正则项，$\lambda \geqslant 0$为调整两者之间关系的系数。\\
+正则化可以取不同的形式，最常见两种是$L_1$范数和$L_2$范数。$L_1$范数表示为：
+\[L\left( w \right) =\frac{1}{N}\sum_{i=1}^N{\left( \hat{f}\left( x_i;w \right) -y_i \right) ^2}+\lambda |w|_1$\]
+这里，$|w|_1$表示参数向量的$L_1$范数。$L_2$范数表示为：
+\[L\left( w \right) =\frac{1}{N}\sum_{i=1}^N{\left( \hat{f}\left( x_i;w \right) -y_i \right) ^2}+\frac{\lambda}{2}|w|^2\]
+这里，$|w|_2$表示参数向量的$L_2$范数。\\
+正则化符合奥卡姆剃刀原理：在所有可能选择的模型中，能够很好的解释已知数据并且十分简单的才是最好的模型。
+
+
+\subsection{梯度下降法}
+梯度下降法是求解无约束优化问题的一种方法，若函数可微，从函数的任意一点，通过梯度下降法可以找到函数的局部极小值。\\
+梯度下降方法基于以下的观察：如果实值函数F(\textbf{x})在点\textbf{a}处可微且有定义，那么函数F(\textbf{x})在\textbf{a}点沿着梯度相反的方向$-\nabla F(\mathbf{a})$下降最快。因而，如果
+\[\mathbf{b}=\mathbf{a}-\gamma \nabla F\left( \mathbf{a} \right) \]
+对于\gamma >0为一个够小数值时成立，那么$F(\mathbf{a})\geq F(\mathbf{b})$。\\
+考虑到这一点，我们可以从函数F的局部极小值的初始估计$\mathbf{x}_0$出发，并考虑如下序列$\mathbf{x}_{0}, \mathbf{x}_{1}, \mathbf{x}_{2}, \dots$使得
+
+\[\mathbf{x}_{n+1}=\mathbf{x}_n-\gamma_n \nabla F(\mathbf{x}_n),\ n \ge 0\]
+
+因此可得到
+
+\[F(\mathbf{x}_{0})\geq F(\mathbf{x})_{1})\geq F(\mathbf{x})_{2})\geq \cdots\]
+
+如果顺利的话序列{\textbf{x}_n}收敛到期望的局部极小值。注意每次迭代步长\gamma 可以改变。
+
+图\ref{GD}示例了这一过程，这里假设F定义在平面上，并且函数图像是一个碗形。蓝色的曲线是等高线。红色的箭头指向该点梯度的反方向。沿着梯度下降方向，将最终到达碗底，即函数F局部极小值的点。
+
+\begin{figure}[h]
+	\includegraphics{GD.png}
+	\caption{梯度下降示意图}
+	\label{GD}
+\end{figure}
 
 
 
@@ -190,13 +291,6 @@ p_{ij}=p\left( X_{n+1}=i|X_n=j \right) =0 \left( i\notin Adj\left( j \right) \ri
 \end{equation}
 
 其中，Adj(j)表示点阵中与点j相邻的点的集合。
-
-\subsection{模型求解}
-
-
-
-
-
 
 
 \section{本章小结}
