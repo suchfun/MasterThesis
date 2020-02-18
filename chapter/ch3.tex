@@ -1,34 +1,248 @@
-
-\chapter{基于幂级数拟合的分布式轨迹聚类算法}
+\chapter{基于复合采样的的分布式轨迹聚类算法}
 \section{引言}
 
 
-\subsection{时域积分方程时间步进算法产生的阻抗矩阵的特征}
-由于时域混合场积分方程是时域电场积分方程与时域磁场积分方程的线性组合，因此时域混合场积分方程时间步进算法的阻抗矩阵特征与时域电场积分方程时间步进算法的阻抗矩阵特征相同。
+\subsection{问题分析}
+这一节简单介绍我们拟解决的问题。首先是简述基本的网络模型和距离定义，然后是\textbf{隐私相关描述}并给出设计目标。\\
+假设多属地分布式系统中，有k个跨地理分布的属地中心节点，包含一个中心服务器，中心服务器可以由任意一个提交任务的属地服务器担当。每个属地中心节点拥有m条时空轨迹数据。对于每条时空轨迹，其中有n个数据点，表示数据对象经过了n个空间位置。\\
+对于在指定时间内，以恒定时间间隔组成的、包含n个数据点的轨迹，我们通过时空轨迹矩阵T来描述：
 
-\subsection{数值算例与分析}
+\[
+\mathrm{T}=\left[\begin{array}{lll}
+{x_{1}} & {\cdots} & {x_{n}} \\
+{y_{1}} & {\cdots} & {y_{n}} \\
+{t_{1}} & {\cdots} & {t_{n}}
+\end{array}\right]
+\]
 
-如图3-1(a)所示给出了时间步长选取为0.5ns时采用三种不同存储方式计算的平板中心处 方向的感应电流值与IDFT方法计算结果的比较。如图3-1(b)所示给出了存储方式为基权函数压缩存储方式，时间步长分别取时平板中心处 方向的感应电流计算结果，从图中可以看出不同时间步长的计算结果基本相同。
+其中，轨迹T中第i个点的坐标为$(x_i,y_i,t_i)^T$。因为轨迹数据是在指定时间内以恒定时间间隔组成的，轨迹矩阵T可以通过坐标矩阵P来表示：
 
-\begin{algorithm}[H]
- \KwData{this text}
- \KwResult{how to write algorithm with \LaTeX2e }
- initialization\;
- \While{not at end of this document}{
-  read current\;
-  \eIf{understand}{
-   go to next section\;
-   current section becomes this one\;
-   }{
-   go back to the beginning of current section\;
-  }
- }
- \caption{How to write an algorithm.}
-\end{algorithm}
+\[
+P=\left[\begin{array}{lll}
+{x_{1}} & {\dots} & {x_{n}} \\
+{y_{1}} & {\dots} & {y_{n}}
+\end{array}\right]
+\]
 
-由于时域混合场积分方程是时域电场积分方程与时域磁场积分方程的线性组合，因此时域混合场积分方程时间步进算法的阻抗矩阵特征与时域电场积分方程时间步进算法的阻抗矩阵特征相同。
+若现有轨迹a和轨迹b，其对应的坐标矩阵分别为$P_a$和$P_b$，则这两条轨迹空间距离Dist(a,b)定义为：
+% =================距离度量方式的调研和选择
+\textbf{******************可以添加距离度量方式的选择，第四章的距离度量因为是变长的轨迹，所以也对应有不同的选择}\\
 
-\section{时域积分方程时间步进算法矩阵方程的求解}
+\begin{equation}
+\label{ch3dist}
+\Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_{x}^{i}\right)^{2}+\left(a_{y}^{i}-b_{y}^{i}\right)^{2}}
+\end{equation}
+
+其中$a_x^i$表示轨迹a第i个点在x维度上的数值，$a_y^i$表示轨迹a第i个点在y维度上的数值，$b_x^i$ 、$b_y^i$则分别代表轨迹b第i个点在x、y维度上的数值。	\\
+% ==========隐私刻画指标
+\textbf{******************隐私刻画指标}\\
+我们的基本目标是对分布的轨迹数据进行联合处理，快速获取精度的聚类结果，同时减少数据处理的带宽消耗，并保持每条轨迹数据的隐私安全性。为了提高聚类算法的精度，我们采用了ARI指数，其计算方式如式\ref{ARI}ARI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。
+假设每个数据点有2个特征维度，每个属地中心节点拥有的时空数据大小可以定义为IF=2*m*n。同时，在多属地分布式系统中，将必要的信息传输到中心服务器所产生的相应网络流量标记为TF。最后，将网络通信量与总信息量的比值标记为压缩比(compression ratio, CR)，即:
+
+\begin{equation}
+\label{CR}
+\mathrm{CR}=\frac{I F}{T F}
+\end{equation}
+
+
+
+
+
+
+\subsection{基于复合采样的分布式轨迹聚类算法}
+
+\subsubsection{总体流程}
+本文提出了基于复合采样的分布式聚类算法（CSD-Clustering），算法的总体框架如图\ref{cha3frame}所示：
+
+\begin{figure}[h]
+	\includegraphics{ch3frame.png}
+	\caption{CSD-Clustering 算法框架}
+	\label{ch3frame}
+\end{figure}
+
+该算法主要包括四个步骤：首先，属地轨迹建模，在各个属地节点对属地的每条轨迹数据进行预处理和抽样（包含轨迹数量抽样和每条轨迹坐标点抽样），并采用多项式函数拟合各采样轨迹曲线；第二步，局部模型传输，每个属地中心节点将拟合的轨迹函数参数信息发送到中心服务器上。第三步，聚类与反馈，中心服务器根据从接收参数中恢复的轨迹计算聚类结果。最后，属地轨迹聚类，中央服务器将聚类结果返回给每个属地中心节点，最终结果在本地产生。 
+
+
+
+\subsubsection{属地数据预处理}
+属地数据预处理可以分为四个步骤，轨迹数量抽样，轨迹点数抽样，分段和分区。
+\textbf{******************可以添加一张图 }
+
+\subsubsubsection{轨迹数量抽样}
+考虑到更大程度上减少网络中的传输流量和各属地轨迹数据集中存在的数据冗余，属地在对轨迹进行建模前进行轨迹数量上的抽样，但应注意，为了保证全局层面聚类的准确度，分布式平台中的所有属地中心在轨迹数量采样上的采样率应保持一致，且采样的轨迹应具有一定的代表性。可以采用一种VQ算法，比如SOM。\\
+\textbf{******************未完成}
+
+\subsubsubsection{轨迹预处理}
+假设每条轨迹由n个坐标点组成，由于传感器的采样频率一般很高，所以轨迹中相邻点之间的距离相隔很近，针对轨迹拟合问题，适当降低采样频率对于轨迹的大致走势几乎没有影响，为了降低轨迹拟合的计算复杂度，在模型拟合前执行轨迹点数采样，其采样频率对于后续轨迹模型的拟合效果将会有很大的影响。\\
+在轨迹建模阶段前，CSD-Clustering需要将每个轨迹分割成连续的段。其根本原因是，通过函数拟合的曲线必须满足自变量到函数值的唯一映射，当一个自变量对应多个函数值时，函数是无法拟合的。因此，我们采用了轨迹分段的方法，目的是使得轨迹分段曲线任意一个变量中值只对应一个因变量值。
+具体地对于每一个时空轨迹矩阵，均有与其对应的速度轨迹V，其刻画了一段时间段内，物体运动的速度变化轮廓。对于上述时空轨迹矩阵P，V定义如下：
+
+\[\begin{aligned}
+	\text{V}&=\left( \text{v}_1,\text{v}_2,...,\text{v}_{n-1} \right)\\
+	v_i&=\frac{\left( x_{i+1}-x_i,y_{i+1}-y_i \right)}{\varDelta t}\\
+\end{aligned}\]
+
+其中$v_i$是一个向量,V是一个2×(n-1)矩阵。设有一条由n个轨迹点责成的轨迹P，$T={t_1,t_2,...,t_n}$代表轨迹中坐标点对应的时间，对应速度轨迹$V=(v_1,v_2,...,v_{n-1})$，如果轨迹P划分成两段轨迹，分割时间点为$t_i$，则下列式子需要满足：
+\[
+\left\{\begin{array}{c}
+{v_{1} \cdot v_{k}>0 \quad k=1,2, \ldots, i-1} \\
+{v_{1} \cdot v_{i} \leq 0} \\
+{v_{i} \cdot v_{n-1}>0}
+\end{array}\right.
+\]
+这种约束我们称之为速度角约束。整个轨迹将被分割成多个子轨迹段。\\
+假设子轨迹段通过水平平移到其定义域关于y轴对称时（不考虑两段的开闭区间）所对应的真实函数模型为f(x)，我们试图拟合这个子轨迹段的函数记为$$\hat{f}\left( x \right) $$，毫无疑问，我们希望两者在其定义域内应该尽可能的相似。f(x)在x=0处展开的麦克劳伦级数如式\ref{maclaurin}所示，依据其表达式形式可以推出，麦克劳林级数的前n项，即：
+\begin{equation}
+\label{mac_n}
+f\left( x \right) =\sum_{i=0}^n{\frac{f^{\left( i \right)}\left( 0 \right)}{i!}}\left( x \right) ^i
+\end{equation}
+在x=0处的第i阶导数与f(x)相等，所以式\ref{mac_n}在x=0邻域内与f(x)相似度很高，这个邻域范围可以利用幂级数的收敛半径求解方法，若f(x)定义域在其收敛半径内，则一定存在一个幂级数能够很好的拟合f(x)，反之，如果f(x)的定义域超过了其收敛半径所囊括的范围，则$\ref{maclaurin}-f(x)$一定无法收敛，故$\ref{mac_n}-f(x)$也一定无法收敛，所以任意幂级数前n项拟合f(x)时一定存在其第i阶导数与f(x)的第i阶导数不相等，因此这个子轨迹段很难通过幂级数前n项式进行拟合。针对这一现象，我们对子轨迹段进行启发式的分区操作，使得通过存在一个幂级数的前n项式能够较好拟合特定区间的轨迹，即限制子轨迹段的定义域长度。\\
+现假设有子轨迹段$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \dots,\left(x_{N}, y_{N}\right)\right\}$，如果将分段轨迹分成三个轨迹区间：$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \dots,\left(x_{i}, y_{i}\right)\right\}$，$\left\{\left(x_{i+1}, y_{i+1}\right),\left(x_{i+2}, y_{i+2}\right), \ldots,\left(x_{j}, y_{j}\right)\right\}$和$\left\{\left(x_{j+1}, y_{j+1}\right),\left(x_{j+2}, y_{j+2}\right), \dots,\left(x_{N}, y_{N}\right)\right\}$，则分割坐标i和j应满足：
+\[
+\left|x_{i+1}-x_{1}\right|>S\\
+\left|x_{j+1}-x_{i+1}\right|>S
+\]
+其中S是人工设置的阈值。
+
+
+
+\subsubsection{属地轨迹拟合}
+对第i区间含有k个数据点，$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \ldots,\left(x_{k}, y_{k}\right)\right\}$，定义损失函数：
+
+\[
+$\mathrm{L}\left(y_{i}, \mathrm{\hat{f}}\left(x_{i}\right)\right)=\left(\mathrm{y_i}-\mathrm{\hat{f}}\left(x_{i}\right)\right)^{2}$
+\]
+
+其中$\hat{f(x)}$表示轨迹拟合函数模型。\\
+将代价函数定义成经验风险函数：
+\begin{equation}
+\label{ch3costwithoutl1}
+\operatorname{cost}(\mathrm{f})=\frac{1}{k} \sum_{j=1}^{k} \mathrm{L}\left(y_{j}, \mathrm{\hat{f}}\left(x_{j}\right)\right)
+\end{equation}
+
+若$\hat(f)(x)$为n-1次多项式，系数分别为$a_0,a_1,…,a_{n-1}$。
+
+若在此区间使用k-1阶多项式作为轨迹拟合函数模型，即：
+\[
+$\hat{f}\left( \text{x} \right) =a_0+a_1x+\cdots +a_{k-1}x^{k-1}$
+\]
+
+以此拟合该区间的曲线，将区间的k个坐标带入$\hat(f)(x)$可以得到k个等式，将这k个等式写成矩阵形式即：
+
+\[
+\left[\begin{array}{cccc}
+{1} & {x_{1}} & {\dots} & {x_{1}^{k-1}} \\
+{1} & {x_{2}} & {\dots} & {x_{2}^{k-1}} \\
+{\vdots} & {\vdots} & {\ddots} & {\vdots} \\
+{1} & {x_{k}} & {\dots} & {x_{k}^{k-1}}
+\end{array}\right]\left[\begin{array}{c}
+{a_{0}} \\
+{a_{1}} \\
+{\vdots} \\
+{a_{k-1}}
+\end{array}\right]=\left[\begin{array}{c}
+{y_{1}} \\
+{y_{2}} \\
+{\vdots} \\
+{y_{k}}
+\end{array}\right]
+\]
+
+记上式中的系数矩阵记为A，易得，$|A^T|$为范德蒙德矩阵，由范德蒙德性质可得：
+
+\[
+\left|A^{T}\right|=\prod_{p>q}\left(x_{p}-x_{q}\right)
+\]
+
+由于$\mathrm{x}_{0}, \mathrm{x}_{1}, \dots, \mathrm{x}_{k}$彼此不相等，所以行列式$|A^T| \ne 0$，此时存在唯一一个k-1次多项式能够包含所有数据点，此时用k-1阶多项式$\hat{f}(x)$拟合曲线的经验风险为0，拟合的函数曲线穿过每一个坐标点，而且此时求解模型的所有计算量只需计算出系数矩阵A即可。但由于数据不可避免受到噪音污染，我们并不要求拟合的函数曲线严格穿过每一个坐标点，通过求解线性方程组解得的模型往往复杂度很高，可以通过简单实验验证，我们假设在$y=x^2$附近取9个点，通过以上求解线性方程组的方法可以得到一个8阶的多项式，拟合的8阶多项式可以通过所有坐标点，但函数形式却过于复杂，如图\ref{empire0}：
+
+\begin{figure}[h]
+	\includegraphics{empire0.png}
+	\caption{无正则化拟合}
+	\label{empire0}
+\end{figure}
+
+而如果我们使用0阶多项式，即常数函数去拟合这条曲线是，此时经验风险非常大，而拟合函数复杂度则很小。为了在满足模型拟合精度的同时避免模型复杂度过高，我们借助最优化理论思想采用经验风险加正则化项的方式，于是代价函数定义为：
+
+\begin{equation}
+\label{ch3costL1}
+\operatorname{cost}(\mathrm{\hat{f}})=\frac{1}{k} \sum_{j=1}^{k} \mathrm{L}\left(y_{j}, \mathrm{\hat{f}}\left(x_{j}\right)\right)+\mathrm{C} * J(\hat{f})
+\end{equation}
+
+式\ref{ch3costL1}前一项是经验风险，后一项$J(\hat{f})$则是正则化项，也称作结构风险,用来表示轨迹拟合函数$\hat{f}(x)$的复杂度，C为常量，用来调整两者之间关系，若C=0，则代价函数退化成经验损失函数，若C取值很大，则函数模型倾向于选择更简单的模型而不顾拟合准确度。\\
+
+我们使用参数向量的第一范数来定义$f(\hat{f})$，即：
+
+\[
+J(\heat{f})=\sum_{i}^{k}\left|a_{i}\right|_2^2
+\]
+
+
+综上，优化目标定义为：
+
+\begin{equation}
+\label{ch3min}
+\min \frac{1}{N\left( i \right)}\sum_{j=1}^{N\left( i \right)}{\text{L}}\left( y_i,\text{\hat{f}}_i\left( x_j \right) \right) +\text{C}*J\left( \hat{f}_i \right) 
+\end{equation}
+
+其中N(i)表示第i区间数据点的个数，$\hat{f}_i(x)$则表示第i区间多项式拟合函数，其多项式次数为N(i-1)。此类问题属于无约束优化问题，可以采用最速下降来求解局部极小值。\\
+
+以上方法可以通过另一个角度解释，我们可以将上式看成一般岭回归的形式：
+\[
+\min _{w}\|X w-y\|_{2}^{2}+\alpha\|w\|_{2}^{2}
+\]
+
+我们只是指定了一个明确映射形式的高维映射$\varPhi \left( x \right) =\left( 1,x,x^2,...,x^{k-1} \right) $，故我们求解问题等同于一个指定高维映射的岭回归问题，我们可以通过求解核岭回归的方式求解文中的优化问题，而且核岭回归的求解问题是存在闭式解的，因此可以加快拟合的速度。\\
+
+将通过以上方法可以得到指定区间的函数参数。为了在中心节点能够还原出轨迹数据，除了传递函数参数信息，还需要传输必要的元信息，将元数据和参数信息打包形成的数据结构成为基于复合采样的轨迹数据单元（CSTD-Unit），其格式如下：
+
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline ID&StartX&StartY&EndX&EndY&Parament\\
+\hline
+\end{tabular}
+
+数据格式字段含义如下：\\
+
+\begin{itemize}
+\item \mathbf{ID}：此字段包含了属节点编号、轨迹编号、所处区间
+\item \mathbf{StartX}：此区间x轴上最小值
+\item \mathbf{StartY}：此区间x轴上最小值对应的y值
+\item \mathbf{StartX}：此区间x轴上最大值
+\item \mathbf{StartX}：此区间x轴上最大值对应的y值
+\item \mathbf{Parament}：此区间轨迹拟合函数参数
+\end{itemize}
+
+各个计算节点把轨迹所有分区坐标信息转化成许多CSTD-Unit传递给中心节点，中心节点通过这种特殊的数据结构能够将轨迹数据进行还原。
+
+
+\subsubsection{综合模型求解和模型回传}
+
+在接收到信息后，中心服务器根据各个计算节点传输的CSTD-Unit数据结构还原轨迹拟合函数，然后在还原出来的轨迹函数上依照原始数据的采样频率进行等间隔抽样，得到还原出的数据点，以此组成还原数据。将恢复的轨迹数据集输入到聚类模型中，本文选择的是K-means++算法，在第二章中描述了k-means算法的具体流程，k-means++只是在k-means基础上针对开始k个均值向量的初始化提供了具体的方法。k-means++方法，尽可能地使初始聚类中心分散开。这种方法首先随机产生一个初始聚类中心点，然后按照概率$P=\omega \sum_i{\left( x-c_i \right) ^2}$选取其他的聚类中心点。其中$\omega$是归一化系数。\\
+对于k值的选择，在上面的讨论中，我们一直把k当做已经给定的参数。但是在实际操作中，聚类类别数通常都是未知的。如何确定超参数k我们采用如下方法。\\
+
+我们可以使用不同的k值进行试验，并作出不同试验收敛后目标函数随k的变化，将k值趋向稳定时的值作为我们的超参数。如下图\ref{chooseK}所示，分别使用1到7之间的几个数字作为k值，曲线在k=3处有一个较为明显的弯曲点。故确定k取值为3。\\
+
+\begin{figure}[h]
+	\includegraphics{chooseK.png}
+	\caption{k值选择}
+	\label{chooseK}
+\end{figure}
+
+\textbf{******************可以添加自定义距离下k-means算法的收敛性证明}
+
+
+中心服务器计算出k个均值向量后，将k个均值向量回传给各个计算节点，当计算节点侦查到新轨迹时，判断其与回传的k个均值向量的距离来判定是否为异常轨迹：若新轨迹与所有均值向量距离都超过了设定的阈值，则可以判定为轨迹为异常轨迹。
+
+
+
+
+
+
+\section{实验与分析}
+\subsection{理论分析}
+\textbf{******************时间复杂度分析，带宽分析，隐私分析}
+
+\subsection{实验与分析}
+
 
 \section{本章小结}
-本章首先研究了时域积分方程时间步进算法的阻抗元素精确计算技术，分别采用DUFFY变换法与卷积积分精度计算法计算时域阻抗元素，通过算例验证了计算方法的高精度。
