@@ -2,6 +2,9 @@
 \section{引言}
 
 
+
+\section{基于复合采样的的分布式轨迹聚类算法}
+
 \subsection{问题分析}
 这一节简单介绍我们拟解决的问题。首先是简述基本的网络模型和距离定义，然后是\textbf{隐私相关描述}并给出设计目标。\\
 假设多属地分布式系统中，有k个跨地理分布的属地中心节点，包含一个中心服务器，中心服务器可以由任意一个提交任务的属地服务器担当。每个属地中心节点拥有m条时空轨迹数据。对于每条时空轨迹，其中有n个数据点，表示数据对象经过了n个空间位置。\\
@@ -243,6 +246,71 @@ J(\heat{f})=\sum_{i}^{k}\left|a_{i}\right|_2^2
 \textbf{******************时间复杂度分析，带宽分析，隐私分析}
 
 \subsection{实验与分析}
+实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了时间、位置x、位置y、人物id等字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了4939条轨迹作为原始数据集，每条轨迹包含500个点。\\
+实验系统由四个属地中心节点和一个中心节点组成。将该算法与两种聚类方法baseline进行了比较。第一种算法对整个数据集执行标准的DBSCAN 算法(baseline I)，而第二种算法直接将抽样的轨迹传输到中心服务器进行聚类(baseline II)，总带宽与我们的算法相同。baseline I的结果为最优结果。\\
+评估实验结果采用两个指标：CR，表示算法的数据压缩能力；ARI，表示聚类结果的精度。\\
 
+在拟合轨迹曲线前，需要为轨迹区间划分阶段的参数S赋值及拟合轨迹曲线上的结构风险惩罚系数C赋值。\\
+首先对惩罚系数C赋值不同，观察拟合曲线的变化。我们保持轨迹间隔相同，并将C的值设置为0.001、1100、10000。结果如图\ref{differentC}所示。
+
+\begin{figure}[h]
+	\includegraphics{differentC.png}
+	\caption{变量C不同取值的结果}
+	\label{differentC}
+\end{figure}
+
+从图\ref{differentC}可以看出，随着C值的减小，拟合性能得到改善。然而，当C越来越小时，模型的结构也变得更加复杂。\\
+然后观察不同参数S对轨迹曲线拟合的影响。我们选择相同的轨迹区间，令S=12和5。结果如图\ref{differentS}所示。
+
+\begin{figure}[h]
+	\includegraphics{differentS.png}
+	\caption{变量S不同取值的结果}
+	\label{differentS}
+\end{figure}
+
+从图\ref{differentS}可以看出，上面的那幅图显示当S=12时，拟合曲线的X∈(6,20),下面那幅图显示当S=5时，拟合曲线的X∈(15,20),根据这个结果可以看出，当S越小，曲线拟合得越好。
+
+\textbf{******************增加选择k值的实验}
+
+关于聚类效果，我们设定参数S的取值为5，C取值为1。在聚类过程中，我们将K的值设为**************。
+
+此处我们固定α=1，为β设置不同值。根据表\ref{differentCYL}，随着β的增加，聚类算法baseline II的结果逐渐接近baseline I。然而，更高的ARI值会造成CR值变低，导致消耗更多的网络带宽。\\
+随着β的增加，CSD-Clustering聚类的ARI值起初上升然后稍微降低。下降的原因是朗格现象。虽然我们也采取了相应的措施，只是减轻了朗格现象的影响，而不是消除它。当β相同时，我们的算法在ARI值和CR两个指标上表现比baseline2要好。
+
+\begin{table}[]
+\label{differentCYL}
+\caption{不同采样率对比}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}beta\\ \\ 评价指标\end{tabular}} & \multicolumn{2}{c|}{0.1}     & \multicolumn{2}{c|}{0.3}     & \multicolumn{2}{c|}{0.5}     \\ \cline{2-7} 
+                                                                        & baseline II & CSD-Clustering & baseline II & CSD-Clustering & baseline II & CSD-Clustering \\ \hline
+ARI                                                                     & 0.79        & 0.81           & 0.80        & 0.93           & 0.81        & 0.91           \\ \hline
+CR                                                                      & 10          & 20             & 3.33        & 6.67           & 2           & 4              \\ \hline
+\end{tabular}
+\end{table}
+
+
+从表\ref{sameDK}可以看出，baseline II和CSD-Clustering算法在有相同CR值时，我们的算法精度更高。此外，我们的算法避免了原始数据的网络传输，保护了数据的隐私。
+\begin{table}[]
+\label{sameDK}
+\caption{相同带宽下的对比实验}
+\begin{tabular}{|c|c|c|}
+\hline
+\multirow{2}{*}{评价指标} & \multicolumn{2}{c|}{实验组}     \\ \cline{2-3} 
+                      & baseline II & CSD-Clustering \\ \hline
+ARI                   & 0.795       & 0.926          \\ \hline
+CR                    & 10          & 10             \\ \hline
+\end{tabular}
+\end{table}
+
+然后我们测试轨迹数量采样率对实验的影响。\\
+此处，设定β=0.2，为α设置不同值来验证不同采样大小的影响。从图\ref{differentALPHA}可以看出，随着α的增加，聚类的精度也不断增加。同时，随着α的增加，模型会逐渐收敛，带宽消耗的效率较低。\\
+
+\begin{figure}[h]
+	\includegraphics{differentALPHA.png}
+	\caption{不同α取值下CSD-Clustering算法的结果}
+	\label{differentALPHA}
+\end{figure}
 
 \section{本章小结}
+本文提出了一种新型的分布式聚类方案，该方案具有节约带宽和保护隐私两方面的优点。网络带宽的降低主要来自三个方面:轨迹集合上的采样，每个轨迹内的部分采样，轨迹模型的拟合函数。此外，该方案还有效地避免了原始数据和直接相关结构信息的传输，加强了隐私保护。评价结果验证了该方法的有效性。在以后的工作中，我们将重点对我们的方案进行理论分析，以及不同服务器之间的公平性。
