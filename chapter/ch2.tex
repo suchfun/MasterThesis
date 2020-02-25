@@ -1,5 +1,5 @@
 \chapter{相关理论与技术}
-概论
+\section{概论}
 
 \section{聚类算法}
 聚类算法是一种无监督学习算法，及数据集中的每个数据项不带有标签信息，通过统计分析技术将数据集分成不同的子集或簇，使得分到同一子集或簇的成员对象都有某种相似的特征。这种技术被广泛应用与各个领域，包括机器学习、数据挖掘、模式识别等。
@@ -8,7 +8,7 @@
 
 \subsubsection{算法流程及复杂度分析}
 现有样本集$D=\left\{x_1,x_2,...,x_m\}\right\}$，K-Means算法将数据集划分成互不相交的K个簇$C=\left\{C_1,C_2,...,C_K\}\right\}$,且满足$C_1\bigcup{C_2\bigcup{...\bigcup{C_m=D}}}$，每个簇的簇心$\mu _i=\frac{1}{|C_i|}\sum_{\mathbf{x}\in C_i}{\mathbf{x}}$。
-其流程如下：
+其流程如下：\\
 \begin{algorithm}[H]
 	 \KwData{样本集$D=\left\{x_1,x_2,...,x_m\}\right\}$，簇个数K}
 	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_k\}\right\}$}
@@ -40,7 +40,7 @@
 一类是将聚类结果与某个“参考模型”进行比较，度量这种比较结果的评估指标称为“外部指标”；另一类是直接评估聚类效果本身，不参考任何其他模型，这种评估指标称为“内部指标”。
 
 \subsubsection{外部指标}
-假设通过聚类算法将数据集D划分成簇集$C=\left\{C_1,C_2,...,C_K\}\right\}$，参考模型将数据集D划分的簇集$C^*=\left\{ C_{1}^{*},C_{2}^{*},...,C_{K}^{*} \right\} $，相应地，令$\lambada$和$\lambada^{*}$分别表示与C和$C^{*}$对应的簇标记。我们将样本两两配对，定义：
+假设通过聚类算法将数据集D划分成簇集$C=\left\{C_1,C_2,...,C_K\}\right\}$，参考模型将数据集D划分的簇集$C^*=\left\{ C_{1}^{*},C_{2}^{*},...,C_{K}^{*} \right\} $，相应地，令$\lambda$和$\lambda^{*}$分别表示与C和$C^{*}$对应的簇标记。我们将样本两两配对，定义：
 
 \begin{equation}
 \label{abcd}
@@ -54,15 +54,14 @@
 
 其中集合SS包含了在C中隶属于相同簇且在$C^{*}$中也隶属于相同簇的样本对，集合SD包含了在C中隶属于相同簇但在$C^{*}$中隶属于不同簇的样本对，......由于样本对$\left(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}\right)(i<j)$仅能出现在一个集合中，因此有$a+b+c+d=m(m-1) / 2$成立。\\
 基于\ref{abcd}，可引出Rand指数的定义：
-
 \begin{equation}
 \label{RI}
 \mathrm{RI}=\frac{2(a+d)}{m(m-1)}
 \end{equation}
 
 但是Rand指数对于不同聚类结果的区分度不高，于是基于Rand指数，提出了Adjusted Rand Index\citing{rand1971objective}。
-
-$\begin{matrix}{c|ccccc}
+\[
+\begin{matrix}{c|ccccc}
 	&		C_{1}^{*}&		C_{2}^{*}&		\dots&		C_{S}^{*}&		\,\,\text{Sums}\\
 	\hline
 	C_1&		n_{11}&		n_{12}&		\dots&		n_{1S}&		a_1\\
@@ -70,10 +69,10 @@ $\begin{matrix}{c|ccccc}
 	\vdots&		\vdots&		\vdots&		\ddots&		\vdots&		\vdots\\
 	C_K&		n_{K1}&		n_{K2}&		\cdots&		n_{KS}&		a_K\\
 	\,\,\text{Sums}&		b_1&		b_2&		\dots&		b_S&		\\
-\end{matrix}$
+\end{matrix}
+\]
 
 其中$n_{ij}$表示簇$C_{i}$和簇$C_{i}^{*}$之间共同存在的对象个数，即$n_{i j}=\left|X_{i} \cap Y_{j}\right|$。ARI指数定义如下：
-
 \begin{equation}
 \label{ARI}
 ARI=\frac{\sum_{ij}{\left( \begin{array}{c}
@@ -110,7 +109,6 @@ ARI=\frac{\sum_{ij}{\left( \begin{array}{c}
 \subsubsection{内部指标}
 
 若直接评估聚类结果本身，则需要考虑内部指标，同样设定聚类算法得到的簇划分为$C=\left\{C_1,C_2,...,C_K\}\right\}$。在定义内部指标之前，先定义几种距离公式：
-
 \begin{equation}
 \label{distance}
 \begin{aligned}
@@ -121,14 +119,13 @@ d_{cen}\left(C_{i}, C_{j}\right) &=dist\left(\mu_{i}, \mu_{j}\right)
 \end{aligned}
 \end{equation}
 
-其中，dist(.)用于计算两个样本之间的距离；$\mu$代表簇C的中心点。avg(C)对应于簇C内样本间的平均距离，diam(C)对应于簇C内样本间的最远距离，$d_{\min }\left(C_{i}, C_{j}\right)$对应于簇$C_i$与簇$C_j$最近样本间的距离，$d_{cen}\left(C_{i}, C_{j}\right)$对应于簇$C_i$与簇$C_j$中心点间的距离。\\
-基于\ref{distance}可引出以下两种常用内部指标：
+其中，dist(.)用于计算两个样本之间的距离；$\mu$代表簇C的中心点。avg(C)对应于簇C内样本间的平均距离，diam(C)对应于簇C内样本间的最远距离，$d_{\min }\left(C_{i}, C_{j}\right)$对应于簇$C_i$与簇$C_j$最近样本间的距离，$d_{cen}\left(C_{i}, C_{j}\right)$对应于簇$C_i$与簇$C_j$中心点间的距离。
 
+基于\ref{distance}可引出以下两种常用内部指标：
 \begin{equation}
 \label{DBI}
 DBI=\frac{1}{k} \sum_{i=1}^{k} \max _{j \neq i}\left(\frac{\operatorname{avg}\left(C_{i}\right)+\operatorname{avg}\left(C_{j}\right)}{d_{\operatorname{con}}\left(\mu_{i}, \mu_{j}\right)}\right)
 \end{equation}
-
 \begin{equation}
 \label{DI}
 DI=\min _{1 \leqslant i \leqslant k}\left\{\min _{j \neq i}\left(\frac{d_{\min }\left(C_{i}, C_{j}\right)}{\max _{1 \leqslant l \leqslant k} \operatorname{diam}\left(C_{l}\right)}\right)\right\}
@@ -136,15 +133,13 @@ DI=\min _{1 \leqslant i \leqslant k}\left\{\min _{j \neq i}\left(\frac{d_{\min }
 
 DBI的值越小表示聚类效果越好，DI相反，其值越大表示聚类效果更好。
 
-
-
 \section{*********************矩阵稀疏表示}
-
 
 \section{多项式拟合}
 轨迹数据中的每条轨迹一般是由若干个点组成，有时需要通过这若干个点来拟合轨迹曲线，本文使用多项式来实现轨迹的拟合。
 \subsection{理论基础}
-在二维空间里，一条轨迹由n个点组成：$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \dots,\left(x_{k}, y_{k}\right)\right\}$，若轨迹对应的函数为$f(x)$，多项式拟合则试图通过多项式来近似$f(x)$，n-1阶多项式的形式为$g\left( x \right) =a_0+a_1x+\cdots +a_{n-1}x^{n-1}$。\\
+在二维空间里，一条轨迹由n个点组成：$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \dots,\left(x_{k}, y_{k}\right)\right\}$，若轨迹对应的函数为$f(x)$，多项式拟合则试图通过多项式来近似$f(x)$，n-1阶多项式的形式为$g\left( x \right) =a_0+a_1x+\cdots +a_{n-1}x^{n-1}$。
+
 若通过n-1阶多项式来对n个坐标点对应的轨迹进行拟合，则将n个点的坐标带入n-1阶多项式可得到n个等式，将这n个等式通过矩阵表示则为：
 \begin{equation}
 \label{vandermonde}
@@ -173,105 +168,104 @@ DBI的值越小表示聚类效果越好，DI相反，其值越大表示聚类效
 	1&		x_n&		\dots&		x_{n}^{n-1}\\
 \end{matrix} \right] $
 ，$\left|A^{T}\right|$则为范德蒙德行列式，故有：
-
 \begin{equation}
 \left|A^{T}\right|=\prod_{p>q}\left(x_{p}-x_{q}\right)
 \end{equation}
 
-若x_0,x_1,…,x_n彼此不相等，故此时存在唯一一个n-1次阶多项式能够包含所有数据点，此时用n-1阶多项式拟合的函数可以经过每一个点。
+若$x_0,x_1,…,x_n$彼此不相等，故此时存在唯一一个n-1次阶多项式能够包含所有数据点，此时用n-1阶多项式拟合的函数可以经过每一个点。
 
 \subsection{麦克劳林级数及其收敛域}
-若函数f(x)在$x_0$的某一个邻域内具有任意阶导数，则幂级数$\sum_{n=0}^{\infty}{\frac{f^{\left( n \right)}\left( x_0 \right)}{n!}}\left( x-x_0 \right) ^n$称为f(x)在$x_0$处的泰勒级数；当$x_0=0$时，此幂级数则称为麦克劳林级数，即$\sum_{n=0}^{\infty}{\frac{f^{\left( n \right)}\left( 0 \right)}{n!}}\left( x \right) ^n$。\\
-假设f(x)在$x_0=0$处的麦克劳林级数收敛于f(x)，即当$n\rightarrow \infty $时，f(x)在$x_0=0$处的麦克劳林公式的余项$R_n(x)$对邻域中的点趋于0。此时，则有：
+若函数f(x)在$x_0$的某一个邻域内具有任意阶导数，则幂级数$\sum_{n=0}^{\infty}{\frac{f^{\left( n \right)}\left( x_0 \right)}{n!}}\left( x-x_0 \right) ^n$称为f(x)在$x_0$处的泰勒级数；当$x_0=0$时，此幂级数则称为麦克劳林级数，即$\sum_{n=0}^{\infty}{\frac{f^{\left( n \right)}\left( 0 \right)}{n!}}\left( x \right) ^n$。
 
+假设f(x)在$x_0=0$处的麦克劳林级数收敛于f(x)，即当$n\rightarrow \infty $时，f(x)在$x_0=0$处的麦克劳林公式的余项$R_n(x)$对邻域中的点趋于0。此时，则有：
 \begin{equation}
 \label{maclaurin}
 f\left( x \right) =\sum_{n=0}^{\infty}{\frac{f^{\left( n \right)}\left( 0 \right)}{n!}}\left( x \right) ^n
 \end{equation}
 
-等式\ref{maclaurin}右侧是幂级数，关于幂级数的收敛半径满足阿尔贝定理。\\
-\textbf{阿贝尔定理}：如果幂级数$\sum_{n=0}^{\infty}{a_nx^n}$当$x=x_0(x_0 \ne 0)$时收敛，则对于一切满足$x<|x_0|$的x，幂级数$\sum_{n=0}^{\infty}{a_nx^n}$均绝对收敛；如果幂级数$\sum_{n=0}^{\infty}{a_nx^n}$在$x=x_1$处发散，则对于一切$x>|x_1|$的x，幂级数$\sum_{n=0}^{\infty}{a_nx^n}$均发散。\\
+等式\ref{maclaurin}右侧是幂级数，关于幂级数的收敛半径满足阿尔贝定理。
+
+\textbf{阿贝尔定理}：如果幂级数$\sum_{n=0}^{\infty}{a_nx^n}$当$x=x_0(x_0 \ne 0)$时收敛，则对于一切满足$x<|x_0|$的x，幂级数$\sum_{n=0}^{\infty}{a_nx^n}$均绝对收敛；如果幂级数$\sum_{n=0}^{\infty}{a_nx^n}$在$x=x_1$处发散，则对于一切$x>|x_1|$的x，幂级数$\sum_{n=0}^{\infty}{a_nx^n}$均发散。
+
 因此我们依据\ref{maclaurin}和阿贝尔定理可以得到函数f(x)其麦克劳林级数的收敛域。
 
-
-
-
-
 \section{最优化理论}
-很过机器学习问题在求解过程中面对的都是在指定约束条件下的最优化问题，其一般形式如下：
-
-\begin{equation}
-minimize \quad f_{0}(x)$ \\$s.t. \quad f_{i}(x) \leq 0, \quad i=1, \ldots, m
-\end{equation}
+很多机器学习问题在求解过程中面对的都是在指定约束条件下的最优化问题，其一般形式如下：
+\[
+minimize\quad f_0\left( x \right) \\
+s.t.\quad f_i\left( x \right) \le 0,\quad i=1,...,m
+\]
 
 其中$f_0(x)$称为目标函数，$f_{i}(x) \leq 0, \quad i=1, \ldots, m$称为约束函数。若优化问题没有任何约束函数，则称此优化问题为无约束优化问题。
 
 \subsection{经验误差与正则化}
 在机器学习中，优化目标一般称为代价函数，代价函数一般与所训练的模型$\hat{f}\left( x \right) $在训练集上的误差相关，学得的模型$\hat{f}\left( x \right) $在训练集上的误差称为经验误差，经验误差是模型$\hat{f}\left( x \right) $关于训练集的平均损失：
-
 \[
 R_{\text{emg}}\left( \hat{f} \right) =\frac{1}{N}\sum_{i=1}^N{L}\left( y_i,\hat{f}\left( x_i \right) \right) 
 \]
 
-其中，$L\left( y_i,\hat{f}\left( x_i \right) \right) $表示在样本$x_i$上，模型$\hat{f}\left( x_i \right)来判断输出的损失度量。\\
+其中，$L\left( y_i,\hat{f}\left( x_i \right) \right) $表示在样本$x_i$上，模型$\hat{f}\left( x_i \right)$来判断输出的损失度量。
 
 如果只追求训练得到的模型$\hat{f}\left( x \right) $使得经验损失尽可能得小，意味着模型$\hat{f}\left( x \right) $在训练集上表现得很好，但是往往会因为模型$\hat{f}\left( x \right) $的复杂度过高而导致对未知数据的预测能力很差，即所谓的泛化能力很差，这种现象称为过拟合，为了防止过拟合现象的出现，人们往往给经验损失添加一个正则项，这种优化经验损失和正则项的方法称为正则化，正则化一般有如下形式：
-
 \begin{equation}
 \label{regularization}
 \min_{\hat{f}\in \mathcal{F}} \frac{1}{N}\sum_{i=1}^N{L}\left( y_i,\hat{f}\left( x_i \right) \right) +\lambda J\left( \hat{f} \right) 
-\end{eqaution}
+\end{equation}
 
-其中，第一项是经验风险，第二项是正则项，$\lambda \geqslant 0$为调整两者之间关系的系数。\\
+其中，第一项是经验风险，第二项是正则项，$\lambda \geqslant 0$为调整两者之间关系的系数。
+
 正则化可以取不同的形式，最常见两种是$L_1$范数和$L_2$范数。$L_1$范数表示为：
-\[L\left( w \right) =\frac{1}{N}\sum_{i=1}^N{\left( \hat{f}\left( x_i;w \right) -y_i \right) ^2}+\lambda |w|_1$\]
+\[
+L\left( w \right) =\frac{1}{N}\sum_{i=1}^N{\left( \hat{f}\left( x_i;w \right) -y_i \right) ^2}+\lambda |w|_1
+\]
+
 这里，$|w|_1$表示参数向量的$L_1$范数。$L_2$范数表示为：
 \[L\left( w \right) =\frac{1}{N}\sum_{i=1}^N{\left( \hat{f}\left( x_i;w \right) -y_i \right) ^2}+\frac{\lambda}{2}|w|^2\]
-这里，$|w|_2$表示参数向量的$L_2$范数。\\
+
+这里，$|w|_2$表示参数向量的$L_2$范数。
+
 正则化符合奥卡姆剃刀原理：在所有可能选择的模型中，能够很好的解释已知数据并且十分简单的才是最好的模型。
 
-
 \subsection{梯度下降法}
-梯度下降法是求解无约束优化问题的一种方法，若函数可微，从函数的任意一点，通过梯度下降法可以找到函数的局部极小值。\\
+梯度下降法是求解无约束优化问题的一种方法，若函数可微，从函数的任意一点，通过梯度下降法可以找到函数的局部极小值。
+
 梯度下降方法基于以下的观察：如果实值函数F(\textbf{x})在点\textbf{a}处可微且有定义，那么函数F(\textbf{x})在\textbf{a}点沿着梯度相反的方向$-\nabla F(\mathbf{a})$下降最快。因而，如果
 \[\mathbf{b}=\mathbf{a}-\gamma \nabla F\left( \mathbf{a} \right) \]
-对于\gamma >0为一个够小数值时成立，那么$F(\mathbf{a})\geq F(\mathbf{b})$。\\
-考虑到这一点，我们可以从函数F的局部极小值的初始估计$\mathbf{x}_0$出发，并考虑如下序列$\mathbf{x}_{0}, \mathbf{x}_{1}, \mathbf{x}_{2}, \dots$使得
+对于$\gamma$ >0为一个够小数值时成立，那么$F(\mathbf{a})\geq F(\mathbf{b})$。
 
-\[\mathbf{x}_{n+1}=\mathbf{x}_n-\gamma_n \nabla F(\mathbf{x}_n),\ n \ge 0\]
+考虑到这一点，我们可以从函数F的局部极小值的初始估计$\mathbf{x}_0$出发，并考虑如下序列$\mathbf{x}_{0}, \mathbf{x}_{1}, \mathbf{x}_{2}, \dots$使得
+\[
+\mathbf{x}_{n+1}=\mathbf{x}_n-\gamma_n \nabla F(\mathbf{x}_n),\ n \ge 0
+\]
 
 因此可得到
+\[
+F(\mathbf{x}_{0})\geq F(\mathbf{x})_{1})\geq F(\mathbf{x})_{2})\geq \cdots
+\]
 
-\[F(\mathbf{x}_{0})\geq F(\mathbf{x})_{1})\geq F(\mathbf{x})_{2})\geq \cdots\]
-
-如果顺利的话序列{\textbf{x}_n}收敛到期望的局部极小值。注意每次迭代步长\gamma 可以改变。
+如果顺利的话序列${\textbf{x}_n}$收敛到期望的局部极小值。注意每次迭代步长$\gamma$ 可以改变。
 
 图\ref{GD}示例了这一过程，这里假设F定义在平面上，并且函数图像是一个碗形。蓝色的曲线是等高线。红色的箭头指向该点梯度的反方向。沿着梯度下降方向，将最终到达碗底，即函数F局部极小值的点。
-
 \begin{figure}[h]
-	\includegraphics{GD.png}
+	\includegraphics[height=4.5cm,width=7.5cm]{GD.png}
 	\caption{梯度下降示意图}
 	\label{GD}
 \end{figure}
 
 
-
-
-
 \section{马尔科夫链理论}
 
 \subsection{模型简介}
+
 马尔可夫链，又称离散时间马可夫链\citing{norris1998markov}，
 是状态空间中从一个状态到另一个状态的转换的随机过程，该过程要求具备“无记忆”的性质：下一状态的概率分布只能由当前状态决定，在时间序列中它前面的事件均与之无关。这种特定类型的“无记忆性”称作马可夫性质。马尔科夫链作为实际过程的统计模型具有许多应用。\\
 马尔可夫链中的每一步，可以依据概率分别从一个状态转移到另一状态，与状态之间改变相关的概率叫做转移概率。已知满足马尔可夫性质的随机变量序列X1，X2，X3，...，依据马尔科夫性质的“无记忆性”有：
-
 \begin{equation}
 \label{markov_nature}
 p\left(X_{n+1}=x | X_{1}=x_{1}, X_{2}=x_{2}, \ldots, X_{n}=x_{n}\right)=p\left(X_{n+1}=x | X_{n}=x_{n}\right)
 \end{equation}
 
 当转移概率与n无关时，则称此马尔科夫链是时齐马尔科夫链，本文后续提出的模型是建立在时齐马尔科夫链模型基础上构建的。时齐马尔科夫链满足：
-
 \begin{equation}
 \label{time_homogeneity}
 p\left(X_{n+1}=x | X_{n}=y\right)=p\left(X_{n}=x | X_{n-1}=y\right)
@@ -279,7 +273,8 @@ p\left(X_{n+1}=x | X_{n}=y\right)=p\left(X_{n}=x | X_{n-1}=y\right)
 
 
 \subsubsection{随机游走}
-随机游走是一种数学统计模型，它是一连串的轨迹所组成，其中每一次都是随机的。一种较常见的随机游走模型是在规则点阵上进行，称为点阵随机游走。在每一步中，标记的位置根据特定的概率分布从一点跳到另一个点。在简单点阵随机游走中，每一点只能跳到点阵中的相邻位置，形成点阵路径。\\
+随机游走是一种数学统计模型，它是一连串的轨迹所组成，其中每一次都是随机的。一种较常见的随机游走模型是在规则点阵上进行，称为点阵随机游走。在每一步中，标记的位置根据特定的概率分布从一点跳到另一个点。在简单点阵随机游走中，每一点只能跳到点阵中的相邻位置，形成点阵路径。
+
 设定简单点阵随机游走是时齐的，其转移概率除了满足\ref{time_homogeneity}，还满足：
 
 \begin{equation}
@@ -290,7 +285,6 @@ p_{ij}=p\left( X_{n+1}=i|X_n=j \right) =0 \left( i\notin Adj\left( j \right) \ri
 \end{equation}
 
 其中，Adj(j)表示点阵中与点j相邻的点的集合。
-
 
 \section{本章小结}
 
