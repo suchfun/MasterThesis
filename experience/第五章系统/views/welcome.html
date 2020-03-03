@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script th:src="@{/resources/js/jquery-3.3.1.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/bootstrap.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/bootstrap-treeview.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/computing_viewer.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/jquery.dataTables.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/task_list.js}" type="text/javascript"></script>
+    <!--    <script th:src="@{/resources/js/polling_overallState.js}"-->
+    <!--            type="text/javascript"></script>-->
+    <script th:src="@{/resources/js/dataTables.bootstrap.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/d3.min.js}"
+            type="text/javascript"></script>
+    <!--<script th:src="@{/resources/js/task_res_pic.js}"
+        type="text/javascript"></script>-->
+    <link rel="stylesheet"
+          th:href="@{/resources/css/bootstrap.min.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/css/dataTables.bootstrap.min.css}">
+    <style>
+        .container-fluid {
+            background-color:#239FAC;
+        }
+
+
+
+    </style>
+
+    <link rel="stylesheet" th:href="@{/resources/css/main.css}">
+    <title>welcome</title>
+
+</head>
+<body>
+
+<div class="container-fluid">
+    <div id="title" align="center" >
+        <h1 style="color:white; height: 100px "class="text-center">基于区块链的多中心属地化数据价值共享平台展示系统</h1>
+    </div>
+
+        <div style=" width : 90% ;margin:0 auto">
+            <button class="btn btn-success" style="float: right"
+                    onclick="window.location.href='http://localhost:8080/in_sute_demo/demo'"> 进入系统</button>
+
+            <h2 style="color:white; height: 40px  ;text-align: center">欢迎您使用本系统!</h2>
+
+        </div>
+    <div style="height: 2000px  ; width : 90% ;margin:0 auto ;background-color:white">
+
+        <div class="itm text-center" id="pic1" style=" height: 400px; width : 90% ;margin:0 auto ">
+
+            <svg  width="400" height="400"></svg>
+
+        </div>
+        <div >
+            <h4 style="color:black; height: 10px "class="text-center">属地中心上线数(3)/属地中心总数(4)</h4>
+        </div>
+        <div class="itm text-center" id="pic2" style=" height: 300px; width : 90% ;margin:0 auto ">
+
+        </div>
+        <div >
+            <div>
+                <h4 style="color:black; height: 10px "class="text-center">知识产出数(近一周)</h4>
+            </div>
+        </div>
+        <div class="text-center" id="pic3" style=" height: 400px; width : 90% ;margin:0 auto ">
+
+            <svg id="svg2" width="400" height="400"></svg>
+        </div>
+        <div >
+            <h4 style="color:black; height: 10px "class="text-center">系统利用率(61%)</h4>
+        </div>
+    </div>
+
+</div>
+</body>
+<script>
+    $.ajax({
+        type: 'POST',
+        url: '/in_sute_demo/json.do',
+        // data: {
+        // 'creator': creator,
+        // 'dataName': dataName,
+        // 'taskType': taskType
+        //     },
+success: function(data) { // data 保存提交后返回的数据，一般为 json 数据
+    // 此处可对 data 作相关处理
+    if(data==1){
+        alert('提交成功！');
+    }else alert('提交失败')
+        }
+    })
+</script>
+<script>
+
+    var svg = d3.select("#svg2")
+    var width = svg.attr("width")
+    var height = svg.attr("height")
+    var g = svg.append("g")
+
+    var dataset = [ 60, 40];
+
+    //设置一个color的颜色比例尺，为了让不同的扇形呈现不同的颜色
+    var colorScale = d3.scaleOrdinal()
+        .domain(d3.range(dataset.length))
+        .range(d3.schemeCategory10);
+
+    //新建一个饼状图
+    var pie = d3.pie();
+
+    //新建一个弧形生成器
+    var innerRadius = 0;//内半径
+    var outerRadius = 150;//外半径
+    var arc_generator = d3.arc()
+        .innerRadius(0)
+        .outerRadius(150);
+
+    //将原始数据变成可以绘制饼状图的数据，
+    var pieData = pie(dataset);
+
+    //在浏览器的控制台打印pieData
+    console.log(pieData);
+
+    //在有了绘制饼状图必须的数据后，我们就可以开始绘制了
+    var gs = g.selectAll(".g")
+        .data(pieData)
+        .enter()
+        .append("g")
+        .attr("transform","translate("+width/2+","+height/2+")")//位置信息
+
+    //绘制饼状图的各个扇形
+    gs.append("path")
+        .attr("d",function(d){
+            return arc_generator(d);//往弧形生成器中出入数据
+        })
+        .attr("fill",function(d,i){
+            return colorScale(i);
+        });
+    data = [ "系统利用率",""]
+    //绘制饼状图上面的文字信息
+    gs.append("text")
+        .attr("transform",function(d){//位置设在中心处
+            return "translate("+arc_generator.centroid(d)+")";
+        })
+        .attr("text-anchor","middle")
+        .text(function(d,i){
+            return data[i];
+        })
+
+</script >
+<script>
+
+    var svg = d3.select("svg")
+    var width = svg.attr("width")
+    var height = svg.attr("height")
+    var g = svg.append("g")
+
+    var dataset = [ 30 , 10];
+
+    //设置一个color的颜色比例尺，为了让不同的扇形呈现不同的颜色
+    var colorScale = d3.scaleOrdinal()
+        .domain(d3.range(dataset.length))
+        .range(d3.schemeCategory10);
+
+    //新建一个饼状图
+    var pie = d3.pie();
+
+    //新建一个弧形生成器
+    var innerRadius = 0;//内半径
+    var outerRadius = 150;//外半径
+    var arc_generator = d3.arc()
+        .innerRadius(0)
+        .outerRadius(150);
+
+    //将原始数据变成可以绘制饼状图的数据，
+    var pieData = pie(dataset);
+
+    //在浏览器的控制台打印pieData
+    console.log(pieData);
+
+    //在有了绘制饼状图必须的数据后，我们就可以开始绘制了
+    var gs = g.selectAll(".g")
+        .data(pieData)
+        .enter()
+        .append("g")
+        .attr("transform","translate("+width/2+","+height/2+")")//位置信息
+
+    //绘制饼状图的各个扇形
+    gs.append("path")
+        .attr("d",function(d){
+            return arc_generator(d);//往弧形生成器中出入数据
+        })
+        .attr("fill",function(d,i){
+            return colorScale(i);
+        });
+    data = [ "属地中心上线数",""]
+    //绘制饼状图上面的文字信息
+    gs.append("text")
+        .attr("transform",function(d){//位置设在中心处
+            return "translate("+arc_generator.centroid(d)+")";
+        })
+        .attr("text-anchor","middle")
+        .text(function(d,i){
+            return data[i];
+        })
+</script>
+<script>
+    var width=500,height=250,
+        margin={left:50,top:30,right:20,bottom:20},
+        g_width=width-margin.left-margin.right,
+        g_height=height-margin.top-margin.bottom;
+
+    //svg
+    var svg1=d3.select("#pic2").append("svg")
+    //width,height
+        .attr("width",width)
+        .attr("height",height)
+    $("#pic2")
+    {
+        var g = svg1
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    }
+    var data=[1,8,5,6,8,9,3]
+    //Scale
+    var scale_x=d3.scaleLinear()
+        .domain([0,data.length-1])
+        .range([0,g_width]);
+    var scale_y=d3.scaleLinear()
+        .domain([0,d3.max(data)])
+        .range([g_height,0]);
+
+    //画线函数
+    var line_generator= d3.line()
+        .x(function (d,i) {
+            return scale_x(i);
+        })
+        .y(function (d) {
+            return scale_y(d);
+        })
+        .curve(d3.curveBasis)
+    // .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+    //画路径
+    // g.append("path")
+    //     .attr("d",line_generator(data))
+    //     .attr("stroke", "black")
+    //     .attr("fill", "none")//d="M1,0L20,40.....  d-path data
+
+    //画面积函数
+    var area_generator= d3.area()
+        .x(function (d,i) {
+            return scale_x(i);
+        })
+        .y0(g_height)
+        .y1(function (d) {
+            return scale_y(d);
+        })
+        .curve(d3.curveMonotoneX)
+
+    //画面积
+    g.append("path")
+        .attr("d",area_generator(data)) //d="M1,0L20,40.....  d-path data
+        .style("fill","steelblue")
+
+
+    //X轴
+    g.append("g")
+        .call(d3.axisBottom(scale_x))
+        .attr("transform","translate(0,"+g_height+")")
+
+    //Y轴
+    g.append("g")
+        .call(d3.axisLeft(scale_y))
+
+    //y轴文字
+    g.append("text")
+        .text("Price($)")
+        .attr("transform","rotate(-90)")
+        .attr("dy","1em")
+        .attr("text-anchor","end")
+</script>
+<!--<script>
+
+    var marge = {top:60,bottom:60,left:60,right:60}
+    var svg = d3.select("#svg2");//得到SVG画布
+    var width = svg.attr("width");//得到画布的宽
+    var height = svg.attr("height");//得到画布的长
+    var g = svg.append("g")
+        .attr("transform","translate("+marge.top+","+marge.left+")");
+
+    var dataset = [10,20,30,23,13,40,27];
+
+    var xScale = d3.scaleBand()
+        .domain(d3.range(dataset.length))
+        .rangeRound([0,width-marge.left-marge.right]);
+    var xAxis = d3.axisBottom(xScale);
+
+    var yScale = d3.scaleLinear()
+        .domain([0,d3.max(dataset)])
+        .range([height-marge.top-marge.bottom,0]);
+    var yAxis = d3.axisLeft(yScale);
+
+    g.append("g")
+        .attr("transform","translate("+0+","+(height-marge.top-marge.bottom)+")")
+        .call(xAxis);
+    g.append("g")
+        .attr("transform","translate(0,0)")
+        .call(yAxis);
+
+    //绘制矩形和文字
+    var gs = g.selectAll(".rect")
+        .data(dataset)
+        .enter()
+        .append("g");
+
+    //绘制矩形
+    var rectPadding = 5;//矩形之间的间隙
+    gs.append("rect")
+        .attr("x",function(d,i){
+            return xScale(i)+rectPadding/2;
+        })
+        .attr("y",function(d){
+            return yScale(d);
+        })
+        .attr("width",function(){
+            return xScale.step()-rectPadding;
+        })
+        .attr("height",function(d){
+            return height-marge.top-marge.bottom-yScale(d);
+        })
+        .attr("fill","orange");
+    //绘制文字
+    gs.append("text")
+        .attr("x",function(d,i){
+            return xScale(i)+rectPadding/2;
+        })
+        .attr("y",function(d){
+            return yScale(d);
+        })
+        .attr("dx",function(){
+            (xScale.step()-rectPadding)/2;
+        })
+        .attr("dy",20)
+        .text(function(d){
+            return d;
+        })
+    </script>-->
+</html>

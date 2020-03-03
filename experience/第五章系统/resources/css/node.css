@@ -1,0 +1,619 @@
+/**
+ * 使文本在鼠标拖动时不被选中
+ */
+body {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+/**
+ * 开始节点
+ */
+.startNode {
+	background-color: rgb(120, 220, 107);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 50%;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 30px;
+	/* 宽度 */
+	width: 30px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 30px;
+	/* 设置字间距 */
+	/*letter-spacing: 2px;*/
+	/* 背景渐变 */
+	/*background: linear-gradient(to right, rgb(120, 220, 107, 0.9), rgb(120, 220, 107, 0.8), rgb(120, 220, 107, 0.9));*/
+	/*background: -ms-linear-gradient(rgba(120, 220, 107, 0.9), rgba(120, 220, 107, 0.9));*/
+	/* 层叠顺序 */
+	z-index: 26;
+	display: table;
+}
+/**
+ * 过滤节点
+ */
+.filter{
+	background-color: rgb(107, 171, 220);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 10px;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 30px;
+	/* 宽度 */
+	width: 30px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 40px;
+	/* 设置字间距 */
+	/*letter-spacing: 2px;*/
+	/* 背景渐变 */
+	/*background: linear-gradient(to right, rgb(107, 171, 220, 0.9), rgb(107, 171, 220, 0.8), rgb(107, 171, 220, 0.9));
+	background: -ms-linear-gradient(rgba(107, 171, 220, 0.9), rgba(107, 171, 220, 0.9));*/
+	/* 层叠顺序 */
+	z-index: 26;
+	display: table;
+}
+/**
+ * 接续节点
+ */
+.continue{
+	background-color: rgb(107, 171, 220);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 10px;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 30px;
+	/* 宽度 */
+	width: 30px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 40px;
+	/* 设置字间距 */
+	/*letter-spacing: 2px;*/
+	/* 背景渐变 */
+	/*background: linear-gradient(to right, rgb(107, 171, 220, 0.9), rgb(107, 171, 220, 0.8), rgb(107, 171, 220, 0.9));
+	background: -ms-linear-gradient(rgba(107, 171, 220, 0.9), rgba(107, 171, 220, 0.9));*/
+	/* 层叠顺序 */
+	z-index: 26;
+	display: table;
+}
+/**
+ * 结束节点
+ */
+.endNode {
+	background-color: rgb(220, 107, 107);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 50%;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 30px;
+	/* 宽度 */
+	width: 30px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 30px;
+	/* 设置字间距 */
+	/*letter-spacing: 2px;*/
+	/* 背景渐变 */
+	background: linear-gradient(to right, rgb(220, 107, 107, 0.9), rgb(220, 107, 107, 0.8), rgb(220, 107, 107, 0.9));
+	background: -ms-linear-gradient(rgba(220, 107, 107, 0.9), rgba(220, 107, 107, 0.9));
+	/* 层叠顺序 */
+	z-index: 26;
+	display: table;
+}
+
+/**
+ * 人工活动
+ */
+.commNode {
+	background-color: rgb(107, 171, 220);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 10px;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 30px;
+	/* 宽度 */
+	width: 70px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 40px;
+	/* 设置字间距 */
+	/*letter-spacing: 2px;*/
+	/* 背景渐变 */
+	background: linear-gradient(to right, rgb(107, 171, 220, 0.9), rgb(107, 171, 220, 0.8), rgb(107, 171, 220, 0.9));
+	background: -ms-linear-gradient(rgba(107, 171, 220, 0.9), rgba(107, 171, 220, 0.9));
+	/* 层叠顺序 */
+	z-index: 26;
+	display: table;
+}
+
+/**
+ * 自由活动
+ */
+.freedomNode {
+	background-color: rgb(107, 171, 220);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 10px;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 30px;
+	/* 宽度 */
+	width: 70px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 40px;
+	/* 设置字间距 */
+	/*letter-spacing: 2px;*/
+	/* 背景渐变 */
+	background: linear-gradient(to right, rgb(107, 171, 220), rgb(107, 171, 220), rgb(107, 171, 220));
+	background: -ms-linear-gradient(rgba(107, 171, 220, 0.9), rgba(107, 171, 220, 0.9));
+	/* 层叠顺序 */
+	z-index: 26;
+	display: table;
+}
+
+/**
+ * 网关节点
+ */
+.gateWayNode {
+    background-color: rgb(107, 171, 220);
+    /* 边框 */
+	border: 2px solid #40AFFE;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+    height: 25px;
+    /* 宽度 */
+    width: 25px;
+    /* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 30px;
+	/* 设置字间距 */
+	letter-spacing: 1px;
+    /* 背景渐变 */
+	background: linear-gradient(to right, rgb(107, 171, 220, 0.9), rgb(107, 171, 220, 0.8), rgb(107, 171, 220, 0.9));
+	background: -ms-linear-gradient(rgba(107, 171, 220, 0.9), rgba(107, 171, 220, 0.9));
+	/* 层叠顺序 */
+	z-index: 26;
+    
+	/* Rotate */
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+	/* Rotate Origin */
+    -webkit-transform-origin: 0 100%;
+    -moz-transform-origin: 0 100%;
+    -ms-transform-origin: 0 100%;
+    -o-transform-origin: 0 100%;
+    transform-origin: 0 100%;
+}
+
+/**
+ * 网关节点内部字体不倾斜
+ */
+.gateWayNode span{
+    display: inline-block;
+    transform: rotate(45deg);
+}
+
+/**
+ * 内部子流程
+ */
+.innerChildFlowNode {
+	background-color: rgb(237, 239, 49);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 10px;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 30px;
+	/* 宽度 */
+	width: 70px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 40px;
+	/* 设置字间距 */
+	/*letter-spacing: 2px;*/
+	/* 背景渐变 */
+	background: linear-gradient(to right, rgb(237, 239, 49), rgb(237, 239, 49), rgb(237, 239, 49));
+	background: -ms-linear-gradient(rgba(237, 239, 49, 0.9), rgba(237, 239, 49, 0.9));
+	/* 层叠顺序 */
+	z-index: 26;
+	display: table;
+}
+
+/**
+ * 外部子流程
+ */
+.outerChildFlowNode {
+	background-color: rgb(237, 239, 49);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 10px;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 30px;
+	/* 宽度 */
+	width: 70px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 40px;
+	/* 设置字间距 */
+	/*letter-spacing: 2px;*/
+	/* 背景渐变 */
+	background: linear-gradient(to right, rgba(237, 239, 49, 0.9), rgba(237, 239, 49, 0.8), rgba(237, 239, 49, 0.9));
+	background: -ms-linear-gradient(rgba(237, 239, 49, 0.9), rgba(237, 239, 49, 0.9));
+	/* 层叠顺序 */
+	z-index: 26;
+	display: table;
+}
+
+/**
+ * 横向泳道
+ */
+.broadwiseLaneNode {
+	background-color: rgb(237, 239, 49);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 5px;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 40px;
+	/* 宽度 */
+	width: 80px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 40px;
+	/* 设置字间距 */
+	/*letter-spacing: 2px;*/
+	/* 背景渐变 */
+	background: linear-gradient(to right, rgb(237, 239, 49, 0.9), rgb(237, 239, 49, 0.8), rgb(237, 239, 49, 0.9));
+	background: -ms-linear-gradient(rgba(237, 239, 49, 0.9), rgba(237, 239, 49, 0.9));
+}
+
+/**
+ * 在容器中的横向泳道
+ */
+.broadwiseLaneNodeOnContainer {
+	/* 边框 */
+	border: 1px solid #000000;
+	/* 圆角 */
+	border-radius: 5px;
+	/* 高度 */
+	height: 250px;
+	/* 宽度 */
+	width: 1200px;
+	/* 定位 */
+	position: absolute;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 60px;
+	/* 设置字间距 */
+	letter-spacing: 2px;
+	/* 层叠顺序 */
+	z-index: 1;
+}
+
+/**
+ * 纵向泳道
+ */
+.directionLaneNode {
+	background-color: rgb(237, 239, 49);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 5px;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 40px;
+	/* 宽度 */
+	width: 80px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 40px;
+	/* 设置字间距 */
+	/*letter-spacing: 2px;*/
+	/* 背景渐变 */
+	background: linear-gradient(to right, rgb(237, 239, 49, 0.9), rgb(237, 239, 49, 0.8), rgb(237, 239, 49, 0.9));
+	background: -ms-linear-gradient(rgba(237, 239, 49, 0.9), rgba(237, 239, 49, 0.9));
+}
+
+/**
+ * 在容器中的纵向泳道
+ */
+.directionLaneNodeOnContainer {
+	/* 边框 */
+	border: 1px solid #000000;
+	/* 圆角 */
+	border-radius: 5px;
+	/* 高度 */
+	height: 750px;
+	/* 宽度 */
+	width: 300px;
+	/* 定位 */
+	position: absolute;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 50px;
+	/* 设置字间距 */
+	letter-spacing: 2px;
+	/* 层叠顺序 */
+	z-index: 1;
+}
+
+/**
+ * 泳道文本div块样式
+ */
+.laneLabelDivClass {
+	background-color: rgb(252, 235, 0);
+	/* 边框 */
+	border: 2px solid black;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 背景渐变 */
+	background: linear-gradient(to right, rgb(252, 235, 0, 0.9), rgb(252, 235, 0, 0.8), rgb(252, 235, 0, 0.9));
+	background: -ms-linear-gradient(rgba(252, 235, 0, 0.9), rgba(252, 235, 0, 0.9));
+}
+
+/**
+ * 事件
+ */
+.eventNode {
+	background-color: rgb(107, 171, 220);
+	/* 边框 */
+	border: 2px solid #40AFFE;
+	/* 圆角 */
+	border-radius: 50%;
+	/* 泛光 */
+	/*box-shadow: 0 0 15px #4E4E4E;*/
+	/* 高度 */
+	height: 30px;
+	/* 宽度 */
+	width: 30px;
+	/* 定位 */
+	position: absolute;
+	/* 鼠标样式 */
+	cursor: move;
+	/* 文字水平居中 */
+	text-align: center;
+	/* 文字垂直居中，与div的高度要保持一致 */
+	line-height: 40px;
+	/* 设置字间距 */
+	letter-spacing: 2px;
+	/* 背景渐变 */
+	background: linear-gradient(to right, rgb(107, 171, 220, 0.9), rgb(107, 171, 220, 0.8), rgb(107, 171, 220, 0.9));
+	background: -ms-linear-gradient(rgba(107, 171, 220, 0.9), rgba(107, 171, 220, 0.9));
+	/* 层叠顺序 */
+	z-index: 26;
+}
+
+/**
+ * 连接线动画样式
+ */
+.connectionAnimateClass {
+	display: none;
+}
+
+/**
+ * overlay label样式
+ */
+.labelClass {
+	background-color: white;
+	padding: 5px;
+	opacity: 0.7;
+	border: 1px solid #346789;
+	border-radius: 10px;
+	cursor: pointer;
+	
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	user-select:none;
+}
+
+.jtk-connector { z-index: 25; }
+.jtk-endpoint { z-index: 27; }
+.jtk-overlay { z-index: 30; }
+
+#hideBg { position:absolute;left:0px;top:0px;
+	background-color:#000;
+	width:100%;  /*宽度设置为100%，这样才能使隐藏背景层覆盖原页面*/
+	filter:alpha(opacity=60);  /*设置透明度为60%*/
+	opacity:0.6;  /*非IE浏览器下设置透明度为60%*/
+	display:none; /* http://www.jb51.net */
+	z-Index:2;
+}
+#hideBox { position:fixed;
+	_position: absolute;
+	margin:0 auto;
+	width:600px;
+	height: 80%;
+	left:30%;
+	background-color:#fff;
+	display:none;
+	cursor:pointer;
+	z-Index:3;
+	text-align: center;
+	overflow: scroll;
+
+
+}
+.form-control{display:block;width:100%;padding:.375rem .75rem;font-size:1rem;line-height:1.5;color:#495057;background-color:#fff;background-clip:padding-box;border:1px solid #ced4da;border-radius:.25rem;transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out}.form-control::-ms-expand{background-color:transparent;border:0}.form-control:focus{color:#495057;background-color:#fff;border-color:#80bdff;outline:0;box-shadow:0 0 0 .2rem rgba(0,123,255,.25)}.form-control::-webkit-input-placeholder{color:#6c757d;opacity:1}.form-control::-moz-placeholder{color:#6c757d;opacity:1}.form-control:-ms-input-placeholder{color:#6c757d;opacity:1}.form-control::-ms-input-placeholder{color:#6c757d;opacity:1}.form-control::placeholder{color:#6c757d;opacity:1}.form-control:disabled,.form-control[readonly]{background-color:#e9ecef;opacity:1}select.form-control:not([size]):not([multiple]){height:calc(2.25rem + 2px)}select.form-control:focus::-ms-value{color:#495057;background-color:#fff}.form-control-file,.form-control-range{display:block;width:100%}.col-form-label{padding-top:calc(.375rem + 1px);padding-bottom:calc(.375rem + 1px);margin-bottom:0;font-size:inherit;line-height:1.5}.col-form-label-lg{padding-top:calc(.5rem + 1px);padding-bottom:calc(.5rem + 1px);font-size:1.25rem;line-height:1.5}.col-form-label-sm{padding-top:calc(.25rem + 1px);padding-bottom:calc(.25rem + 1px);font-size:.875rem;line-height:1.5}.form-control-plaintext{display:block;width:100%;padding-top:.375rem;padding-bottom:.375rem;margin-bottom:0;line-height:1.5;background-color:transparent;border:solid transparent;border-width:1px 0}.form-control-plaintext.form-control-lg,.form-control-plaintext.form-control-sm,.input-group-lg>.form-control-plaintext.form-control,.input-group-lg>.input-group-append>.form-control-plaintext.btn,.input-group-lg>.input-group-append>.form-control-plaintext.input-group-text,.input-group-lg>.input-group-prepend>.form-control-plaintext.btn,.input-group-lg>.input-group-prepend>.form-control-plaintext.input-group-text,.input-group-sm>.form-control-plaintext.form-control,.input-group-sm>.input-group-append>.form-control-plaintext.btn,.input-group-sm>.input-group-append>.form-control-plaintext.input-group-text,.input-group-sm>.input-group-prepend>.form-control-plaintext.btn,.input-group-sm>.input-group-prepend>.form-control-plaintext.input-group-text{padding-right:0;padding-left:0}.form-control-sm,.input-group-sm>.form-control,.input-group-sm>.input-group-append>.btn,.input-group-sm>.input-group-append>.input-group-text,.input-group-sm>.input-group-prepend>.btn,.input-group-sm>.input-group-prepend>.input-group-text{padding:.25rem .5rem;font-size:.875rem;line-height:1.5;border-radius:.2rem}.input-group-sm>.input-group-append>select.btn:not([size]):not([multiple]),.input-group-sm>.input-group-append>select.input-group-text:not([size]):not([multiple]),.input-group-sm>.input-group-prepend>select.btn:not([size]):not([multiple]),.input-group-sm>.input-group-prepend>select.input-group-text:not([size]):not([multiple]),.input-group-sm>select.form-control:not([size]):not([multiple]),select.form-control-sm:not([size]):not([multiple]){height:calc(1.8125rem + 2px)}.form-control-lg,.input-group-lg>.form-control,.input-group-lg>.input-group-append>.btn,.input-group-lg>.input-group-append>.input-group-text,.input-group-lg>.input-group-prepend>.btn,.input-group-lg>.input-group-prepend>.input-group-text{padding:.5rem 1rem;font-size:1.25rem;line-height:1.5;border-radius:.3rem}.input-group-lg>.input-group-append>select.btn:not([size]):not([multiple]),.input-group-lg>.input-group-append>select.input-group-text:not([size]):not([multiple]),.input-group-lg>.input-group-prepend>select.btn:not([size]):not([multiple]),.input-group-lg>.input-group-prepend>select.input-group-text:not([size]):not([multiple]),.input-group-lg>select.form-control:not([size]):not([multiple]),select.form-control-lg:not([size]):not([multiple]){height:calc(2.875rem + 2px)}.form-group{left:50%;margin-left: -100px;margin-bottom:1rem}.form-text{display:block;margin-top:.25rem}
+.form-row{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-5px;margin-left:-5px}.form-row>.col,.form-row>[class*=col-]{padding-right:5px;padding-left:5px}
+.form-check{position:relative;display:block;padding-left:1.25rem}
+.modal-open{overflow:hidden}
+.modal{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1050;overflow:hidden;outline:0}
+.modal-open .modal{overflow-x:hidden;overflow-y:auto}
+.modal-dialog{position:relative;width:auto;margin:.5rem;pointer-events:none}
+.modal.fade .modal-dialog{transition:-webkit-transform .3s ease-out;transition:transform .3s ease-out;transition:transform .3s ease-out,-webkit-transform .3s ease-out;-webkit-transform:translate(0,-25%);transform:translate(0,-25%)}
+.modal.show .modal-dialog{-webkit-transform:translate(0,0);transform:translate(0,0)}
+.modal-dialog-centered{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;min-height:calc(100% - (.5rem * 2))}
+.modal-content{position:relative;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;width:100%;pointer-events:auto;background-color:#fff;background-clip:padding-box;border:1px solid rgba(0,0,0,.2);border-radius:.3rem;outline:0}
+.modal-header{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;padding:1rem;border-bottom:1px solid #e9ecef;border-top-left-radius:.3rem;border-top-right-radius:.3rem}
+.modal-header .close{padding:1rem;margin:-1rem -1rem -1rem auto}
+.modal-title{margin-bottom:0;line-height:1.5}
+.modal-body{position:relative;-webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;padding:1rem}
+.modal-footer{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;padding:1rem;border-top:1px solid #e9ecef}
+.modal-footer>:not(:first-child){margin-left:.25rem}
+.modal-footer>:not(:last-child){margin-right:.25rem}
+.modal-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}@media (min-width:576px) {
+	.modal-dialog {
+		max-width: 500px;
+		margin: 1.75rem auto
+	}
+
+	.modal-dialog-centered {
+		min-height: calc(100% - (1.75rem * 2))
+	}
+
+	.modal-content {
+		position: relative;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		-webkit-box-orient: vertical;
+		-webkit-box-direction: normal;
+		-ms-flex-direction: column;
+		flex-direction: column;
+		width: 100%;
+		pointer-events: auto;
+		background-color: #fff;
+		background-clip: padding-box;
+		border: 1px solid rgba(0, 0, 0, .2);
+		border-radius: .3rem;
+		outline: 0
+	}
+}
+#content {
+	text-align:center;
+	cursor:pointer;
+	z-Index:1;
+}
+.box-head{
+	font-size: 18px;
+	padding-top: 18px;
+	padding-bottom: 10px;
+}
+.box-textarea{
+	font-size: 14px;
+	padding-top: 30px;
+	padding-bottom: 32px;
+}
+.hideBox-hr{
+	width: 384px;
+	text-align: center;
+	/* padding: 0; */
+	padding-left: 8px;
+}
+.clickbtn{
+	display: block;
+	width: 107px;
+	height: 33px;
+	border-radius: 3px;
+	font-size: 18px;
+}
+.cancel{
+	background-color: #ededed;
+	float: left;
+	margin-left: 88px;
+}
+.confirm{
+	background-color:#00aed8;
+	color: #ffffff;
+	float: left;
+	margin-left: 22px;
+}
+.boxbtn{
+	width: 100%;
+	height: 33px;
+	line-height: 33px;
+}

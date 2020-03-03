@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script th:src="@{/resources/js/jquery-3.3.1.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/bootstrap.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/bootstrap-treeview.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/computing_viewer.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/jquery.dataTables.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/task_list.js}" type="text/javascript"></script>
+    <script th:src="@{/resources/js/polling_overallState.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/dataTables.bootstrap.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/d3.min.js}"
+            type="text/javascript"></script>
+    <!--<script th:src="@{/resources/js/task_res_pic.js}"
+        type="text/javascript"></script>-->
+    <link rel="stylesheet"
+          th:href="@{/resources/css/bootstrap.min.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/css/dataTables.bootstrap.min.css}">
+    <style>
+        ul {
+            width: 100%;
+        }
+
+        li.TabHead {
+            width: 33%;
+        }
+
+    </style>
+
+    <link rel="stylesheet" th:href="@{/resources/css/main.css}">
+    <title>test</title>
+
+</head>
+<body>
+<div class="modal fade text-center" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="display:inline-block; width: auto">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <!--<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>-->
+                <h4 class="modal-title" id="myModalLabel">任务结果展示</h4>
+            </div>
+            <div class="modal-body" >
+               <!-- <div>
+                    <h5>原始数据</h5>
+                    <div id="num1"></div>
+                </div>
+
+                <div  >
+                    <h5>轨迹展示</h5>
+                    <div id="num2"></div>
+                </div>
+                <div >
+                    <h5>轨迹聚类结果</h5>
+                    <div id="num3"></div>
+                </div>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div> <!--聚类结果图片展示模态窗-->
+<div class="modal fade text-center" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="display:inline-block; width: auto">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <!--<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>-->
+                <h4 class="modal-title" id="ModalLabel">新建任务</h4>
+            </div>
+            <div class="modal-body" >
+
+                    创建者：<input type="text" name="creator"> <br/>
+                    数据名：<input type="text" name="dataName" > <br/>
+                    <select  任务类型 id="taskType">
+                        <option value="CLUSTRE">聚类 </option>
+                        <option >神经网络</option>
+                    </select>
+                    <button  id="submitTask" onclick="but()">提交</button>
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>  <!--添加任务模态窗-->
+<div class="modal fade text-center" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="display:inline-block; width: auto">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <!--<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>-->
+                <h4 class="modal-title" id="ModalLabel2">任务执行状态</h4>
+            </div>
+            <div class="modal-body" id="task_state_view">
+                <table class="table  table-bordered table-striped table-hover "
+                       style="width: 100% ;word-break:keep-all", id="task_state_table">
+                    <thead>
+                    <tr>
+
+                        <th>分中心任务编号</th>
+                        <th>所属集群IP</th>
+                        <th>所属任务ID</th>
+                        <th>当前运行状态</th>
+                        <th>任务类型</th>
+                    </tr>
+                    </thead>
+                    <tbody  id="state_table_body">
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>   <!--任务状态展示模态窗-->
+<div class="container-fluid">
+
+    <div class="col-md-6 " id="all_viewer" align="center" style="height: 800px">
+        <div class="panel panel-primary" style="height: 400px">
+            <div class="panel-heading">
+                <h1 class="panel-title">基于区块链的多中心属地化数据价值共享平台展示系统</h1>
+            </div>
+
+<!--            <img src="test.jpg">-->
+            <!--<button id="draw_pic">画图</button>
+            <button id="show_pic">展示</button>-->
+<!--            <button id="show_task_state">展示</button>-->
+          <!--  <div  style="overflow:hidden">
+                <div style="display: table-cell" >
+                    <h5>原始数据</h5>
+                    <div id="num1"></div>
+                </div>
+
+                <div   style="display: table-cell">
+                    <h5>轨迹展示</h5>
+                    <div id="num2"></div>
+                </div>
+                <div style="display: table-cell">
+                    <h5>轨迹聚类结果</h5>
+                    <div id="num3"></div>
+                </div>
+            </div>-->
+        </div>
+        <div class="panel panel-primary" id="state_viewer" style="height: 380px">
+            <div class="panel-heading">
+                <h3 class="panel-title">状态区</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table" style="table-layout:fixed" id="overall_state">
+                    <thead>
+                    <tr>
+                        <th>系统参数</th>
+                        <!--                            <th>上次更新时间</th>-->
+                        <th>状态</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr id="state_1" class="success">
+                        <td>属地中心上线数/属地中心总数</td>
+                        <td id="center_num" th:text="${centerOnline}+'/'+${centerTotal}"></td>
+                    </tr>
+                    <tr id="state_2" class="success">
+                        <td>累计请求数</td>
+                        <td id="request_num" th:text="${requestTotal}"></td>
+                    </tr>
+                    <tr id="state_3" class="success">
+                        <td>竞价总额</td>
+                        <td id="bidding_amount" th:text="${requestTotal}"></td>
+                    </tr>
+                    <!-- <tr class="success">
+
+                    <td>累计产生知识数</td>
+                    <td id="knowledge_amount" th:text="${knowledgeTotal}"></td>
+                </tr> -->
+                    <tr id="state_4" class="success">
+                        <td>系统利用率</td>
+                        <td id="system_utilization" th:text="${systemUseingRate}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6 panel panel-primary" id="sub_module_viewer"
+         style="height: 800px  ; overflow:auto" >
+        <div class="panel-heading">
+            <h1 class="panel-title">子模块展示区</h1>
+        </div>
+        <div class="tabbable" id="tabs">
+            <!-- Only required for left/right tabs -->
+
+            <ul class="nav nav-tabs">
+                <li class="TabHead"><a data-toggle="tab" href="#panel-task"
+                                       id="panel_task">任务管理</a></li>
+                <li class="TabHead "><a data-toggle="tab"
+                                        href="#panel-block">区块链系统</a></li>
+                <li class="TabHead active"><a data-toggle="tab"
+                                              href="#panel-computing">属地计算系统</a></li>
+            </ul>
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane "   id="panel-task">
+                <!--					<p>任务管理内容.</p>-->
+
+
+                <div class="btn-group open">
+
+                    <button id="newTask">新建任务</button>
+
+
+
+                </div>
+                <div class="panel-heading panel-primary">
+                    <h3 class="panel-title">未完成任务列表</h3>
+                </div>
+                <table class="table  table-bordered table-striped table-hover "
+                       style="width: 100%" id="incomplete_table">
+                    <thead>
+                    <tr>
+                        <!-- <th>任务序号</th> -->
+                        <th>流程ID</th>
+                        <th>发布者</th>
+                        <th>任务名称</th>
+                        <th>版本号</th>
+                        <!--<th>数据源数目</th>
+                        <th>taskId </th>-->
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+                <div class="panel-heading panel-primary">
+                    <h3 class="panel-title">已完成任务列表</h3>
+                </div>
+                <table class="table  table-bordered table-striped table-hover "
+                       style="width: 100%" id="complete_table">
+                    <thead>
+                    <tr>
+                        <th>任务类型</th>
+                        <th>发起单位</th>
+                        <th>完成时间</th>
+                        <th>执行时长</th>
+                        <th>知识产出数</th>
+                        <th>taskId </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+                <div  style="clear:both"></div>
+            </div>
+            <div class="tab-pane " id="panel-block" >
+                <iframe src="http://192.168.1.4:8080" width="100%" height="700px">
+                </iframe>
+
+            </div>
+            <div class="tab-pane active row " id="panel-computing">
+                <!--                        <p>属地计算内容.</p>-->
+                <div class="col-md-4 ">
+                    <div id="computing_list"></div>
+                </div>
+                <div class="col-md-8 ">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>支持算法</th>
+                            <th>数据信息</th>
+                        </tr>
+                        </thead>
+                        <tbody id="attr_table">
+                        <tr>
+                            <th id="name"></th>
+                            <th id="algorithm"></th>
+                            <th id="dataInfo"></th>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+</body>
+<!--<script type="text/javascript">
+    $(document).ready(function() {
+        var baseUrl = "/in_sute_demo";
+        // $('#complete_table tbody').on('click', 'tr', function () {
+        //     var rowIndex = $(this).index();
+//此处拿到隐藏列的id
+//             var idStr = $('#complete_table').DataTable().row(rowIndex).data().taskId;
+//             var id = parseInt(idStr);
+//             console.log(typeof id);
+            $('#num1').empty();
+            $('#num2').empty();
+            $('#num3').empty(); //消除上次展示结果
+            $.ajax({
+                type: "post",
+                url: baseUrl + "/paint.do/{id}",
+                /*contentType: "application/json;charset=utf-8",*/
+                data: {
+                    'taskId': id
+                },
+                dataType: "json",
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                async: false,
+                success: function (result) {
+                    // for(var i=0;i<result.length;i++){
+                    var tracks = result.tracks;   //获取拟合轨迹
+                    var peoplemap = result.peopleMap; //获取原始数据
+                    var width = 200;
+                    var height =200;
+                    var padding = 30;
+                    var xScale = d3.scaleLinear();
+                    xScale.domain([-40,50])
+                        .range([padding, width - padding * 2]);
+
+                    var yScale = d3.scaleLinear();
+                    yScale.domain([-30,20])
+                        .range([height - padding, padding]);
+                    var lineGenerator = d3.line().curve(d3.curveCardinal) //d3.curveCardinal
+                        .x(function (d) {
+                            return xScale2(d.x)
+                        })
+                        .y(function (d) {
+                            return yScale2(d.y)
+                        }); //配置图1比例尺
+                    var xScale2 = d3.scaleLinear();
+                    xScale2.domain([-40,50])
+                        .range([padding, width - padding * 2]);
+
+                    var yScale2 = d3.scaleLinear();
+                    yScale2.domain([-30,20])
+                        .range([height - padding, padding]);
+                    var lineGenerator2 = d3.line().curve(d3.curveCardinal) //d3.curveCardinal
+                        .x(function (d) {
+                            return xScale2(d.x)
+                        })
+                        .y(function (d) {
+                            return yScale2(d.y)
+                        }); //配置图2、3比例尺
+                    var xAxis = d3.axisBottom(xScale)
+                        .ticks(6);
+                    var yAxis = d3.axisLeft(yScale)
+                        .ticks(6);
+
+
+
+                    var svg = d3.select("#num1")
+                        .append("svg")
+                        .attr("width", width)
+                        .attr("height", height); //图1画布
+                    var svg2 = d3.select("#num2")
+                        .append("svg")
+                        .attr("width", width)
+                        .attr("height", height); //图2画布
+                    svg.append("g")
+                        .attr("class","axis")
+                        .call(xAxis)
+                        .attr("transform","translate(0,"+(height-padding)+")")
+                        .append("text") //添加坐标轴刻度
+                        .attr("transform","translate("+(height-padding)+",0)");//指定坐标轴说明的坐标
+                    svg.append("g")
+                        .attr("class","axis")
+                        .attr("transform","translate("+padding+",0)")
+                        .call(yAxis)
+                        .append("text") //添加坐标轴刻度
+                        .attr("transform","translate(0,"+(padding)+")");//指定坐标轴说明的坐标
+                    svg2.append("g")
+                        .attr("class","axis")
+                        .call(xAxis)
+                        .attr("transform","translate(0,"+(height-padding)+")")
+                        .append("text") //添加坐标轴刻度
+                        .attr("transform","translate("+(height-padding)+",0)");//指定坐标轴说明的坐标
+                    svg2.append("g")
+                        .attr("class","axis")
+                        .attr("transform","translate("+padding+",0)")
+                        .call(yAxis)
+                        .append("text") //添加坐标轴刻度
+                        .attr("transform","translate(0,"+(padding)+")");//指定坐标轴说明的坐标
+                    for(var id in peoplemap)   {
+                            var data1 = peoplemap[id];
+                        console.log(data1.length);
+                        svg.append("path")
+                            .attr("d", lineGenerator(data1))
+                            .attr("stroke", "black")
+                            .attr("fill", "none")
+                    }  //原始数据
+                    for(var i=0;i<tracks.length;i++) {
+                        var data2 = tracks[i].points;
+                        svg2.append("path")
+                            .attr("d", lineGenerator2(data2))
+                            .attr("stroke", "black")
+                            .attr("fill", "none")
+                    }  //拟合轨迹
+                }
+            }); //取轨迹画图
+
+                // $('#myModal1').modal("show")  //弹出模态窗
+
+
+            // xScale.domain([d3.min(data2, function (d) {
+            //     return d.x;
+            // }), d3.max(data2, function (d) {
+            //     return d.x;
+            // })])
+            //     .range([padding, width - padding * 2]);
+            //
+            // var yScale = d3.scaleLinear();
+            // yScale.domain([d3.min(data2, function (d) {
+            //     return d.y;
+            // }), d3.max(data2, function (d) {
+            //     return d.y;
+            // })])
+            //     .range([height - padding, padding]);
+
+
+        })
+    // })
+</script> -->  <!--画图-->  <!--加入完成列表点击事件-->
+<script type="text/javascript">
+    var baseUrl = "/in_sute_demo";
+
+    /* 用ajax发送请求*.do，controller接收并返回结果 */
+    $('#panel_task').click(function() {
+        $.ajax({
+            type : "post",
+            url : baseUrl + "/toTaskFlow.do",
+            contentType : "application/json;charset=utf-8",
+            dataType : "json",
+            xhrFields : {
+                withCredentials : true
+            },
+            crossDomain : true,
+            async : false,
+            success : function(result) {
+                initList(result.taskflow_list);
+                // console.log(1);
+            }
+        });
+    });
+</script >  <!--任务列表刷新-->
+<script type="text/javascript">
+
+    $('#newTask').on('click', function () {
+        $('#myModal2').modal("show")
+    } );
+    function but() {
+        var creator = $(" input[ name='creator' ] ").val();
+        var dataName = $(" input[ name='dataName' ] ").val();
+        var taskType =$("#taskType").val();
+        $.ajax({
+            type: 'POST',
+            url: '/in_sute_demo/addTask.do',
+            data: {
+                'creator': creator,
+                'dataName': dataName,
+                'taskType': taskType
+            },
+            success: function(data) { // data 保存提交后返回的数据，一般为 json 数据
+                // 此处可对 data 作相关处理
+                if(data.state==1){
+                alert('提交成功！');
+                }else alert('提交失败')
+            }
+
+    });
+        $('#myModal2').modal('hide') ;
+    }
+
+</script>  <!--添加任务-->
+<script type="text/javascript">
+    var baseUrl = "/in_sute_demo";
+
+    $('#incomplete_table tbody').on('click','tr', function () {
+        var rowIndex = $(this).index();
+//此处拿到隐藏列的id
+        var idStr = $('#incomplete_table').DataTable().row(rowIndex).data().版本号;
+        // var id = parseInt(idStr);
+        console.log( idStr);
+
+     // $.ajax({
+     //            type : "post",
+     //            url : baseUrl + "/viewMission.do",
+     //            data: {
+     //                'taskId': id
+     //            },
+     //
+     //            // contentType : "application/json;charset=utf-8",表明采用json字符串形式
+     //            dataType : "json",
+     //            xhrFields : {
+     //                withCredentials : true
+     //            },
+     //            crossDomain : true,
+     //            async : false,
+     //            success : function(result) {
+     //                // alert(result.id)
+     //                var missions = result.missions;
+     //                console.log( missions[0]);
+     //                $("#task_state_table").DataTable({
+     //                    destroy:true,
+     //                        data : missions,
+     //                        // datatype:JSON,
+     //                        columns : [ {
+     //                            data : "id"
+     //                        }, {
+     //                            data : "clusterIp"
+     //                        }, {
+     //                            data : "taskId"
+     //                        }, {
+     //                            data : "state"
+     //                        }, {
+     //                            data : "missionType"
+     //                        }],
+     //                        lengthMenu : [ 5, 10, 20, 30 ],
+     //                        searching : false,
+     //                        ordering : false,
+     //                        language : {
+     //                            paginate: {// 分页的样式内容。
+     //                                previous: "上一页",
+     //                                next: "下一页",
+     //                                first: "第一页",
+     //                                last: "最后"
+     //                            }
+     //                        },
+     //                        pagingType : "full_numbers",
+     //                        bPaginate:false,
+     //                        bLengthChange:false,
+     //                        bAutoWidth: true,
+     //                        showNEntries : false,
+     //                        bInfo : false
+     //
+     //                });
+     //
+     //
+     //                $("#myModal3").modal("show");
+     //            }
+     //        });
+    } );
+</script >   <!--未完成任务状态-->
+
+</html>

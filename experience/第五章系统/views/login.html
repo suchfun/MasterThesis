@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script th:src="@{/resources/js/jquery-3.3.1.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/bootstrap.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/bootstrap-treeview.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/computing_viewer.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/jquery.dataTables.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/task_list.js}" type="text/javascript"></script>
+    <!--    <script th:src="@{/resources/js/polling_overallState.js}"-->
+    <!--            type="text/javascript"></script>-->
+    <script th:src="@{/resources/js/dataTables.bootstrap.min.js}"
+            type="text/javascript"></script>
+<!--    <script th:src="@{/resources/js/d3.min.js}"-->
+<!--            type="text/javascript"></script>-->
+    <!--<script th:src="@{/resources/js/task_res_pic.js}"
+        type="text/javascript"></script>-->
+    <link rel="stylesheet"
+          th:href="@{/resources/css/bootstrap.min.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/css/dataTables.bootstrap.min.css}">
+    <style>
+       .container-fluid {
+            background-color:#FFFFFF;
+        }
+       .mycenter{
+           margin-left: auto;
+           margin-right: auto;
+           height: 350px;
+           width:500px;
+           padding: 5%;
+           padding-left: 5%;
+           padding-right: 5%;
+       }
+       .mycenter mysign{
+           width: 440px;
+       }
+       .mycenter input,checkbox,button{
+           margin-top:2%;
+           margin-left: 10%;
+           margin-right: 10%;
+       }
+       #add{
+           margin-top:10%;
+       }
+       .mycheckbox{
+           margin-top:10px;
+           margin-left: 40px;
+           margin-bottom: 10px;
+           height: 10px;
+       }
+
+
+    </style>
+
+    <link rel="stylesheet" th:href="@{/resources/css/main.css}">
+    <title>登陆界面</title>
+
+
+</head>
+<body>
+
+<div class="container-fluid">
+
+    <div id="title" class="auth_logo">
+
+        <h1 style="color:black "><img src="resources/images/uestc.png" >基于区块链的多中心属地化数据价值共享平台展示系统</h1>
+    </div>
+
+
+    <div  id="login" style="height: 800px ;background-image: url(resources/images/bgd.jpg); background-repeat:no-repeat " th:width=" 400" align="center" >
+
+
+        <form  method="post">
+            <div class="mycenter" >
+                <div class="mysign">
+
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control" name="username" placeholder="请输入用户名" required autofocus/>
+                    </div>
+                    <div class="col-lg-10"></div>
+                    <div class="col-lg-10">
+                        <input type="password" class="form-control" name="password" placeholder="请输入密码" required autofocus/>
+                    </div>
+                    <div class="col-lg-10"></div>
+                    <!--<div class="col-lg-10 mycheckbox checkbox">
+                        <input type="checkbox" class="col-lg-1">记住密码</input>
+                    </div>-->
+                    <div class="col-lg-10"></div>
+                    <div class="col-lg-10">
+                        <button id="loginbut" type="button" class="btn btn-success col-lg-12" >
+
+                        登录</button>
+                    </div>
+<!--                    <div class="col-lg-12 " id = "add">
+                        <button type="button"  class=" btn btn-link " style="color: white"> 注册</button>
+                        <button type="button"  class="btn btn-link " style="color: white"> 找回密码</button>
+                    </div>-->
+                </div>
+            </div>
+        </form>
+
+
+    </div>
+
+</div>
+</body>
+<script>
+    String.prototype.format = function () {
+        var values = arguments;
+        return this.replace(/\{(\d+)\}/g, function (match, index) {
+            if (values.length > index) {
+                return values[index];
+            } else {
+                return "";
+            }
+        });
+    };
+    $('#loginbut').on('click', function () {
+
+        var username = $(" input[ name='username' ] ").val();
+        var password = $(" input[ name='password' ] ").val();
+        if (username === ''){
+            alert("请输入用户名！！！");
+            return;
+        }
+        if (password === ''){
+            alert("请输入密码！！！");
+            return;
+        }
+        // var taskType =$("#taskType").val();
+        $.ajax({
+            type: 'POST',
+            url: '/in_sute_demo/login.do',
+            data: {
+                'username': username,
+                'password': password,
+            },
+            success: function(data) { // data 保存提交后返回的数据，一般为 json 数据
+                // 此处可对 data 作相关处理
+                console.log(data);
+                if(data.res==1){
+                    console.log('databasepwd:'+data);
+                    console.log('password:'+password);
+                    console.log('提交成功！');
+                    //alert("登录成功！！！");
+                    let userAuthority = data.user_authority;
+                   let userRole = data.role;
+                    let nodeId = data.nodeId;
+                    console.log(userRole);
+                    let temp = "http://127.0.0.1:8080/in_sute_demo/demo?userauthority={0}&userrole={1}&nodeId={2}";
+                    //let temp = "http://192.168.1.4:8081/in_sute_demo/demo?userauthority={0}&userrole={1}&nodeId={2}";
+                    let url = temp.format(userAuthority,userRole,nodeId);
+                    window.location.href = url;
+                }else {
+                    console.log('databasepwd:'+data);
+                    console.log('password:'+password);
+                    console.log('提交失败');
+                    alert("登录失败！！！用户名或密码错误");
+                }
+            }
+
+        });
+    } );
+</script >
+
+<!--<script type="text/javascript" >-->
+    <!--function check(form){-->
+        <!--var reg= /^\s*|\s*$/g;-->
+        <!--if(form.username.value.replace(reg,'')=="")-->
+        <!--{-->
+            <!--alert("请输入用户名");-->
+            <!--form.username.focus();-->
+            <!--return false;-->
+        <!--}-->
+        <!--else if(form.password.value.replace(reg,'')=="")-->
+        <!--{-->
+            <!--alert("请输入密码");-->
+            <!--form.password.focus();-->
+            <!--return false;-->
+        <!--}-->
+        <!--else{-->
+            <!--return true;-->
+        <!--}-->
+
+    <!--}-->
+<!--</script>-->
+
+</html>
+

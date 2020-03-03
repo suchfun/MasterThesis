@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p>#!/usr/bin/env bash</p>
+
+
+
+<p>PROCESS=`ps -ef|grep 'yc_model_train'|grep -v grep|grep -v PPID|awk '{ print $2}'`</p>
+
+<p>for i in ${PROCESS}</p>
+
+<p>do</p>
+
+<p>echo "Kill the yc_model_train process [ $i ]"</p>
+
+<p>kill -9 ${i}</p>
+
+<p>done</p>
+
+
+
+<p>echo 'first param'</p>
+
+<p>echo ${1}</p>
+
+<p>echo 'second param'</p>
+
+<p>echo ${2}</p>
+
+<p>echo 'thrid param'</p>
+
+<p>echo ${3}</p>
+
+
+
+<p>python3 yc_model_train.py \</p>
+
+<p>--ps_hosts=localhost:2222 \</p>
+
+<p>--worker_hosts=localhost:2223 \</p>
+
+<p>--job_name=ps \</p>
+
+<p>--task_index=0 \</p>
+
+<p>--itr_step=${1} \</p>
+
+<p>--batch_size=${2} \</p>
+
+<p>--is_sync=True \</p>
+
+<p>--version=${3} &</p>
+
+
+
+
+
+<p>python3 yc_model_train.py \</p>
+
+<p>--ps_hosts=localhost:2222 \</p>
+
+<p>--worker_hosts=localhost:2223 \</p>
+
+<p>--job_name=worker \</p>
+
+<p>--task_index=0 \</p>
+
+<p>--itr_step=${1} \</p>
+
+<p>--batch_size=${2} \</p>
+
+<p>--is_sync=True \</p>
+
+<p>--version=${3} &</p>
+</body>
+</html>

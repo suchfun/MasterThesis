@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>数据源列表</title>
+    <link rel="stylesheet"
+          th:href="@{/resources/plugings/layui/css/layui.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/css/bootstrap.min.css}">
+    <script th:src="@{/resources/js/jquery-3.3.1.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/bootstrap.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/jquery.dataTables.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/dataTables.bootstrap.min.js}"
+            type="text/javascript"></script>
+</head>
+<body>
+
+
+        <div class="modal-content" >
+            <div class="modal-body" >
+                <table class="table  table-bordered table-striped table-hover "
+                       style="height:100%;width: 100% ;word-break:keep-all" id="datasource_table">
+                    <thead>
+                    <tr>
+
+                        <th>资源编号</th>
+                        <th>数据名称</th>
+                        <th>价格</th>
+                        <th>容量</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody  >
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+</body>
+<script>
+    var baseUrl = "/in_sute_demo";
+    function  ListInit(data){
+        $('#datasource_table').DataTable({
+            destroy:true,
+            data : data,
+            columns : [ {
+                data : '资源编号'
+            }, {
+                data : '数据名称'
+            }, {
+                data : '价格'
+            }, {
+                data : '容量'
+            }
+                // },{
+                // 	data: 'taskId',visible: false
+                // }
+            ],
+            lengthMenu : [ 5, 10, 20, 30 ],
+            searching : false,
+            ordering : false,
+            language : {
+                paginate: {// 分页的样式内容。
+                    previous: "上一页",
+                    next: "下一页",
+                    first: "第一页",
+                    last: "最后"
+                },
+                // info: " 总计 _TOTAL_个任务",
+                lengthMenu:     "展示_MENU_ 条"
+            },
+            bPaginate:false,
+            bLengthChange:false,
+            bAutoWidth: true,
+            showNEntries : false,
+            bInfo : false,
+            pagingType : "full_numbers"
+        });
+    }
+
+    $(document).ready(
+        $.ajax({
+        type : "post",
+        url : baseUrl + "/toDataSource.do",
+        contentType : "application/json;charset=utf-8",
+        dataType : "json",
+        xhrFields : {
+            withCredentials : true
+        },
+        crossDomain : true,
+        // async : false,
+        success : function(result) {
+            console.log(result.datasource_list);
+            ListInit(result.datasource_list);
+            // console.log(1);
+
+        }
+    }))
+
+</script>
+</html>

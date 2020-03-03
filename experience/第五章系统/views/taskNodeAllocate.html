@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<!--https://www.runoob.com/font-awesome/fontawesome-reference.html-->
+<head>
+    <meta charset="UTF-8">
+    <script th:src="@{/resources/js/component/jquery-1.11.0.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/bootstrap.min.js}"
+            type="text/javascript"></script>
+    <!-- <script th:src="@{/resources/js/bootstrap-treeview.min.js}"
+             type="text/javascript"></script>-->
+    <!--    <script th:src="@{/resources/js/computing_viewer.js}"
+            type="text/javascript"></script>-->
+    <script th:src="@{/resources/js/jquery.dataTables.min.js}"
+            type="text/javascript"></script>
+    <!--<script th:src="@{/resources/js/task_list.js}" type="text/javascript"></script>-->
+    <!--        <script th:src="@{/resources/js/polling_overallState.js}"-->
+    <!--                type="text/javascript"></script>-->
+    <script th:src="@{/resources/js/dataTables.bootstrap.min.js}"
+            type="text/javascript"></script>
+    <!--    <script th:src="@{/resources/js/d3.min.js}"-->
+    <!--            type="text/javascript"></script>-->
+    <script th:src="@{/resources/jedate-6.5.0/src/jedate.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/bmap-offline/map3.0_init.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/bmap-offline/map3.0.js}"
+            type="text/javascript"></script>
+    <!-- 百度地图3.0 End -->
+    <script th:src="@{/resources/bmap-offline/layer.js}"
+            type="text/javascript"></script>
+    <!--<script th:src="@{/resources/js/task_res_pic.js}"
+        type="text/javascript"></script>-->
+    <link rel="stylesheet"
+          th:href="@{/resources/css/bootstrap.min.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/css/node.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/plugings/layui/css/layui.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/css/jedate.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/plugings/font-awesome-4.7.0/css/font-awesome.min.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/plugings/jquery-ui-1.12.1.custom/jquery-ui.min.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/css/web.contextmenu.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/css/dataTables.bootstrap.min.css}">
+    <!--<link rel="stylesheet"-->
+    <!--th:href="@{/resources/css/font-awesome.css}">-->
+
+    <link rel="stylesheet"
+          th:href="@{/resources/css/style.css}">
+    <!-- <link rel="stylesheet"
+           th:href="@{/resources/css/uestc.css}">-->
+</head>
+<body>
+<div class="tab-pane row " id="task-table" style="width: 90%;margin:0 auto">
+    <table class="layui-hide" id="test"></table>
+
+    <table class="table table-bordered table-hover table-striped "
+           style="width:100% ;margin:0 auto" id="node_info_table">
+    </table>
+</div>
+</body>
+<script>
+    function child(id) {
+        $.ajax({
+
+            url: '/in_sute_demo/nodeinfo.do',
+            type: 'post',
+            dataType: "json",
+            data: {
+                'id': id
+            },
+            success: function (result) {
+                console.log("刷新任务表格");
+                initList(result);
+            }
+        });
+    }
+
+    function initList(data) {
+        $("#node_info_table").DataTable({
+            destroy: true,
+            data: data,
+            autoWidth: false,
+            bPaginate:false,
+            // deferRender: true,
+            columns: [{
+                data: 'subtaskid',
+                title: '任务编号'
+
+            }, {
+                data: 'nodeid',
+                title: '节点编号'
+            }, {
+                data: 'resourceid',
+                title: '资源编号'
+            },
+                {
+                    data: 'resourcenum',
+                    title: '资源数目'
+                },
+                {
+                    data: 'donevalue',
+                    title: '成交价格'
+
+                }, {
+                    data: 'reason',
+                    title: '支付原因'
+
+                }
+            ],
+            searching: false,
+            ordering: false,
+            language: {
+                info: " 总计 _TOTAL_个任务",
+            },
+        });
+    }
+</script>
+</html>

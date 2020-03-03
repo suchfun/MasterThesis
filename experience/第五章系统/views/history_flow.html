@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+<!--    <title>Title</title>-->
+    <meta charset="UTF-8">
+    <title>数据源列表</title>
+    <link rel="stylesheet"
+          th:href="@{/resources/plugings/layui/css/layui.css}">
+    <link rel="stylesheet"
+          th:href="@{/resources/css/bootstrap.min.css}">
+    <script th:src="@{/resources/js/jquery-3.3.1.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/bootstrap.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/jquery.dataTables.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/js/dataTables.bootstrap.min.js}"
+            type="text/javascript"></script>
+    <script th:src="@{/resources/plugings/layui/layui.all.js}"
+            type="text/javascript"></script>
+</head>
+<body>
+
+
+<div class="modal-content" >
+    <div class="modal-body" >
+        <table class="table  table-bordered table-striped table-hover "
+               style="height:100%;width: 100% ;word-break:keep-all" id="history_flow_table">
+            <thead>
+            <tr>
+
+<!--                <th>任务编号</th>-->
+<!--                <th>任务名称</th>-->
+<!--                <th>创建者</th>-->
+<!--                <th>任务类型</th>-->
+<!--                <th>版本号</th>-->
+            </tr>
+            </thead>
+            <tbody  >
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+<script type="text/javascript">
+    var baseUrl = "/in_sute_demo";
+    function  ListInit(data){
+        $('#history_flow_table').DataTable({
+            destroy:true,
+            data : data,
+            columns : [ {
+                data : '任务编号',
+                title: '任务编号'
+            }, {
+                data : '任务名称',
+                title:'任务名称'
+            }, {
+                data : '创建者',
+                title:'创建者'
+            },{
+                data : '任务类型',
+                title:'任务类型'
+            }, {
+                data : '版本号',
+                title:'版本号'
+            },
+                {
+                    data: 'state',
+                    title: '操作',
+                    "render": function (data) {
+                        return data = '<button type="button"  style="width:80px" class="btn btn-sm btn-default bt_search" id="dt_search"><i class="fa fa-search"></i> 查看 </button>' + '&nbsp;&nbsp;&nbsp;';
+                    }
+                }
+            ],
+            lengthMenu : [ 5, 10, 20, 30 ],
+            searching : false,
+            ordering : false,
+            language : {
+                paginate: {// 分页的样式内容。
+                    previous: "上一页",
+                    next: "下一页",
+                    first: "第一页",
+                    last: "最后"
+                }
+                // info: " 总计 _TOTAL_个任务",
+                // lengthMenu:     "展示_MENU_ 条"
+            },
+            // bPaginate:false,
+            bLengthChange:false,
+            // bAutoWidth: true,
+            showNEntries : false,
+            bInfo : false,
+            pagingType : "full_numbers"
+        });
+    }
+
+    $(document).ready(
+        $.ajax({
+            type : "post",
+            url : baseUrl + "/toTaskFlow.do",   /////////////////////////////////
+            contentType : "application/json;charset=utf-8",
+            dataType : "json",
+            xhrFields : {
+                withCredentials : true
+            },
+            crossDomain : true,
+            // async : false,
+            success : function(result) {
+                ListInit(result.taskflow_list);
+                // console.log(1);
+
+            }
+        }))
+
+</script>  <!-- 渲染历史流程表-->
+<script type="text/javascript">
+    var baseUrl = "/in_sute_demo";
+    $(document).ready(
+    $('#history_flow_table').off("click", ".bt_do").on('click','.bt_search', function () {
+        console.log(1);
+        // var row = $(this).index();
+//此处拿到隐藏列的id
+//        var data =  $('#history_flow_table').DataTable().row($(this).parents().parents()).data().type;
+        var idStr = $('#history_flow_table').DataTable().row($(this).parents().parents("tr")).data().任务编号;
+        var id = parseInt(idStr);
+        console.log( id);
+
+        $.ajax({
+            type : "post",
+            url : baseUrl + "/toBusinessFlow.do",
+            data: {
+                'id': id
+            },
+
+            // contentType : "application/json;charset=utf-8",表明采用json字符串形式
+            dataType : "json",
+            xhrFields : {
+                withCredentials : true
+            },
+            crossDomain : true,
+            async : false,
+            success : function(result) {
+                // alert(result.id)
+
+                // parent.FLOW.removeAll();
+                console.log(result.flowRes);
+                parent.FLOW.removeAll();
+                parent.FLOW.loadJson(JSON.parse(result.flowRes));
+                parent.FLOW._base.flowDescription=result.taskDescription;
+                parent.FLOW._base.flowName=result.taskName;
+                parent.attrCfgUtil.setCanvasAttr();
+                parent.$("#saveStatus").css('display', '');
+                parent.layer.closeAll();
+            }
+        });
+    } ));
+</script >  <!--打开历史流程-->
+
+</html>
