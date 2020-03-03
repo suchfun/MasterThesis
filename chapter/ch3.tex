@@ -66,6 +66,7 @@ Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_
 \subsubsubsection{轨迹数量抽样}
 考虑到更大程度上减少网络中的传输流量和各属地轨迹数据集中存在的数据冗余，属地在对轨迹进行建模前进行轨迹数量上的抽样，但应注意，为了保证全局层面聚类的准确度，分布式平台中的所有属地中心在轨迹数量采样上的采样率应保持一致，且采样的轨迹应具有一定的代表性。可以采用一种VQ算法，比如SOM。\\
 \textbf{******************未完成}
+先进行聚类，然后从每个簇中按照一点比例抽取就好。
 
 \subsubsubsection{轨迹预处理}
 假设每条轨迹由n个坐标点组成，由于传感器的采样频率一般很高，所以轨迹中相邻点之间的距离相隔很近，针对轨迹拟合问题，适当降低采样频率对于轨迹的大致走势几乎没有影响，为了降低轨迹拟合的计算复杂度，在模型拟合前执行轨迹点数采样，其采样频率对于后续轨迹模型的拟合效果将会有很大的影响。
@@ -186,8 +187,8 @@ J(\heat{f})=\sum_{i}^{k}\left|a_{i}\right|_2^2
 我们只是指定了一个明确映射形式的高维映射$\varPhi \left( x \right) =\left( 1,x,x^2,...,x^{k-1} \right) $，故我们求解问题等同于一个指定高维映射的岭回归问题，我们可以通过求解核岭回归的方式求解文中的优化问题，而且核岭回归的求解问题是存在闭式解的，因此可以加快拟合的速度。
 
 将通过以上方法可以得到指定区间的函数参数。为了在中心节点能够还原出轨迹数据，除了传递函数参数信息，还需要传输必要的元信息，将元数据和参数信息打包形成的数据结构成为基于复合采样的轨迹数据单元（CSTD-Unit），其格式如下：
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline ID&StartX&StartY&EndX&EndY&Parament\\
+\begin{tabular}{|c|c|c|c|}
+\hline ID&StartX&EndX&Parament\\
 \hline
 \end{tabular}
 
@@ -195,9 +196,7 @@ J(\heat{f})=\sum_{i}^{k}\left|a_{i}\right|_2^2
 \begin{itemize}
 \item \mathbf{ID}：此字段包含了属节点编号、轨迹编号、所处区间
 \item \textbf{StartX}：此区间x轴上最小值
-\item \textbf{StartY}：此区间x轴上最小值对应的y值
-\item \textbf{StartX}：此区间x轴上最大值
-\item \textbf{StartX}：此区间x轴上最大值对应的y值
+\item \textbf{EndX}：此区间x轴上最大值
 \item \textbf{Parament}：此区间轨迹拟合函数参数
 \end{itemize}
 
@@ -208,7 +207,6 @@ J(\heat{f})=\sum_{i}^{k}\left|a_{i}\right|_2^2
 在接收到信息后，中心服务器根据各个计算节点传输的CSTD-Unit数据结构还原轨迹拟合函数，然后在还原出来的轨迹函数上依照原始数据的采样频率进行等间隔抽样，得到还原出的数据点，以此组成还原数据。将恢复的轨迹数据集输入到聚类模型中，本文选择的是K-means++算法，在第二章中描述了k-means算法的具体流程，k-means++只是在k-means基础上针对开始k个均值向量的初始化提供了具体的方法。k-means++方法，尽可能地使初始聚类中心分散开。这种方法首先随机产生一个初始聚类中心点，然后按照概率$P=\omega \sum_i{\left( x-c_i \right) ^2}$选取其他的聚类中心点。其中$\omega$是归一化系数。
 
 对于k值的选择，在上面的讨论中，我们一直把k当做已经给定的参数。但是在实际操作中，聚类类别数通常都是未知的。如何确定超参数k我们采用如下方法。\\
-
 ********************轨迹生成伪代码
 
 我们可以使用不同的k值进行试验，并作出不同试验收敛后目标函数随k的变化，将k值趋向稳定时的值作为我们的超参数。如下图\ref{chooseK}所示，分别使用1到7之间的几个数字作为k值，曲线在k=3处有一个较为明显的弯曲点。故确定k取值为3。
@@ -226,11 +224,22 @@ J(\heat{f})=\sum_{i}^{k}\left|a_{i}\right|_2^2
 \section{实验与分析}
 \subsection{理论分析}
 \textbf{******************时间复杂度分析，带宽分析，隐私分析}
+（1）时间复杂度
+
+计算节点时间复杂度分为两个阶段: 轨迹预处理和优化函数求解。
+
+轨迹预处理分为三个步骤，，轨迹数量抽样，轨迹点数抽样，分段和分区。假设轨迹数目为m条，每条轨迹含有点数为n，假设轨迹数量抽样阶段使用k-means算法进行聚类，其复杂度为O(m*n*k*t)，k表示簇个数，t是平均迭代次数。轨迹点数抽样复杂度为O(m)，
+轨迹分段阶段，对于每一条轨迹计算复杂度为O(2*(n-1))，对于m条轨迹则为O(m*2*(n-1))，化简即为O(m*n)；区间划分阶段，假设区间中数据点数为i，复杂度为O(2*(i-1))，若对于所有轨迹的所有区间进行分析，则复杂度为O(2*(n-1)*m)，化简为O(m*n)；优化函数求解阶段，若以最速下降法为例，每次迭代复杂度为O(n*m)，若平均迭代次数为t，则在此阶段时间复杂度为O(t*m*n)。综上，函数拟合时间复杂度为O(k*m*n*t)。
+
+中心节点的时间复杂度分为两个阶段：轨迹生成和全局聚类。假设轨迹数目为m，每条轨迹包含n个点,轨迹生成时间复杂度为O(m*n)；全局聚类，其时间复杂度为O(m*n*k*t)。\\\\
+（2）带宽消耗
+
+对于带宽分析，若对于每个节点，若轨迹数量抽样率为$\gamma$，轨迹点数抽样率为$\alpha$；对于n个数据点进行轨迹拟合后的参数向量通过稀疏表示后的压缩率为$\beta$（即需要n*α参数拟合），则对于一个含有m条轨迹、每条轨迹拥有n个数据点、每个数据点维度为2的节点来说，将其传递给中心节点的网络通信量为$(m*n)/(\gamma*\alpha*\beta)$；若是传输数据，则网络通信量为m*n*2，故网络通信量的压缩比为$2*\gamma*\alpha*\beta$，在此压缩比下，聚类准确度分析将在第五章详细介绍。
 
 \subsection{实验与分析}
 实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了时间、位置x、位置y、人物id等字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了4939条轨迹作为原始数据集，每条轨迹包含500个点。
 
-实验系统由四个属地中心节点和一个中心节点组成。将该算法与两种聚类方法baseline进行了比较。第一种算法对整个数据集执行标准的DBSCAN 算法(baseline I)，而第二种算法直接将抽样的轨迹传输到中心服务器进行聚类(baseline II)，总带宽与我们的算法相同。baseline I的结果为最优结果。
+实验系统由三个计算节点和一个中心节点组成。将该算法与两种聚类方法baseline进行了比较。第一种算法对整个数据集执行标准的k-means算法(baseline I)，而第二种算法直接将抽样的轨迹传输到中心服务器进行聚类(baseline II)。baseline I 的结果视为最优结果，后续实验中使用的ARI指数则是以 baselien I 的聚类结果作为标签的。第三种算法则是本章提出的 CSD-Clustering 算法。
 
 评估实验结果采用两个指标：CR，表示算法的数据压缩能力；ARI，表示聚类结果的精度。
 
@@ -258,15 +267,15 @@ J(\heat{f})=\sum_{i}^{k}\left|a_{i}\right|_2^2
 
 关于聚类效果，我们设定参数S的取值为5，C取值为1。在聚类过程中，我们将K的值设为**************。
 
-此处我们固定α=1，为β设置不同值。根据表\ref{differentCYL}，随着β的增加，聚类算法baseline II的结果逐渐接近baseline I。然而，更高的ARI值会造成CR值变低，导致消耗更多的网络带宽。
+此处我们固定$\gamma$=1，为$\alpha$设置不同值。根据表\ref{differentALPHA}，随着β的增加，聚类算法baseline II的结果逐渐接近baseline I。然而，更高的ARI值会造成CR值变低，导致消耗更多的网络带宽。
 
-随着β的增加，CSD-Clustering聚类的ARI值起初上升然后稍微降低。下降的原因是朗格现象。虽然我们也采取了相应的措施，只是减轻了朗格现象的影响，而不是消除它。当β相同时，我们的算法在ARI值和CR两个指标上表现比baseline2要好。
+随着β的增加，CSD-Clustering聚类的ARI值起初上升然后稍微降低。下降的原因是朗格现象。虽然我们也采取了相应的措施，只是减轻了朗格现象的影响，而不是消除它。当$\alpha$相同时，我们的算法在ARI值和CR两个指标上表现比baselineII要好。
 \begin{table}[]
-\label{differentCYL}
-\caption{不同采样率对比}
+\label{differentALPHA}
+\caption{不同轨迹点数采样率对比}
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline
-\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}beta\\ \\ 评价指标\end{tabular}} & \multicolumn{2}{c|}{0.1}     & \multicolumn{2}{c|}{0.3}     & \multicolumn{2}{c|}{0.5}     \\ \cline{2-7} 
+\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}\alpha\\ \\ 评价指标\end{tabular}} & \multicolumn{2}{c|}{0.1}     & \multicolumn{2}{c|}{0.3}     & \multicolumn{2}{c|}{0.5}     \\ \cline{2-7} 
                                                                         & baseline II & CSD-Clustering & baseline II & CSD-Clustering & baseline II & CSD-Clustering \\ \hline
 ARI                                                                     & 0.79        & 0.81           & 0.80        & 0.93           & 0.81        & 0.91           \\ \hline
 CR                                                                      & 10          & 20             & 3.33        & 6.67           & 2           & 4              \\ \hline
@@ -287,11 +296,11 @@ CR                    & 10          & 10             \\ \hline
 \end{table}
 
 然后我们测试轨迹数量采样率对实验的影响。\\
-此处，设定β=0.2，为α设置不同值来验证不同采样大小的影响。从图\ref{differentALPHA}可以看出，随着α的增加，聚类的精度也不断增加。同时，随着α的增加，模型会逐渐收敛，带宽消耗的效率较低。
+此处，设定$\alpha$=0.2，为$\gamma$设置不同值来验证不同采样大小的影响。从图\ref{differentGAMMA}可以看出，随着$\gamma$的增加，聚类的精度也不断增加。同时，随着$\gamma$的增加，模型会逐渐收敛，带宽消耗的效率较低。
 \begin{figure}[h]
-	\includegraphics[height=4.5cm,width=7.5cm]{differentALPHA.png}
-	\caption{不同α取值下CSD-Clustering算法的结果}
-	\label{differentALPHA}
+	\includegraphics[height=4.5cm,width=7.5cm]{differentGAMMA.png}
+	\caption{不同轨迹数量采样率对比}
+	\label{differentGAMMA}
 \end{figure}
 
 \section{本章小结}
