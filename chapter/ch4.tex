@@ -86,15 +86,15 @@ k-means++初始化操作如下：\\
 \end{figure}
 
 对于轨迹数据可以采用同样的方法对其进行网格化，网格化规则可以通过下面式子表示：
-\[
+\begin{center}
 f\left( x \right) =\left\{ \begin{array}{c}
 	sign\left( x \right) *\left( \lfloor x \rfloor +1 \right) \,\,if\,\,|x-\lfloor x \rfloor |>0.5\\
 	sign\left( x \right) *\left( \lfloor x \rfloor -1 \right) \,\,if\,\,|x-\lfloor x \rfloor |\leqslant 0.5|\\
-\end{array} \right. \\
-\varPhi \left( \left( x,y \right) \right) =\left( f\left( x \right) ,f\left( y \right) \right) 
-\\
-g\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_l,y_l \right) \right\} =\left( x_1,y_1 \right) \,\, if\,\,\left( x_1,y_1 \right) =\left( x_2,y_2 \right) =...=\left( x_l,y_l \right) 
-\]
+\end{array} \right\\
+\varPhi \left( \left( x,y \right) \right) =\left( f\left( x \right) ,f\left( y \right) \right)\\
+g\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_l,y_l \right) \right\} =\left( x_1,y_1 \right) \,\, if\,\,\left( x_1,y_1 \right) =\left( x_2,y_2 \right) =...=\left( x_l,y_l \right)
+\end{center}
+
 
 其中，sign(x)表示实数x的符号。通过上式规则对轨迹中的每一个坐标点进行网格化，图\ref{gridization}展现了轨迹经过网格化后的效果，图\ref{originaltrajectory}表示原始轨迹数据，图\ref{gridedtrajectory}表示网格化后的轨迹数据。网格化对轨迹数据的精度造成了一定程度的影响，但是完全不影响其对轨迹形状的刻画。
 \begin{figure}[h]
@@ -189,13 +189,15 @@ LL(A)分别对$p_1$和$p_2$求导：
 
 通过求解上式方程组可得到方程组的解为：
 \[
-\{ \begin{array}{c}
+\begin{cases}
+\begin{array}{c}
 	\begin{array}{c}
 	p_1=\frac{n_1}{n_1+n_2+n_3}\\
 	p_2=\frac{n_2}{n_1+n_2+n_3}\\
 \end{array}\\
 	p_3=\frac{n_3}{n_1+n_2+n_3}\\
-\end{array} 
+\end{array}    
+\end{cases}
 \]
 
 依照上式解的形式，转移矩阵可以在O(n)时间复杂度内可以得到。
