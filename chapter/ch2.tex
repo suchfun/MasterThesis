@@ -1,12 +1,18 @@
 \chapter{相关理论与技术}
+
 \section{概论}
+
+本章对后续章节所用到的相关理论和技术进行简介，主要包括常用的聚类算法（k-means算法和k-medoids算法）以及聚类算法的评估标准、稀疏矩阵的存储方式和多项式拟合技术，对最优化理论进行了简单的阐述，最后简单介绍了马尔科夫链模型。这些理论为后续研究提供了理论机基础。
 
 \section{聚类算法}
 聚类算法是一种无监督学习算法，及数据集中的每个数据项不带有标签信息，通过统计分析技术将数据集分成不同的子集或簇，使得分到同一子集或簇的成员对象都有某种相似的特征。这种技术被广泛应用与各个领域，包括机器学习、数据挖掘、模式识别等。
 
-\subsection{K-Means 算法}
+\subsection{k-means 算法}
+
+k-means算法由文献\cite{hartigan1979algorithm}正式提出，现已成为数据挖掘中常用的聚类算法，其算法主要求解思路是一种启发性算法，求解过程利用了EM算法\citing{AMaximum}，通过不断迭代优化直到满足停止迭代的条件。
 
 \subsubsection{算法流程及复杂度分析}
+
 现有样本集$D=\left\{x_1,x_2,...,x_m\}\right\}$，K-Means算法将数据集划分成互不相交的K个簇$C=\left\{C_1,C_2,...,C_K\}\right\}$,且满足$C_1\bigcup{C_2\bigcup{...\bigcup{C_m=D}}}$，每个簇的簇心$\mu _i=\frac{1}{|C_i|}\sum_{\mathbf{x}\in C_i}{\mathbf{x}}$。
 其流程如下：\\
 \begin{algorithm}[H]
@@ -14,7 +20,7 @@
 	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_k\}\right\}$}
 	 从数据集D中随机初始化K个样本，将其作为K个初始簇心\;
 	 \Repeat{所有簇心不再更新或更新值小于一定阈值}{
-		 将所有的簇置为空，$C_i=\phi \,\,\left( 1\leqslant i\leqslant K \right)$
+		 将所有的簇置为空，$C_i=\phi \,\,\left( 1\leqslant i\leqslant K \right)$\\
 		 \For{j=1,2,...,m}{
 		 	计算样本$x_i$与所有簇心之间的距离，并将$x_i$归为第$\alpha _i$类，使其满足：
 		 	$\alpha _i=arg\,\,\min \left( d_{i\alpha _i} \right) $\\其中：
@@ -22,19 +28,39 @@
 		 	将样本$x_i$划入簇$C_{\alpha _i}$
 		 }
 		 \For{i=1,2,...,K}{
-		 	$\hat{\mu}_i=\frac{1}{|C_i|}\sum_{x\in C_i}{x}$
+		 	$\hat{\mu}_i=\frac{1}{|C_i|}\sum_{x\in C_i}{x}$\\
 		 	\If{$\hat{\mu}_i\ne \mu _i$}{
 		 		$\mu _i$=$\hat{\mu}_i$
 		 	}
 		 }
 	 }
-	 \caption{kmeans}
+	 \caption{k-means 算法}
+\end{algorithm}
+从上述流程可以得到，k-means算法复杂度为O(n*k*t)，其中n表示样本数目，k表示簇个数，t是平均迭代次数。
+
+\subsection{k-medoids 算法}
+k-means算法要求元素维度相同且距离度量必须基于欧式距离，如果需要对不规整的数据进行聚类，k-means算法显然无法解决此类聚类问题。针对不规整的数据，可以采用k-medoids算法\citing{rdusseeun1987clustering}进行聚类。k-medoids算法只需输入距离矩阵即可，所以对距离度量方法也更加宽泛。k-medoids流程如下：\\
+\begin{algorithm}[H]
+	 \KwData{样本距离矩阵$M_{nn}$，簇个数K}
+	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_k\}\right\}$}
+	 随机初始化K个样本，将其作为K个初始簇心\;
+	 \Repeat{所有簇心不再更新或更新值小于一定阈值}{
+		 将所有的簇置为空，$C_i=\phi \,\,\left( 1\leqslant i\leqslant K \right)$\\
+		 \For{j=1,2,...,m}{
+		 	依据距离矩阵，计算序号为i的样本与所有簇心之间的距离，并将序号为i的样本归为第$\alpha _i$类，使其满足：
+		 	$\alpha _i=arg\,\,\min \left( M[i，alpha _i] \right) $\\
+		 }
+		 \For{i=1,2,...,K}{
+		 	$\hat{\mu }_i=arg\,\,\min_{x\in C_i} \left( \sum_{j\in C_i}{M\left[ x,j \right]} \right) $\\
+		 	\If{$\hat{\mu}_i\ne \mu _i$}{
+		 		$\mu _i$=$\hat{\mu}_i$
+		 	}
+		 }
+	 }
+	 \caption{k-medoids 算法}
 \end{algorithm}
 
-从上述流程可以得到，k-means算法复杂度为O(n*k*t)，其中n表示样本数目，k表示簇个数，t是平均迭代次数。
-\subsubsection{收敛性证明}
-
-\subsection{*********kmedoids**********}
+从上述流程可以得到，k-medoids算法复杂度同k-means一样为O(n*k*t)，其中n表示样本数目，k表示簇个数，t是平均迭代次数。
 
 
 \subsection{聚类评估指标}
@@ -60,17 +86,18 @@
 \mathrm{RI}=\frac{2(a+d)}{m(m-1)}
 \end{equation}
 
-但是Rand指数对于不同聚类结果的区分度不高，于是基于Rand指数，提出了Adjusted Rand Index\citing{rand1971objective}。
+但是Rand指数对于不同聚类结果的区分度不高，于是基于Rand指数，提出了Adjusted Rand Index\citing{rand1971objective}。首先定义列联表,如下：
 \[
-\begin{matrix}{c|ccccc}
+\begin{array}{c|ccccc}
 	&		C_{1}^{*}&		C_{2}^{*}&		\dots&		C_{S}^{*}&		\,\,\text{Sums}\\
 	\hline
 	C_1&		n_{11}&		n_{12}&		\dots&		n_{1S}&		a_1\\
 	C_2&		n_{21}&		n_{22}&		\dots&		n_{2S}&		a_2\\
 	\vdots&		\vdots&		\vdots&		\ddots&		\vdots&		\vdots\\
 	C_K&		n_{K1}&		n_{K2}&		\cdots&		n_{KS}&		a_K\\
-	\,\,\text{Sums}&		b_1&		b_2&		\dots&		b_S&		\\
-\end{matrix}
+	\hline
+	\,\,\text{Sums}&		b_1&		b_2&		\dots&		b_S&		n\\
+\end{array}
 \]
 
 其中$n_{ij}$表示簇$C_{i}$和簇$C_{i}^{*}$之间共同存在的对象个数，即$n_{i j}=\left|X_{i} \cap Y_{j}\right|$。ARI指数定义如下：
@@ -109,7 +136,7 @@ ARI=\frac{\sum_{ij}{\left( \begin{array}{c}
 
 \subsubsection{内部指标}
 
-若直接评估聚类结果本身，则需要考虑内部指标，同样设定聚类算法得到的簇划分为$C=\left\{C_1,C_2,...,C_K\}\right\}$。在定义内部指标之前，先定义几种距离公式：
+若直接评估聚类结果本身，则需要考虑内部指标，同样设定聚类算法得到的簇划分为$C=\left\{C_1,C_2,...,C_K\right\}$。在定义内部指标之前，先定义几种距离公式：
 \begin{equation}
 \label{distance}
 \begin{aligned}
@@ -134,7 +161,94 @@ DI=\min _{1 \leqslant i \leqslant k}\left\{\min _{j \neq i}\left(\frac{d_{\min }
 
 DBI的值越小表示聚类效果越好，DI相反，其值越大表示聚类效果更好。
 
-\section{*********************矩阵稀疏表示}
+\section{矩阵稀疏存储格式}
+
+计算机经常会对矩阵形式的数据进行处理，在实际场景中处理的矩阵往往包含很多零元素，大部分元素为零元素的矩阵称为稀疏矩阵，对于稀疏矩阵，可以通过特定的存储方式来代替矩阵格式的存储方式，可以大大减少存储的压力。
+
+\subsection{COO存储格式}
+
+COO存储格式对矩阵中的非零元素的坐标和取值进行存储，利用row向量、column向量和value向量来表示稀疏矩阵中的非零元素。假设现在有矩阵T，其内容如下：
+\[T=\left[ \begin{matrix}
+	0&		0&		1&		0\\
+	3&		0&		0&		0\\
+	0&		0&		0&		4\\
+	2&		0&		0&		0\\
+\end{matrix} \right] \]
+
+利用COO存储格式则将矩阵A转换成如下三个向量：
+\[\begin{matrix}
+	row&		column&		value\\
+	0&		2&		1\\
+	\begin{array}{c}
+	1\\
+	\begin{array}{c}
+	2\\
+	3\\
+\end{array}\\
+\end{array}&		\begin{array}{c}
+	0\\
+	\begin{array}{c}
+	3\\
+	0\\
+\end{array}\\
+\end{array}&		\begin{array}{c}
+	3\\
+	\begin{array}{c}
+	4\\
+	2\\
+\end{array}\\
+\end{array}\\
+\end{matrix}\]
+
+利用坐标和取值来存储稀疏矩阵还有另一种方式：DOK（Dictionary of keys），只不过是通过键值对来表示非零元素的坐标和取值的，上式的矩阵T可以通过如下键值对来表示：
+\[\begin{matrix}
+	key&		value\\
+	\begin{array}{c}
+	\left( 0,2 \right)\\
+	\begin{array}{c}
+	\begin{array}{c}
+	\left( 1,0 \right)\\
+	\left( 2,3 \right)\\
+\end{array}\\
+	\left( 3,0 \right)\\
+\end{array}\\
+\end{array}&		\begin{array}{c}
+	\begin{array}{c}
+	\begin{array}{c}
+	1\\
+	3\\
+\end{array}\\
+	4\\
+\end{array}\\
+	2\\
+\end{array}\\
+\end{matrix}\]
+
+\subsection{CSR存储格式}
+
+CRS存储是基于COO存储的改进\citing{bulucc2009parallel}，CRS通过三个向量来存储稀疏矩阵：A,IA和JA。A向量是存储矩阵所有非零元素的数组，元素顺序是行优先，即从左到右、从上往下，如图\ref{rowmajor}所示，IA向量中的元素是递推得到的，IA元素的个数为行数加一，递推关系如下：
+\[
+\begin{aligned}
+IA\left[ 0 \right] &=0
+\\
+IA\left[ i \right] &=IA\left[ i-1 \right] +第i\text{行非零元素的个数} 0<i<m
+\end{aligned}
+\]
+第三个向量JA是A中每个元素的列索引，同样针对稀疏矩阵T，我们利用CRS存储方式可以表示为：
+\[
+\begin{aligned}
+A&=\left[ 1,3,4,2 \right] 
+\\
+IA&=\left[ 0,1,2,3,4 \right] 
+\\
+JA&=\left[ 2,0,3,0 \right] 
+\end{aligned}
+\]
+\begin{figure}[h]
+	\includegraphics[height=4.5cm,width=7.5cm]{rowmajor.png}
+	\caption{CRS存储元素的顺序}
+	\label{rowmajor}
+\end{figure}
 
 \section{多项式拟合}
 轨迹数据中的每条轨迹一般是由若干个点组成，有时需要通过这若干个点来拟合轨迹曲线，本文使用多项式来实现轨迹的拟合。
@@ -288,3 +402,4 @@ p_{ij}=p\left( X_{n+1}=i|X_n=j \right) =0 \left( i\notin Adj\left( j \right) \ri
 
 \section{本章小结}
 
+本章对本文涉及到的理论技术进行了简要的概述。首先介绍了两种聚类算法：k-means算法和k-medoids算法，并通过伪代码展示了算法的流程，并分析了聚类算法的两种评估指标，即内部指标和外部指标；然后介绍了多项式拟合技术，引出了幂级数中关于收敛域的讨论；随后简单介绍了最优化理论，并针对无约束优化问题引出了经验误差加正则化的通用方法和常用求解算法；最后介绍了马尔科夫链模型，阐述了马尔科夫链建模的特性。本章介绍的所有理论技术对后文研究起到了举足轻重的作用。
