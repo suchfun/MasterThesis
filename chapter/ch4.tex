@@ -1,18 +1,19 @@
 \chapter{基于马尔科夫链的分布式轨迹聚类算法}
 
+%已研究的缺点：
+%1.需要数据聚集，不符合场景和隐私
+%2.统计信息+代表向量
+%3.概率模型
+
 \section{*****************引言}
-列出目前分布式轨迹聚类或者说分布式聚类的处理方法，即传输原型向量或概率密度估计的方法。
-
-阐述这样做的缺点，可以添加图。
-
-分布不确定性和高维数据生成模型估计问题
+针对由局部聚类结果和统计信息组成的数据结构到数据分布的多样性问题，由部分研究采用概率密度分布模型来描述本地数据分布\citing{Klusch2003Distributed}\citing{merugu2003privacy}，这类方法可以有效估计低维数据的数据分布，但是针对高维数据的数据分布则由于训练数据规模大小的限制，在估计数据分布上表示很差，而轨迹数据是一种高维数据，故通过概率密度分布模型来估计本地轨迹数据分布是行不通的，对于第三章提出的CSD-Clustering算法，计算节点需要拟合所有轨迹的多项式模型，在本地数据规模大的情形下，计算节点的计算能力将成为算法的瓶颈，而且通过拟合的多项式模型还原出的轨迹数据，虽然与原始轨迹数据不相同，但却与原始数据有着一定程度的相似性，这对中心节点的权威性也提出了一定的挑战。
 
 \section{基于马尔科夫链的分布式聚类算法}
 
 \sucsection{总体方案}
 为了避免分布不确定性问题和高维数据生成模型轨迹问题，我们提出基于马尔科夫链的分布式聚类算法（MCD-Clustering）。为了避免分布不确定性问题，很自然想到直接传输属地数据概率分布模型参数到中心节点，这种方法在数据量大和数据维度低时使用，而一条具有500个二维坐标点的轨迹数据可以将其看做维度为1000的数据，此时估计数据概率分布模型的方法将不再使用，我们必须通过另外一种模型来估计轨迹数据的概率分布模型。因为每条轨迹各个点之间显然不是独立于彼此的，故当我们将轨迹数据看做是高维数据时，由于每条轨迹数据相邻点存在相关性，可以看做维度和维度之间存在相关性，我们基于这种认知提出使用马尔科夫链来模拟一簇相似轨迹的生成模型，于是提出了基于马尔科夫链的分布式聚类算法（MCD-Clustering）。方案大致流程如图\ref{ch4frame}所示解：
 \begin{figure}[h]
-	\includegraphics[height=4.5cm,width=7.5cm]{ch4frame.png}
+	\includegraphics[width=1.0\textwidth]{ch4frame.png}
 	\caption{MCD-Clustering 算法框架}
 	\label{ch4frame}
 \end{figure}
@@ -80,30 +81,30 @@ k-means++初始化操作如下：\\
 
 轨迹子簇生成后，针对每个子簇进行网格化。原始轨迹数据中的坐标点在二维连续空间上取值，将轨迹数据网格化后，轨迹所有坐标点在二维离散网格空间取值。最简单的网格化则是将二维连续空间中的点坐标取整，即将二维连续空间映射到由所有整数构成的坐标形成的二维离散网格空间，如图\ref{gridization}所示。
 \begin{figure}[h]
-	\includegraphics[height=4.5cm,width=7.5cm]{gridization.png}
+	\includegraphics[width=1.0\textwidth]{gridization.png}
 	\caption{空间网格化}
 	\label{gridization}
 \end{figure}
 
 对于轨迹数据可以采用同样的方法对其进行网格化，网格化规则可以通过下面式子表示：
-\begin{center}
+\begin{aligned}
 f\left( x \right) =\left\{ \begin{array}{c}
 	sign\left( x \right) *\left( \lfloor x \rfloor +1 \right) \,\,if\,\,|x-\lfloor x \rfloor |>0.5\\
 	sign\left( x \right) *\left( \lfloor x \rfloor -1 \right) \,\,if\,\,|x-\lfloor x \rfloor |\leqslant 0.5|\\
 \end{array} \right\\
 \varPhi \left( \left( x,y \right) \right) =\left( f\left( x \right) ,f\left( y \right) \right)\\
 g\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_l,y_l \right) \right\} =\left( x_1,y_1 \right) \,\, if\,\,\left( x_1,y_1 \right) =\left( x_2,y_2 \right) =...=\left( x_l,y_l \right)
-\end{center}
+\end{aligned}
 
 
 其中，sign(x)表示实数x的符号。通过上式规则对轨迹中的每一个坐标点进行网格化，图\ref{gridization}展现了轨迹经过网格化后的效果，图\ref{originaltrajectory}表示原始轨迹数据，图\ref{gridedtrajectory}表示网格化后的轨迹数据。网格化对轨迹数据的精度造成了一定程度的影响，但是完全不影响其对轨迹形状的刻画。
 \begin{figure}[h]
 \subfigure[]{
 \label{originaltrajectory}
-\includegraphics[width=6.77cm]{originaltrajectory.png}}
+\includegraphics[width=0.5\textwidth]{originaltrajectory.png}}
 \subfigure[]{
 \label{gridedtrajectory}
-\includegraphics[width=7.04cm]{gridedtrajectory.png}}
+\includegraphics[width=0.5\textwidth]{gridedtrajectory.png}}
 \caption{轨迹网格化前后对比}
 \label{gridization}
 \end{figure}
@@ -275,7 +276,7 @@ d_{\text{H}}\left( A,B \right) =\max \left\{ \mathop{\text{sup}}_a\in A\mathop{\
 
 对于三种聚类方案中，都需要对簇个数进行选择，我们以 baseline I 实验中选取的k视为标准，在 baseline I 实验中选取不同的K值其损失函数值变化情况如图\ref{differentK}。
 \begin{figure}[h]
-	\includegraphics[height=4.5cm,width=7.5cm]{replace.png}
+	\includegraphics[width=1.0\textwidth]{replace.png}
 	\caption{不同K值损失函数变化}
 	\label{differentK}
 \end{figure}
@@ -284,7 +285,7 @@ d_{\text{H}}\left( A,B \right) =\max \left\{ \mathop{\text{sup}}_a\in A\mathop{\
 
 在 MCD-Clustering 算法中的局部聚类过程，K值选取将会影响马尔科夫链对轨迹生成模型的估计，图\ref{differentKJB}展示了局部聚类不同K值下的ARI指数变化。
 \begin{figure}[h]
-	\includegraphics[height=4.5cm,width=7.5cm]{replace.png}
+	\includegraphics[width=1.0\textwidth]{replace.png}
 	\caption{局部聚类不同K值对实验结果的影响}
 	\label{differentKJB}
 \end{figure}
@@ -293,7 +294,7 @@ d_{\text{H}}\left( A,B \right) =\max \left\{ \mathop{\text{sup}}_a\in A\mathop{\
 
 在 MCD-Clustering 算法中对轨迹数据进行了网格化处理，假设网格化粒度记为$\delta$，若$\delta$越大则表示网格化粒度越粗，反之，则网格化粒度越精细。我们对不同网格化粒度情况下 MCD-Clustering 算法的聚类效果进行了实验，实验结果如图\ref{differentDELTA}。
 \begin{figure}[h]
-	\includegraphics[height=4.5cm,width=7.5cm]{replace.png}
+	\includegraphics[width=1.0\textwidth]{replace.png}
 	\caption{不同网格粒度对实验结果的影响}
 	\label{differentDELTA}
 \end{figure}
