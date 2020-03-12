@@ -11,7 +11,7 @@
 
 另一部分研究主流思路是基于局部聚类和全局聚类相结合的方式\citing{Januzaj2004Scalable}\citing{郑苗苗2007DK}\citing{merugu2003privacy}，其主要思想为：在分布式框架中有两种角色，若干个计算节点和一个中心节点，计算节点基于本地的数据先进行局部聚类，然后依据局部聚类结果和一些额外的统计信息组成特定的数据结构，各个计算节点将由局部聚类结果和统计信息组成的数据结构通过网络传输给中心节点，中心节点利用局部聚类结果进行全局聚类，然后将全局聚类结果传输给各个计算节点。这类方法由于其在计算准确度、带宽和隐私性层面三方面的平衡，受到了很多学者的青睐，但这类算法的计算准确度不太稳定，造成这种不稳定的原因是这类方法在网络中传输的数据结构与数据的真实分布不是一一映射的关系，一个计算节点利用局部聚类结果和统计信息组成的数据结构可能对应多种数据分布，而这种映射到数据分布的多样性将给后续的全局聚类造成影响，数据结构到数据分布的多样性如图\ref{diversity}
 \begin{figure}[h]
-	\includegraphics[width=1.0\textwidth]{diversity.png}
+	\includegraphics[width=0.8\textwidth]{diversity.png}
 	\caption{数据结构到数据分布映射的多样性}
 	\label{diversity}
 \end{figure}
@@ -48,10 +48,7 @@ P=\left[\begin{array}{lll}
 Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_{x}^{i}\right)^{2}+\left(a_{y}^{i}-b_{y}^{i}\right)^{2}}
 \end{equation}
 
-其中$a_x^i$表示轨迹a第i个点在x维度上的数值，$a_y^i$表示轨迹a第i个点在y维度上的数值，$b_x^i$ 、$b_y^i$则分别代表轨迹b第i个点在x、y维度上的数值。	\\
-
-% ==========隐私刻画指标
-\textbf{******************隐私刻画指标}\\
+其中$a_x^i$表示轨迹a第i个点在x维度上的数值，$a_y^i$表示轨迹a第i个点在y维度上的数值，$b_x^i$ 、$b_y^i$则分别代表轨迹b第i个点在x、y维度上的数值。	
 
 我们的基本目标是对分布的轨迹数据进行联合处理，快速获取精度的聚类结果，同时减少数据处理的带宽消耗，并保持每条轨迹数据的隐私安全性。为了提高聚类算法的精度，我们采用了ARI指数，其计算方式如式\ref{ARI}ARI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。
 
@@ -61,29 +58,32 @@ Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_
 \mathrm{CR}=\frac{I F}{T F}
 \end{equation}
 
+对于算法隐私保护层面的评价指标，我们从两个方面进行刻画：不确定性和覆盖度。
 
-\subsection{基于复合采样的分布式轨迹聚类算法}
+（1）不确定性：假设攻击者能够从网络传输数据中还原算法模型，从算法模型生成的数据与原始数据的相似程度。
 
-\subsubsection{总体流程}
+（2）覆盖度：从网络中进行传输的数据中获取的信息量占原始数据信息量的百分比。注意这个度量指标与网络中传输数据量的大小和上述提到的不确定性无关，该指标只与训练模型使用到的数据与原始数据的占比有关。
+
+\subsection{总体流程}
 本文提出了基于复合采样的分布式聚类算法（CSD-Clustering），算法的总体框架如图\ref{cha3frame}所示：
 \begin{figure}[h]
-	\includegraphics[width=1.0\textwidth]{ch3frame.png}
+	\includegraphics[width=0.8\textwidth]{ch3frame.png}
 	\caption{CSD-Clustering 算法框架}
 	\label{ch3frame}
 \end{figure}
 
 该算法主要包括四个步骤：首先，属地轨迹建模，在各个属地节点对属地的每条轨迹数据进行预处理和抽样（包含轨迹数量抽样和每条轨迹坐标点抽样），并采用多项式函数拟合各采样轨迹曲线；第二步，局部模型传输，每个属地中心节点将拟合的轨迹函数参数信息发送到中心服务器上。第三步，聚类与反馈，中心服务器根据从接收参数中恢复的轨迹计算聚类结果。最后，属地轨迹聚类，中央服务器将聚类结果返回给每个属地中心节点，最终结果在本地产生。 
 
-\subsubsection{属地数据预处理}
-属地数据预处理可以分为四个步骤，轨迹数量抽样，轨迹点数抽样，分段和分区。
-\textbf{******************可以添加一张图 }
+\subsection{属轨迹地数据预处理}
+属地数据预处理可以分为四个步骤，轨迹数量抽样，轨迹点数抽样，分段和分区。如图\ref{ch3pre}所示。
+\begin{figure}[h]
+	\includegraphics[width=0.8\textwidth]{ch3pre.png}
+	\caption{属地轨迹数据预处理}
+	\label{ch3pre}
+\end{figure}
 
-\subsubsubsection{轨迹数量抽样}
-考虑到更大程度上减少网络中的传输流量和各属地轨迹数据集中存在的数据冗余，属地在对轨迹进行建模前进行轨迹数量上的抽样，但应注意，为了保证全局层面聚类的准确度，分布式平台中的所有属地中心在轨迹数量采样上的采样率应保持一致，且采样的轨迹应具有一定的代表性。可以采用一种VQ算法，比如SOM。\\
-\textbf{******************未完成}
-先进行聚类，然后从每个簇中按照一点比例抽取就好。
+考虑到更大程度上减少网络中的传输流量和各属地轨迹数据集中存在的数据冗余，属地在对轨迹进行建模前进行轨迹数量上的抽样，但应注意，为了保证全局层面聚类的准确度，分布式平台中的所有属地中心在轨迹数量采样上的采样率应保持一致，且采样的轨迹应具有一定的代表性。可以采用一种VQ算法，最典型的VQ算法即是聚类算法。本文采用了k-means聚类算法，其算法流程如算法\ref{kmeans}所示，将属地轨迹数据集输入到k-means算法，得到输出结果，即簇划分$C=\left\{C_1,C_2,...,C_k\}\right\}$，在每个簇中，采用指定的抽样频率对簇中的轨迹进行随机抽样，对抽样得到的所有轨迹集合中的每条轨迹将执行后续预处理操作。
 
-\subsubsubsection{轨迹预处理}
 假设每条轨迹由n个坐标点组成，由于传感器的采样频率一般很高，所以轨迹中相邻点之间的距离相隔很近，针对轨迹拟合问题，适当降低采样频率对于轨迹的大致走势几乎没有影响，为了降低轨迹拟合的计算复杂度，在模型拟合前执行轨迹点数采样，其采样频率对于后续轨迹模型的拟合效果将会有很大的影响。
 
 在轨迹建模阶段前，CSD-Clustering需要将每个轨迹分割成连续的段。其根本原因是，通过函数拟合的曲线必须满足自变量到函数值的唯一映射，当一个自变量对应多个函数值时，函数是无法拟合的。因此，我们采用了轨迹分段的方法，目的是使得轨迹分段曲线任意一个变量中值只对应一个因变量值。
@@ -121,7 +121,7 @@ f\left( x \right) =\sum_{i=0}^n{\frac{f^{\left( i \right)}\left( 0 \right)}{i!}}
 
 其中S是人工设置的阈值。
 
-\subsubsection{属地轨迹拟合}
+\subsection{属地轨迹拟合}
 对第i区间含有k个数据点，$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \ldots,\left(x_{k}, y_{k}\right)\right\}$，定义损失函数：
 \[
 \mathrm{L}\left(y_{i}, \mathrm{\hat{f}}\left(x_{i}\right)\right)=\left(\mathrm{y_i}-\mathrm{\hat{f}}\left(x_{i}\right)\right)^{2}
@@ -168,7 +168,7 @@ f\left( x \right) =\sum_{i=0}^n{\frac{f^{\left( i \right)}\left( 0 \right)}{i!}}
 
 由于$\mathrm{x}_{0}, \mathrm{x}_{1}, \dots, \mathrm{x}_{k}$彼此不相等，所以行列式$|A^T| \ne 0$，此时存在唯一一个k-1次多项式能够包含所有数据点，此时用k-1阶多项式$\hat{f}(x)$拟合曲线的经验风险为0，拟合的函数曲线穿过每一个坐标点，而且此时求解模型的所有计算量只需计算出系数矩阵A即可。但由于数据不可避免受到噪音污染，我们并不要求拟合的函数曲线严格穿过每一个坐标点，通过求解线性方程组解得的模型往往复杂度很高，可以通过简单实验验证，我们假设在$y=x^2$附近取9个点，通过以上求解线性方程组的方法可以得到一个8阶的多项式，拟合的8阶多项式可以通过所有坐标点，但函数形式却过于复杂，如图\ref{empire0}：
 \begin{figure}[h]
-	\includegraphics[width=1.0\textwidth]{empire0.png}
+	\includegraphics[width=0.8\textwidth]{empire0.png}
 	\caption{无正则化拟合}
 	\label{empire0}
 \end{figure}
@@ -209,7 +209,7 @@ $$
 \end{tabular}
 $$
 
-数据格式字段含义如下：
+数据单元格式字段含义如下：
 \begin{itemize}
 \item \mathbf{ID}：此字段包含了属节点编号、轨迹编号、所处区间
 \item \textbf{StartX}：此区间x轴上最小值
@@ -219,28 +219,85 @@ $$
 
 各个计算节点把轨迹所有分区坐标信息转化成许多CSTD-Unit传递给中心节点，中心节点通过这种特殊的数据结构能够将轨迹数据进行还原。
 
-\subsubsection{综合模型求解和模型回传}
+\subsection{综合模型求解和模型回传}
 
-在接收到信息后，中心服务器根据各个计算节点传输的CSTD-Unit数据结构还原轨迹拟合函数，然后在还原出来的轨迹函数上依照原始数据的采样频率进行等间隔抽样，得到还原出的数据点，以此组成还原数据。将恢复的轨迹数据集输入到聚类模型中，本文选择的是K-means++算法，在第二章中描述了k-means算法的具体流程，k-means++只是在k-means基础上针对开始k个均值向量的初始化提供了具体的方法。k-means++方法，尽可能地使初始聚类中心分散开。这种方法首先随机产生一个初始聚类中心点，然后按照概率$P=\omega \sum_i{\left( x-c_i \right) ^2}$选取其他的聚类中心点。其中$\omega$是归一化系数。
+在接收到信息后，中心服务器根据各个计算节点传输的CSTD-Unit数据单元还原轨迹拟合函数，然后在还原出来的轨迹函数上依照原始数据的采样频率进行等间隔抽样，得到还原出的数据点，以此组成还原数据，从CSTD-Unit数据单元中还原轨迹数据的过程称为轨迹生成过程，轨迹生成过程操作流程如算法\ref{ch3gen}所示。
+\begin{algorithm}[H]
+	 \KwData{CSTD-Unit数据单元集合U}
+	 \KwResult{生成轨迹集合G}
+	 \For{unit in U}{
+	 		初始化序列ys;\\
+	 		id = unit['ID'];\\
+	 		para = unit['Prament'];\\
+	 		xmin = unit['StartX'];\\
+	 		xmax = unit['EndX'];\\
+	 		以一定采样率在区间[xmin,xmax]上进行均匀采样，得到序列xs;\\
+	 		\For{x in xs}{
+	 			lx = np.array([x**i for i in range(len(params))]);\\
+    			y = np.dot(x,params);\\
+    			将y纳入ys;\\
+	 		}
+	 		利用序列xs和序列ys组成轨迹序列L;\\
+	 	}
+	 	将轨迹序列L纳入生成轨迹集合G\;\\
+	 }
+	 \caption{轨迹生成过程}
+\end{algorithm}
 
-对于k值的选择，在上面的讨论中，我们一直把k当做已经给定的参数。但是在实际操作中，聚类类别数通常都是未知的。如何确定超参数k我们采用如下方法。\\
-********************轨迹生成伪代码
+将恢复的轨迹数据集输入到聚类模型中，本文选择的是K-means++算法，在第二章中描述了k-means算法的具体流程，k-means++只是在k-means基础上针对开始k个均值向量的初始化提供了具体的方法。k-means++方法，尽可能地使初始聚类中心分散开。这种方法首先随机产生一个初始聚类中心点，然后按照概率$P=\omega \sum_i{\left( x-c_i \right) ^2}$选取其他的聚类中心点。其中$\omega$是归一化系数。
+
+k-means++初始化操作如下：\\
+\begin{algorithm}[H]
+	 \KwData{样本集$D=\left\{t_1,t_2,...,t_n\}\right\}$，簇个数K}
+	 \KwResult{簇心向量$\mu=\left\{\mu_1,\mu_2,...,\mu_K\}\right\}$}
+	 从数据集D中随机初始化1个样本，将其作为第一个簇的簇心$\mu={\mu_1}$\;
+	 \Repeat{k=2,3,...,K}{
+	 	R=D-$\mu$\\
+	 	\For{$t_i$ in R}{
+	 		计算$P(x_i)$，$P\left( t_i \right) =\omega \sum_{\mu _i\in \mu}{\left( t_i-\mu _i \right) ^2}$，其中$\omega$是归一化系数\;\\
+	 	}
+	 	按照R集合中所有点的概率分布选出$\mu_k$，将其加入集合$\mu$\;\\
+	 }
+	 \caption{kmeanspp_initialization}
+\end{algorithm}
+
+全局聚类的具体流程如下：\\
+\begin{algorithm}[H]
+	\label{kmeanspp}
+	 \KwData{样本集$D=\left\{t_1,t_2,...,t_n\}\right\}$，簇个数K，阈值S}
+	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_K\}\right\}$，簇心向量$\mu=\left\{\mu_1,\mu_2,...,\mu_K\}\right\}$}
+	 K=2\;\\
+	 kmeanspp_initialization\(D,K\)\;
+	 C,$\mu$=kmeans\(D,K\)\;
+	 $DI_K$=DI(C)\;
+	 flag=true\;
+	 \Repeat{flag}{
+	 	K=K+1\;
+	 	kmeans_initialization\(D,K\)\;
+	 	C,$\mu$=kmeans\(D,K\)\;	
+	 	DI_K=DI(C)\; \\
+	 	\If{$DI_K-DI_{K-1}\leqslant S$}{
+	 		flag=false\;
+	 	}	
+	 }
+	 \caption{全局聚类流程}
+\end{algorithm}
+
+对于k值的选择，在上面的讨论中，我们一直把k当做已经给定的参数。但是在实际操作中，聚类类别数通常都是未知的。如何确定超参数k我们采用如下方法。
 
 我们可以使用不同的k值进行试验，并作出不同试验收敛后目标函数随k的变化，将k值趋向稳定时的值作为我们的超参数。如下图\ref{chooseK}所示，分别使用1到7之间的几个数字作为k值，曲线在k=3处有一个较为明显的弯曲点。故确定k取值为3。
 \begin{figure}[h]
-	\includegraphics[width=1.0\textwidth]{chooseK.png}
+	\includegraphics[width=0.8\textwidth]{chooseK.png}
 	\caption{k值选择}
 	\label{chooseK}
 \end{figure}
-
-\textbf{******************可以添加自定义距离下k-means算法的收敛性证明}
 
 中心服务器计算出k个均值向量后，将k个均值向量回传给各个计算节点，当计算节点侦查到新轨迹时，判断其与回传的k个均值向量的距离来判定是否为异常轨迹：若新轨迹与所有均值向量距离都超过了设定的阈值，则可以判定为轨迹为异常轨迹。
 
 
 \section{实验与分析}
+
 \subsection{理论分析}
-\textbf{******************时间复杂度分析，带宽分析，隐私分析}
 
 （1）时间复杂度
 
@@ -255,6 +312,12 @@ $$
 
 对于带宽分析，若对于每个节点，若轨迹数量抽样率为$\gamma$，轨迹点数抽样率为$\alpha$；对于n个数据点进行轨迹拟合后的参数向量通过稀疏表示后的压缩率为$\beta$（即需要n*α参数拟合），则对于一个含有m条轨迹、每条轨迹拥有n个数据点、每个数据点维度为2的节点来说，将其传递给中心节点的网络通信量为$(m*n)/(\gamma*\alpha*\beta)$；若是传输数据，则网络通信量为m*n*2，故网络通信量的压缩比为$2*\gamma*\alpha*\beta$，在此压缩比下，聚类准确度分析将在第五章详细介绍。
 
+（3）隐私性分析
+
+算法隐私性层面主要从两个角度进行考量：不确定性和覆盖率。
+
+不确定性通过生成轨迹数据与原始属地轨迹数据之间的相似度进行度量，首先，拟合轨迹的多项式模型是通过最小化代价函数得到，而代价函数是由经验损失和正则化构成，所以拟合出的的多项式模型是不经过所有训练数据的，故原始属地轨迹数据不可能由多项式轨迹准确还原；再者，由于生成轨迹数据是拟合多项式模型在指定区间均匀采样得到，故与原始属地轨迹数据存在一定的差异；但生成轨迹数据与原始轨迹数据有着相同的轨迹走势，这一点不容否认。算法在隐私性的覆盖率方面，由于属地节点在属地轨迹预处理阶段经过了轨迹数量抽样处理，故生成的轨迹数据是无法覆盖所有原始数据的，覆盖率的大小取决于轨迹数量抽样操作采样的抽样率，抽样率越低则覆盖率越低，反之，覆盖率则越高。
+
 \subsection{实验与分析}
 实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了时间、位置x、位置y、人物id等字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了4939条轨迹作为原始数据集，每条轨迹包含500个点。
 
@@ -266,7 +329,7 @@ $$
 
 首先对惩罚系数C赋值不同，观察拟合曲线的变化。我们保持轨迹间隔相同，并将C的值设置为0.001、1100、10000。结果如图\ref{differentC}所示。
 \begin{figure}[h]
-	\includegraphics{differentC.png}
+	\includegraphics[width=0.8\textwidth]{differentC.png}
 	\caption{变量C不同取值的结果}
 	\label{differentC}
 \end{figure}
@@ -275,7 +338,7 @@ $$
 
 然后观察不同参数S对轨迹曲线拟合的影响。我们选择相同的轨迹区间，令S=12和5。结果如图\ref{differentS}所示。
 \begin{figure}[h]
-	\includegraphics{differentS.png}
+	\includegraphics[width=0.5\textwidth]{differentS.png}
 	\caption{变量S不同取值的结果}
 	\label{differentS}
 \end{figure}
@@ -318,7 +381,7 @@ CR                    & 10          & 10             \\ \hline
 
 此处，设定$\alpha$=0.2，为$\gamma$设置不同值来验证不同采样大小的影响。从图\ref{differentGAMMA}可以看出，随着$\gamma$的增加，聚类的精度也不断增加。同时，随着$\gamma$的增加，模型会逐渐收敛，带宽消耗的效率较低。
 \begin{figure}[h]
-	\includegraphics[width=1.0\textwidth]{differentGAMMA.png}
+	\includegraphics[width=0.8\textwidth]{differentGAMMA.png}
 	\caption{不同轨迹数量采样率对比}
 	\label{differentGAMMA}
 \end{figure}
