@@ -6,14 +6,16 @@
 %3.概率模型
 
 \section{*****************引言}
-针对由局部聚类结果和统计信息组成的数据结构到数据分布的多样性问题，由部分研究采用概率密度分布模型来描述本地数据分布\citing{Klusch2003Distributed}\citing{merugu2003privacy}，这类方法可以有效估计低维数据的数据分布，但是针对高维数据的数据分布则由于训练数据规模大小的限制，在估计数据分布上表示很差，而轨迹数据是一种高维数据，故通过概率密度分布模型来估计本地轨迹数据分布是行不通的，对于第三章提出的CSD-Clustering算法，计算节点需要拟合所有轨迹的多项式模型，在本地数据规模大的情形下，计算节点的计算能力将成为算法的瓶颈，而且通过拟合的多项式模型还原出的轨迹数据，虽然与原始轨迹数据不相同，但却与原始数据有着一定程度的相似性，这对中心节点的权威性也提出了一定的挑战。
+针对由局部聚类结果和统计信息组成的数据结构到数据分布的多样性问题，有部分研究采用概率密度分布模型来描述本地数据分布\citing{Klusch2003Distributed}\citing{merugu2003privacy}，这类方法可以有效估计低维数据的概率密度分布，但是针对高维数据的概率密度分布则由于训练数据规模大小的限制，在估计数据的概率密度分布上表示很差，这是因为估计数据的概率密度分布需要训练数据尽量多地填充数据所处的空间，而随着数据维度的增大，所需训练数据的数据量需求将会呈指数级增长，现实状况下，训练数据的数据量是很有限的，所以训练高维数据的概率密度分布几乎是不可能完成的任务。而轨迹数据是一种高维数据，故通过概率密度分布模型来估计本地轨迹数据分布是行不通的，直接估计数据的概率密度分布有着默认的先验假设：维度之间是相互独立的。轨迹数据维度之间显然是存在相互关联的，故通过概率密度取估计轨迹数据的分布式不合适的。对于第三章提出的CSD-Clustering算法，计算节点需要拟合所有轨迹的多项式模型，在本地数据规模大的情形下，计算节点的计算能力将成为算法的瓶颈，而且通过拟合的多项式模型还原出的轨迹数据，虽然与原始轨迹数据不相同，但却与原始数据有着一定程度的相似性，这对中心节点的权威性也提出了一定的挑战。
+
+针对以上问题，本章提出一种基于马尔科夫链的分布式轨迹聚类算法：MCD-Clustering算法，该算法通过马尔科夫链模型来估计轨迹数据分布，通过转移矩阵来还原轨迹数据，从而有效解决了对轨迹数据分布估计问题，缓解了CSD-Clustering算法中存在的计算性能瓶颈，而且也增强了数据隐私性的保护。
 
 \section{基于马尔科夫链的分布式聚类算法}
 
-\sucsection{总体方案}
+\subsection{总体方案}
 为了避免分布不确定性问题和高维数据生成模型轨迹问题，我们提出基于马尔科夫链的分布式聚类算法（MCD-Clustering）。为了避免分布不确定性问题，很自然想到直接传输属地数据概率分布模型参数到中心节点，这种方法在数据量大和数据维度低时使用，而一条具有500个二维坐标点的轨迹数据可以将其看做维度为1000的数据，此时估计数据概率分布模型的方法将不再使用，我们必须通过另外一种模型来估计轨迹数据的概率分布模型。因为每条轨迹各个点之间显然不是独立于彼此的，故当我们将轨迹数据看做是高维数据时，由于每条轨迹数据相邻点存在相关性，可以看做维度和维度之间存在相关性，我们基于这种认知提出使用马尔科夫链来模拟一簇相似轨迹的生成模型，于是提出了基于马尔科夫链的分布式聚类算法（MCD-Clustering）。方案大致流程如图\ref{ch4frame}所示解：
 \begin{figure}[h]
-	\includegraphics[width=1.0\textwidth]{ch4frame.png}
+	\includegraphics[width=0.8\textwidth]{ch4frame.png}
 	\caption{MCD-Clustering 算法框架}
 	\label{ch4frame}
 \end{figure}
@@ -42,58 +44,24 @@ t=\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_m,y_m \ri
 \]
 
 k-means++聚类在选择k值时需要聚类评价指标来评判不同k值下的聚类效果，这里采用内部指标DI来衡量，DI表达式如式\ref{DI}所示。
-k-means++初始化操作如下：\\
-\begin{algorithm}[H]
-	 \KwData{样本集$D=\left\{t_1,t_2,...,t_n\}\right\}$，簇个数K}
-	 \KwResult{簇心向量$\mu=\left\{\mu_1,\mu_2,...,\mu_K\}\right\}$}
-	 从数据集D中随机初始化1个样本，将其作为第一个簇的簇心$\mu={\mu_1}$\;
-	 \Repeat{k=2,3,...,K}{
-	 	R=D-$\mu$
-	 	\For{$t_i$ in R}{
-	 		计算$P(x_i)$，$P\left( t_i \right) =\omega \sum_{\mu _i\in \mu}{\left( t_i-\mu _i \right) ^2}$，其中$\omega$是归一化系数\;\\
-	 	}
-	 	按照R集合中所有点的概率分布选出$\mu_k$，将其加入集合$\mu$\;\\
-	 }
-	 \caption{kmeanspp_initialization}
-\end{algorithm}
-
-轨迹子簇生成的具体流程如下：\\
-\begin{algorithm}[H]
-	\label{kmeanspp}
-	 \KwData{样本集$D=\left\{t_1,t_2,...,t_n\}\right\}$，簇个数K，阈值S}
-	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_K\}\right\}$，簇心向量$\mu=\left\{\mu_1,\mu_2,...,\mu_K\}\right\}$}
-	 K=2\;\\
-	 kmeanspp_initialization\(D,K\)\;
-	 C,$\mu$=kmeans\(D,K\)\;
-	 $DI_K$=DI(C)\;
-	 flag=true\;
-	 \Repeat{flag}{
-	 	K=K+1\;
-	 	kmeans_initialization\(D,K\)\;
-	 	C,$\mu$=kmeans\(D,K\)\;	
-	 	DI_K=DI(C)\; 
-	 	\If{$DI_K-DI_{K-1}\leqslant S$}{
-	 		flag=false\;
-	 	}	
-	 }
-	 \caption{轨迹子簇生成流程}
-\end{algorithm}
+轨迹子簇生成的具体流程如\ref{kmeanspp}所示，这里不再赘述。
 
 轨迹子簇生成后，针对每个子簇进行网格化。原始轨迹数据中的坐标点在二维连续空间上取值，将轨迹数据网格化后，轨迹所有坐标点在二维离散网格空间取值。最简单的网格化则是将二维连续空间中的点坐标取整，即将二维连续空间映射到由所有整数构成的坐标形成的二维离散网格空间，如图\ref{gridization}所示。
 \begin{figure}[h]
-	\includegraphics[width=1.0\textwidth]{gridization.png}
+	\includegraphics[width=0.8\textwidth]{gridization.png}
 	\caption{空间网格化}
 	\label{gridization}
 \end{figure}
 
-对于轨迹数据可以采用同样的方法对其进行网格化，网格化规则可以通过下面式子表示：
+对于轨迹数据可以采用同样的方法对其进行网格化，网格化规则可以通过下面式子表示：\\
 \begin{aligned}
 f\left( x \right) =\left\{ \begin{array}{c}
 	sign\left( x \right) *\left( \lfloor x \rfloor +1 \right) \,\,if\,\,|x-\lfloor x \rfloor |>0.5\\
 	sign\left( x \right) *\left( \lfloor x \rfloor -1 \right) \,\,if\,\,|x-\lfloor x \rfloor |\leqslant 0.5|\\
 \end{array} \right\\
 \varPhi \left( \left( x,y \right) \right) =\left( f\left( x \right) ,f\left( y \right) \right)\\
-g\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_l,y_l \right) \right\} =\left( x_1,y_1 \right) \,\, if\,\,\left( x_1,y_1 \right) =\left( x_2,y_2 \right) =...=\left( x_l,y_l \right)
+g\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_l,y_l \right) \right\} =\left( x_1,y_1 \right) \,\, \\
+if\,\,\left( x_1,y_1 \right) =\left( x_2,y_2 \right) =...=\left( x_l,y_l \right)
 \end{aligned}
 
 
@@ -225,6 +193,8 @@ LL(A)分别对$p_1$和$p_2$求导：
 稀疏矩阵表示方法有很多种，本文采用*****************稀疏矩阵表示
 
 
+*******************数据单元格式
+
 \subsection{综合求解和属地模型应用}
 各个计算节点将所有轨迹子簇对应的转移概率矩阵、状态初始分布和轨迹输传输给中心节点，中心节点接收到计算节点传递来的各种参数后，首先将转移概率矩阵稀疏表示还原出原始的轨迹转移矩阵，中心节点通过转移概率矩阵来生成轨迹。假设我们将还原的转移概率矩阵记为A，状态初始概率分布记为$\pi$，轨迹子簇包含的轨迹数量记为N，生成轨迹过程主要流程如下：\\
 \begin{algorithm}[H]
@@ -250,8 +220,43 @@ LL(A)分别对$p_1$和$p_2$求导：
 d_{\text{H}}\left( A,B \right) =\max \left\{ \mathop{\text{sup}}_a\in A\mathop{\text{inf}}_b\in Bd\left( a,b \right) ,\mathop{\text{sup}}_b\in B\mathop{\text{inf}}_a\in Ad\left( a,b \right) \right\} 
 \end{equation}
 
-其中a,b分别表示轨迹A和B上的点，d(a,b)表示a点和b点之间的欧氏距离。将式\ref{hausdorffdist}定义的距离替换 kmedoids 算法中的欧氏距离，则可以对生成的轨迹数据集进行 kmedoids 算法聚类操作了。具体聚类流程如算法\ref{kmeanspp}所示，这里不再赘述。
+其中a,b分别表示轨迹A和B上的点，d(a,b)表示a点和b点之间的欧氏距离。将式\ref{hausdorffdist}定义的距离替换 kmedoids 算法中的欧氏距离，则可以对生成的轨迹数据集进行 kmedoids 算法聚类操作了。具体聚类流程如算法\ref{kmediodspp}所示。
 
+\begin{algorithm}[H]
+	 \KwData{样本距离矩阵$M_{nn}$，簇个数K}
+	 \KwResult{簇心向量序号$\mu=\left\{\mu_1,\mu_2,...,\mu_K\}\right\}$}
+	 从0到n-1中随机选取一个整数$\mu_1$，将其作为第一个簇心对应的元素序号，此时$\mu={\mu_1}$\;\\
+	 D={1,2,...,n-1};\\
+	 \Repeat{k=2,3,...,K}{
+	 	R=D-$\mu$
+	 	\For{$t_i$ in R}{
+	 		计算$P(t_i)$，$P\left( t_i \right) =\omega \sum_{\mu _i\in \mu}{M_{t_i,\mu_i}^2}$，其中$\omega$是归一化系数\;\\
+	 	}
+	 	按照R集合中所有点的概率分布选出$\mu_k$，将其加入集合$\mu$\;\\
+	 }
+	 \caption{kmedoidspp_initialization}
+\end{algorithm}
+
+\begin{algorithm}[H]
+	\label{kmediodspp}
+	 \KwData{样本距离矩阵$M_{nn}$，簇个数K}
+	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_k\}\right\}$}
+	 kmdoidsspp_initialization\($M_{nn}$,K\)\;
+	 \Repeat{所有簇心不再更新或更新值小于一定阈值}{
+		 将所有的簇置为空，$C_i=\phi \,\,\left( 1\leqslant i\leqslant K \right)$\\
+		 \For{j=1,2,...,m}{
+		 	依据距离矩阵，计算序号为i的样本与所有簇心之间的距离，并将序号为i的样本归为第$\alpha _i$类，使其满足：
+		 	$\alpha _i=arg\,\,\min \left( M[i，alpha _i] \right) $\\
+		 }
+		 \For{i=1,2,...,K}{
+		 	$\hat{\mu }_i=arg\,\,\min_{x\in C_i} \left( \sum_{j\in C_i}{M\left[ x,j \right]} \right) $\\
+		 	\If{$\hat{\mu}_i\ne \mu _i$}{
+		 		$\mu _i$=$\hat{\mu}_i$
+		 	}
+		 }
+	 }
+	 \caption{k-medoids++ 算法}
+\end{algorithm}
 
 中心服务器计算出k个均簇心向量后，将k个簇心向量回传给各个计算节点，当计算节点侦查到新轨迹时，判断其与回传的k个簇心向量的距离来判定是否为异常轨迹：若新轨迹与所有均值向量距离都超过了设定的阈值，则可以判定为轨迹为异常轨迹。
 
@@ -276,7 +281,7 @@ d_{\text{H}}\left( A,B \right) =\max \left\{ \mathop{\text{sup}}_a\in A\mathop{\
 
 对于三种聚类方案中，都需要对簇个数进行选择，我们以 baseline I 实验中选取的k视为标准，在 baseline I 实验中选取不同的K值其损失函数值变化情况如图\ref{differentK}。
 \begin{figure}[h]
-	\includegraphics[width=1.0\textwidth]{replace.png}
+	\includegraphics[width=0.8\textwidth]{replace.png}
 	\caption{不同K值损失函数变化}
 	\label{differentK}
 \end{figure}
@@ -285,7 +290,7 @@ d_{\text{H}}\left( A,B \right) =\max \left\{ \mathop{\text{sup}}_a\in A\mathop{\
 
 在 MCD-Clustering 算法中的局部聚类过程，K值选取将会影响马尔科夫链对轨迹生成模型的估计，图\ref{differentKJB}展示了局部聚类不同K值下的ARI指数变化。
 \begin{figure}[h]
-	\includegraphics[width=1.0\textwidth]{replace.png}
+	\includegraphics[width=0.8\textwidth]{replace.png}
 	\caption{局部聚类不同K值对实验结果的影响}
 	\label{differentKJB}
 \end{figure}
@@ -294,7 +299,7 @@ d_{\text{H}}\left( A,B \right) =\max \left\{ \mathop{\text{sup}}_a\in A\mathop{\
 
 在 MCD-Clustering 算法中对轨迹数据进行了网格化处理，假设网格化粒度记为$\delta$，若$\delta$越大则表示网格化粒度越粗，反之，则网格化粒度越精细。我们对不同网格化粒度情况下 MCD-Clustering 算法的聚类效果进行了实验，实验结果如图\ref{differentDELTA}。
 \begin{figure}[h]
-	\includegraphics[width=1.0\textwidth]{replace.png}
+	\includegraphics[width=0.8\textwidth]{replace.png}
 	\caption{不同网格粒度对实验结果的影响}
 	\label{differentDELTA}
 \end{figure}
