@@ -16,7 +16,6 @@ k-means算法由文献\cite{hartigan1979algorithm}正式提出，现已成为数
 现有样本集$D=\left\{x_1,x_2,...,x_m\}\right\}$，K-Means算法将数据集划分成互不相交的K个簇$C=\left\{C_1,C_2,...,C_K\}\right\}$,且满足$C_1\bigcup{C_2\bigcup{...\bigcup{C_m=D}}}$，每个簇的簇心$\mu _i=\frac{1}{|C_i|}\sum_{\mathbf{x}\in C_i}{\mathbf{x}}$。
 其流程如下：\\
 \begin{algorithm}[H]
-	\label{kmeans}
 	 \KwData{样本集$D=\left\{x_1,x_2,...,x_m\}\right\}$，簇个数K}
 	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_k\}\right\}$}
 	 从数据集D中随机初始化K个样本，将其作为K个初始簇心\;
@@ -38,9 +37,6 @@ k-means算法由文献\cite{hartigan1979algorithm}正式提出，现已成为数
 	 \caption{k-means 算法}
 \end{algorithm}
 从上述流程可以得到，k-means算法复杂度为O(n*k*t)，其中n表示样本数目，k表示簇个数，t是平均迭代次数。
-
-
-\textbf{******************可以添加自定义距离下k-means算法的收敛性证明}
 
 \subsection{k-medoids 算法}
 k-means算法要求元素维度相同且距离度量必须基于欧式距离，如果需要对不规整的数据进行聚类，k-means算法显然无法解决此类聚类问题。针对不规整的数据，可以采用k-medoids算法\citing{rdusseeun1987clustering}进行聚类。k-medoids算法只需输入距离矩阵即可，所以对距离度量方法也更加宽泛。k-medoids流程如下：\\
@@ -249,7 +245,7 @@ JA&=\left[ 2,0,3,0 \right]
 \end{aligned}
 \]
 \begin{figure}[h]
-	\includegraphics[width=0.5\textwidth]{rowmajor.png}
+	\includegraphics[height=4.5cm,width=7.5cm]{rowmajor.png}
 	\caption{CRS存储元素的顺序}
 	\label{rowmajor}
 \end{figure}
@@ -366,7 +362,7 @@ F(\mathbf{x}_{0})\geq F(\mathbf{x})_{1})\geq F(\mathbf{x})_{2})\geq \cdots
 
 图\ref{GD}示例了这一过程，这里假设F定义在平面上，并且函数图像是一个碗形。蓝色的曲线是等高线。红色的箭头指向该点梯度的反方向。沿着梯度下降方向，将最终到达碗底，即函数F局部极小值的点。
 \begin{figure}[h]
-	\includegraphics[width=0.5\textwidth]{GD.png}
+	\includegraphics[height=4.5cm,width=7.5cm]{GD.png}
 	\caption{梯度下降示意图}
 	\label{GD}
 \end{figure}
