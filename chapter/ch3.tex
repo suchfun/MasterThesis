@@ -223,6 +223,7 @@ $$
 
 在接收到信息后，中心服务器根据各个计算节点传输的CSTD-Unit数据单元还原轨迹拟合函数，然后在还原出来的轨迹函数上依照原始数据的采样频率进行等间隔抽样，得到还原出的数据点，以此组成还原数据，从CSTD-Unit数据单元中还原轨迹数据的过程称为轨迹生成过程，轨迹生成过程操作流程如算法\ref{ch3gen}所示。
 \begin{algorithm}[H]
+	\label{ch3gen}
 	 \KwData{CSTD-Unit数据单元集合U}
 	 \KwResult{生成轨迹集合G}
 	 \For{unit in U}{
@@ -345,13 +346,29 @@ k-means++初始化操作如下：\\
 
 从图\ref{differentS}可以看出，上面的那幅图显示当S=12时，拟合曲线的X∈(6,20),下面那幅图显示当S=5时，拟合曲线的X∈(15,20),根据这个结果可以看出，当S越小，曲线拟合得越好。
 
-\textbf{******************增加选择k值的实验}
+各个属地节点完成模型训练完成后，将CSTD-Unit传递给中心节点，中心节点依据算法\ref{ch3gen}生成轨迹数据，生成后的轨迹数据与原始轨迹数据如图\ref{ch3GenAndOrigin}所示。
+\begin{figure}[h]
+\subfigure[]{
+\includegraphics[width=0.4\textwidth]{gen3All.png}}
+\subfigure[]{
+\includegraphics[width=0.4\textwidth]{originAll.png}}
+\caption{轨迹生成效果对比图}
+\label{ch3GenAndOrigin}
+\end{figure}
 
-关于聚类效果，我们设定参数S的取值为5，C取值为1。在聚类过程中，我们将K的值设为**************。
 
-此处我们固定$\gamma$=1，为$\alpha$设置不同值。根据表\ref{differentALPHA}，随着β的增加，聚类算法baseline II的结果逐渐接近baseline I。然而，更高的ARI值会造成CR值变低，导致消耗更多的网络带宽。
+实验中选取不同的K值其损失函数值变化情况如图\ref{ck}。
+\begin{figure}[h]
+	\includegraphics[width=0.8\textwidth]{ck1.png}
+	\caption{不同K值损失函数变化}
+	\label{ck}
+\end{figure}
 
-随着β的增加，CSD-Clustering聚类的ARI值起初上升然后稍微降低。下降的原因是朗格现象。虽然我们也采取了相应的措施，只是减轻了朗格现象的影响，而不是消除它。当$\alpha$相同时，我们的算法在ARI值和CR两个指标上表现比baselineII要好。
+关于聚类效果，我们设定参数S的取值为5，C取值为1。在聚类过程中，我们将K的值设为7。
+
+当我们固定$\gamma$=1，为$\alpha$设置不同值。根据表\ref{differentALPHA}，随着β的增加，聚类算法baseline II的结果逐渐接近baseline I。然而，更高的ARI值会造成CR值变低，导致消耗更多的网络带宽。
+
+随着β的增加，CSD-Clustering聚类的ARI值起初上升然后稍微降低。虽然我们也采取了相应的措施，只是减轻了朗格现象的影响，而不是消除它。当$\alpha$相同时，我们的算法在ARI值和CR两个指标上表现比baselineII要好。
 \begin{table}[]
 \label{differentALPHA}
 \caption{不同轨迹点数采样率对比}
