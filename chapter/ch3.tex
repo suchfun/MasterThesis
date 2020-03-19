@@ -11,7 +11,7 @@
 
 另一部分研究主流思路是基于局部聚类和全局聚类相结合的方式\citing{Januzaj2004Scalable}\citing{郑苗苗2007DK}\citing{merugu2003privacy}，其主要思想为：在分布式框架中有两种角色，若干个计算节点和一个中心节点，计算节点基于本地的数据先进行局部聚类，然后依据局部聚类结果和一些额外的统计信息组成特定的数据结构，各个计算节点将由局部聚类结果和统计信息组成的数据结构通过网络传输给中心节点，中心节点利用局部聚类结果进行全局聚类，然后将全局聚类结果传输给各个计算节点。这类方法由于其在计算准确度、带宽和隐私性层面三方面的平衡，受到了很多学者的青睐，但这类算法的计算准确度不太稳定，造成这种不稳定的原因是这类方法在网络中传输的数据结构与数据的真实分布不是一一映射的关系，一个计算节点利用局部聚类结果和统计信息组成的数据结构可能对应多种数据分布，而这种映射到数据分布的多样性将给后续的全局聚类造成影响，数据结构到数据分布的多样性如图\ref{diversity}
 \begin{figure}[h]
-	\includegraphics[width=0.8\textwidth]{diversity.png}
+	\includegraphics[width=0.6\textwidth]{diversity.png}
 	\caption{数据结构到数据分布映射的多样性}
 	\label{diversity}
 \end{figure}
@@ -50,7 +50,7 @@ Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_
 
 其中$a_x^i$表示轨迹a第i个点在x维度上的数值，$a_y^i$表示轨迹a第i个点在y维度上的数值，$b_x^i$ 、$b_y^i$则分别代表轨迹b第i个点在x、y维度上的数值。	
 
-我们的基本目标是对分布的轨迹数据进行联合处理，快速获取精度的聚类结果，同时减少数据处理的带宽消耗，并保持每条轨迹数据的隐私安全性。为了提高聚类算法的精度，我们采用了ARI指数，其计算方式如式\ref{ARI}ARI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。
+我们的基本目标是对分布的轨迹数据进行联合处理，快速获取精度的聚类结果，同时减少数据处理的带宽消耗，并保持每条轨迹数据的隐私安全性。为了提高聚类算法的精度，我们采用了RI指数，其计算方式如式\ref{RI}所示，RI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。
 
 假设每个数据点有2个特征维度，每个属地中心节点拥有的时空数据大小可以定义为IF=2*m*n。同时，在多属地分布式系统中，将必要的信息传输到中心服务器所产生的相应网络流量标记为TF。最后，将网络通信量与总信息量的比值标记为压缩比(compression ratio, CR)，即:
 \begin{equation}
@@ -76,13 +76,13 @@ Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_
 
 \subsection{属轨迹地数据预处理}
 属地数据预处理可以分为四个步骤，轨迹数量抽样，轨迹点数抽样，分段和分区。如图\ref{ch3pre}所示。
-\begin{figure}[h]
+\begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{ch3pre.png}
 	\caption{属地轨迹数据预处理}
 	\label{ch3pre}
 \end{figure}
 
-考虑到更大程度上减少网络中的传输流量和各属地轨迹数据集中存在的数据冗余，属地在对轨迹进行建模前进行轨迹数量上的抽样，但应注意，为了保证全局层面聚类的准确度，分布式平台中的所有属地中心在轨迹数量采样上的采样率应保持一致，且采样的轨迹应具有一定的代表性。可以采用一种VQ算法，最典型的VQ算法即是聚类算法。本文采用了k-means聚类算法，其算法流程如算法\ref{kmeans}所示，将属地轨迹数据集输入到k-means算法，得到输出结果，即簇划分$C=\left\{C_1,C_2,...,C_k\}\right\}$，在每个簇中，采用指定的抽样频率对簇中的轨迹进行随机抽样，对抽样得到的所有轨迹集合中的每条轨迹将执行后续预处理操作。
+考虑到更大程度上减少网络中的传输流量和各属地轨迹数据集中存在的数据冗余，属地在对轨迹进行建模前进行轨迹数量上的抽样，但应注意，为了保证全局层面聚类的准确度，分布式平台中的所有属地中心在轨迹数量采样上的采样率应保持一致，且采样的轨迹应具有一定的代表性。可以采用一种VQ算法，最典型的VQ算法即是聚类算法。本文采用了k-means聚类算法，其算法流程如算法\ref{kmeans}所示，将属地轨迹数据集输入到k-means算法，得到输出结果，即簇划分$C=\left\{C_1,C_2,...,C_k\right\}$，在每个簇中，采用指定的抽样频率对簇中的轨迹进行随机抽样，对抽样得到的所有轨迹集合中的每条轨迹将执行后续预处理操作。
 
 假设每条轨迹由n个坐标点组成，由于传感器的采样频率一般很高，所以轨迹中相邻点之间的距离相隔很近，针对轨迹拟合问题，适当降低采样频率对于轨迹的大致走势几乎没有影响，为了降低轨迹拟合的计算复杂度，在模型拟合前执行轨迹点数采样，其采样频率对于后续轨迹模型的拟合效果将会有很大的影响。
 
@@ -111,7 +111,7 @@ Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_
 f\left( x \right) =\sum_{i=0}^n{\frac{f^{\left( i \right)}\left( 0 \right)}{i!}}\left( x \right) ^i
 \end{equation}
 
-在x=0处的第i阶导数与f(x)相等，所以式\ref{mac_n}在x=0邻域内与f(x)相似度很高，这个邻域范围可以利用幂级数的收敛半径求解方法，若f(x)定义域在其收敛半径内，则一定存在一个幂级数能够很好的拟合f(x)，反之，如果f(x)的定义域超过了其收敛半径所囊括的范围，则$\ref{maclaurin}-f(x)$一定无法收敛，故$\ref{mac_n}-f(x)$也一定无法收敛，所以任意幂级数前n项拟合f(x)时一定存在其第i阶导数与f(x)的第i阶导数不相等，因此这个子轨迹段很难通过幂级数前n项式进行拟合。针对这一现象，我们对子轨迹段进行启发式的分区操作，使得通过存在一个幂级数的前n项式能够较好拟合特定区间的轨迹，即限制子轨迹段的定义域长度。
+在x=0处的第i阶导数与f(x)相等，所以式\ref{mac_n}在x=0邻域内与f(x)相似度很高，这个邻域范围可以利用幂级数的收敛半径求解方法，若f(x)定义域在其收敛半径内，则一定存在一个幂级数能够很好的拟合f(x)，反之，如果f(x)的定义域超过了其收敛半径所囊括的范围，则式$\ref{maclaurin}-f(x)$一定无法收敛，故式$\ref{mac_n}-f(x)$也一定无法收敛，所以任意幂级数前n项拟合f(x)时一定存在其第i阶导数与f(x)的第i阶导数不相等，因此这个子轨迹段很难通过幂级数前n项式进行拟合。针对这一现象，我们对子轨迹段进行启发式的分区操作，使得通过存在一个幂级数的前n项式能够较好拟合特定区间的轨迹，即限制子轨迹段的定义域长度。
 
 现假设有子轨迹段$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \dots,\left(x_{N}, y_{N}\right)\right\}$，如果将分段轨迹分成三个轨迹区间：$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \dots,\left(x_{i}, y_{i}\right)\right\}$，$\left\{\left(x_{i+1}, y_{i+1}\right),\left(x_{i+2}, y_{i+2}\right), \ldots,\left(x_{j}, y_{j}\right)\right\}$和$\left\{\left(x_{j+1}, y_{j+1}\right),\left(x_{j+2}, y_{j+2}\right), \dots,\left(x_{N}, y_{N}\right)\right\}$，则分割坐标i和j应满足：
 \[
@@ -167,7 +167,7 @@ f\left( x \right) =\sum_{i=0}^n{\frac{f^{\left( i \right)}\left( 0 \right)}{i!}}
 \]
 
 由于$\mathrm{x}_{0}, \mathrm{x}_{1}, \dots, \mathrm{x}_{k}$彼此不相等，所以行列式$|A^T| \ne 0$，此时存在唯一一个k-1次多项式能够包含所有数据点，此时用k-1阶多项式$\hat{f}(x)$拟合曲线的经验风险为0，拟合的函数曲线穿过每一个坐标点，而且此时求解模型的所有计算量只需计算出系数矩阵A即可。但由于数据不可避免受到噪音污染，我们并不要求拟合的函数曲线严格穿过每一个坐标点，通过求解线性方程组解得的模型往往复杂度很高，可以通过简单实验验证，我们假设在$y=x^2$附近取9个点，通过以上求解线性方程组的方法可以得到一个8阶的多项式，拟合的8阶多项式可以通过所有坐标点，但函数形式却过于复杂，如图\ref{empire0}：
-\begin{figure}[h]
+\begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{empire0.png}
 	\caption{无正则化拟合}
 	\label{empire0}
@@ -239,7 +239,7 @@ $$
     			将y纳入ys;\\
 	 		}
 	 		利用序列xs和序列ys组成轨迹序列L;\\
-	 	}
+	 	
 	 	将轨迹序列L纳入生成轨迹集合G\;\\
 	 }
 	 \caption{轨迹生成过程}
@@ -287,7 +287,7 @@ k-means++初始化操作如下：\\
 对于k值的选择，在上面的讨论中，我们一直把k当做已经给定的参数。但是在实际操作中，聚类类别数通常都是未知的。如何确定超参数k我们采用如下方法。
 
 我们可以使用不同的k值进行试验，并作出不同试验收敛后目标函数随k的变化，将k值趋向稳定时的值作为我们的超参数。如下图\ref{chooseK}所示，分别使用1到7之间的几个数字作为k值，曲线在k=3处有一个较为明显的弯曲点。故确定k取值为3。
-\begin{figure}[h]
+\begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{chooseK.png}
 	\caption{k值选择}
 	\label{chooseK}
@@ -322,14 +322,14 @@ k-means++初始化操作如下：\\
 \subsection{实验与分析}
 实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了时间、位置x、位置y、人物id等字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了4939条轨迹作为原始数据集，每条轨迹包含500个点。
 
-实验系统由三个计算节点和一个中心节点组成。将该算法与两种聚类方法baseline进行了比较。第一种算法对整个数据集执行标准的k-means算法(baseline I)，而第二种算法直接将抽样的轨迹传输到中心服务器进行聚类(baseline II)。baseline I 的结果视为最优结果，后续实验中使用的ARI指数则是以 baselien I 的聚类结果作为标签的。第三种算法则是本章提出的 CSD-Clustering 算法。
+实验系统由三个计算节点和一个中心节点组成。将该算法与两种聚类方法baseline进行了比较。第一种算法对整个数据集执行标准的k-means算法(baseline I)，而第二种算法直接将抽样的轨迹传输到中心服务器进行聚类(baseline II)。baseline I 的结果视为最优结果，后续实验中使用的RI指数则是以 baselien I 的聚类结果作为标签的。第三种算法则是本章提出的 CSD-Clustering 算法。
 
-评估实验结果采用两个指标：CR，表示算法的数据压缩能力；ARI，表示聚类结果的精度。
+评估实验结果采用两个指标：CR，表示算法的数据压缩能力；RI，表示聚类结果的精度。
 
 在拟合轨迹曲线前，需要为轨迹区间划分阶段的参数S赋值及拟合轨迹曲线上的结构风险惩罚系数C赋值。
 
 首先对惩罚系数C赋值不同，观察拟合曲线的变化。我们保持轨迹间隔相同，并将C的值设置为0.001、1100、10000。结果如图\ref{differentC}所示。
-\begin{figure}[h]
+\begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{differentC.png}
 	\caption{变量C不同取值的结果}
 	\label{differentC}
@@ -338,19 +338,21 @@ k-means++初始化操作如下：\\
 从图\ref{differentC}可以看出，随着C值的减小，拟合性能得到改善。然而，当C越来越小时，模型的结构也变得更加复杂。
 
 然后观察不同参数S对轨迹曲线拟合的影响。我们选择相同的轨迹区间，令S=12和5。结果如图\ref{differentS}所示。
-\begin{figure}[h]
+\begin{figure}[H]
 	\includegraphics[width=0.5\textwidth]{differentS.png}
 	\caption{变量S不同取值的结果}
 	\label{differentS}
 \end{figure}
 
-从图\ref{differentS}可以看出，上面的那幅图显示当S=12时，拟合曲线的X∈(6,20),下面那幅图显示当S=5时，拟合曲线的X∈(15,20),根据这个结果可以看出，当S越小，曲线拟合得越好。
+从图\ref{differentS}可以看出，上面的那幅图显示当S=12时，拟合曲线的$X∈(6,20)$,下面那幅图显示当S=5时，拟合曲线的$X∈(15,20)$,根据这个结果可以看出，当S越小，曲线拟合得越好。
 
-各个属地节点完成模型训练完成后，将CSTD-Unit传递给中心节点，中心节点依据算法\ref{ch3gen}生成轨迹数据，生成后的轨迹数据与原始轨迹数据如图\ref{ch3GenAndOrigin}所示。
-\begin{figure}[h]
+各个属地节点完成模型训练完成后，将CSTD-Unit传递给中心节点，中心节点依据算法\ref{ch3gen}生成轨迹数据，生成后的轨迹数据与原始轨迹数据如图\ref{ch3GenAndOrigin}所示，其中图\ref{gen3All}展示了生成轨迹数据，图\ref{originAll}展示了原始轨迹数据。
+\begin{figure}[H]
 \subfigure[]{
+\label{gen3All}
 \includegraphics[width=0.4\textwidth]{gen3All.png}}
 \subfigure[]{
+\label{originAll}
 \includegraphics[width=0.4\textwidth]{originAll.png}}
 \caption{轨迹生成效果对比图}
 \label{ch3GenAndOrigin}
@@ -358,46 +360,48 @@ k-means++初始化操作如下：\\
 
 
 实验中选取不同的K值其损失函数值变化情况如图\ref{ck}。
-\begin{figure}[h]
+
+\begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{ck1.png}
 	\caption{不同K值损失函数变化}
 	\label{ck}
 \end{figure}
 
+
 关于聚类效果，我们设定参数S的取值为5，C取值为1。在聚类过程中，我们将K的值设为7。
 
-当我们固定$\gamma$=1，为$\alpha$设置不同值。根据表\ref{differentALPHA}，随着β的增加，聚类算法baseline II的结果逐渐接近baseline I。然而，更高的ARI值会造成CR值变低，导致消耗更多的网络带宽。
-
-随着β的增加，CSD-Clustering聚类的ARI值起初上升然后稍微降低。虽然我们也采取了相应的措施，只是减轻了朗格现象的影响，而不是消除它。当$\alpha$相同时，我们的算法在ARI值和CR两个指标上表现比baselineII要好。
-\begin{table}[]
-\label{differentALPHA}
+当我们固定轨迹数量抽样率$\gamma$=1，为轨迹点数抽样率$\alpha$设置不同值。根据表\ref{differentALPHA}，随着β的增加，聚类算法baseline II的结果逐渐接近baseline I。然而，更高的RI值会造成CR值变低，导致消耗更多的网络带宽。
+\begin{table}[H]
 \caption{不同轨迹点数采样率对比}
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline
 \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}\alpha\\ \\ 评价指标\end{tabular}} & \multicolumn{2}{c|}{0.1}     & \multicolumn{2}{c|}{0.3}     & \multicolumn{2}{c|}{0.5}     \\ \cline{2-7} 
                                                                         & baseline II & CSD-Clustering & baseline II & CSD-Clustering & baseline II & CSD-Clustering \\ \hline
-ARI                                                                     & 0.79        & 0.81           & 0.80        & 0.93           & 0.81        & 0.91           \\ \hline
+RI                                                                     & 0.79        & 0.81           & 0.80        & 0.93           & 0.81        & 0.91           \\ \hline
 CR                                                                      & 10          & 20             & 3.33        & 6.67           & 2           & 4              \\ \hline
 \end{tabular}
+\label{differentALPHA}
 \end{table}
 
+随着轨迹点数抽样率β的增加，CSD-Clustering聚类的RI值起初上升然后稍微降低。虽然我们也采取了相应的措施，只是减轻了朗格现象的影响，而不是消除它。当轨迹数量抽样率$\alpha$相同时，我们的算法在RI值和CR两个指标上表现比baselineII要好。
+
 从表\ref{sameDK}可以看出，baseline II和CSD-Clustering算法在有相同CR值时，我们的算法精度更高。此外，我们的算法避免了原始数据的网络传输，保护了数据的隐私。
-\begin{table}[]
-\label{sameDK}
+\begin{table}[H]
 \caption{相同带宽下的对比实验}
 \begin{tabular}{|c|c|c|}
 \hline
 \multirow{2}{*}{评价指标} & \multicolumn{2}{c|}{实验组}     \\ \cline{2-3} 
                       & baseline II & CSD-Clustering \\ \hline
-ARI                   & 0.795       & 0.926          \\ \hline
+RI                   & 0.795       & 0.926          \\ \hline
 CR                    & 10          & 10             \\ \hline
 \end{tabular}
+\label{sameDK}
 \end{table}
 
 然后我们测试轨迹数量采样率对实验的影响。
 
-此处，设定$\alpha$=0.2，为$\gamma$设置不同值来验证不同采样大小的影响。从图\ref{differentGAMMA}可以看出，随着$\gamma$的增加，聚类的精度也不断增加。同时，随着$\gamma$的增加，模型会逐渐收敛，带宽消耗的效率较低。
-\begin{figure}[h]
+此处，设定轨迹点数抽样率$\alpha$=0.2，为轨迹数量抽样率$\gamma$设置不同值来验证不同采样大小的影响。从图\ref{differentGAMMA}可以看出，随着$\gamma$的增加，聚类的精度也不断增加。同时，随着$\gamma$的增加，模型会逐渐收敛，带宽消耗的效率较低。
+\begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{differentGAMMA.png}
 	\caption{不同轨迹数量采样率对比}
 	\label{differentGAMMA}

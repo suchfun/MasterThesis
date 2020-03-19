@@ -40,9 +40,6 @@ k-means算法由文献\cite{hartigan1979algorithm}正式提出，现已成为数
 
 从上述流程可以得到，k-means算法复杂度为O(n*k*t)，其中n表示样本数目，k表示簇个数，t是平均迭代次数。k-meas算法的收敛性可参考论文\cite{neal1998view}。
 
-
-\textbf{******************可以添加自定义距离下k-means算法的收敛性证明}
-
 \subsection{k-medoids 算法}
 k-means算法要求元素维度相同且距离度量必须基于欧式距离，如果需要对不规整的数据进行聚类，k-means算法显然无法解决此类聚类问题。针对不规整的数据，可以采用k-medoids算法\citing{rdusseeun1987clustering}进行聚类。k-medoids算法只需输入距离矩阵即可，所以对距离度量方法也更加宽泛。k-medoids流程如下：\\
 \begin{algorithm}[H]
@@ -84,60 +81,13 @@ k-means算法要求元素维度相同且距离度量必须基于欧式距离，�
 \end{aligned}
 \end{equation}
 
-其中集合SS包含了在C中隶属于相同簇且在$C^{*}$中也隶属于相同簇的样本对，集合SD包含了在C中隶属于相同簇但在$C^{*}$中隶属于不同簇的样本对，......由于样本对$\left(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}\right)(i<j)$仅能出现在一个集合中，因此有$a+b+c+d=m(m-1) / 2$成立。\\
+其中集合SS包含了在C中隶属于相同簇且在$C^{*}$中也隶属于相同簇的样本对，集合SD包含了在C中隶属于相同簇但在$C^{*}$中隶属于不同簇的样本对，......由于样本对$\left(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}\right)(i<j)$仅能出现在一个集合中，因此有$a+b+c+d=m(m-1) / 2$成立。
+
 基于\ref{abcd}，可引出Rand指数的定义：
 \begin{equation}
 \label{RI}
 \mathrm{RI}=\frac{2(a+d)}{m(m-1)}
 \end{equation}
-
-但是Rand指数对于不同聚类结果的区分度不高，于是基于Rand指数，提出了Adjusted Rand Index\citing{rand1971objective}。首先定义列联表,如下：
-\[
-\begin{array}{c|ccccc}
-	&		C_{1}^{*}&		C_{2}^{*}&		\dots&		C_{S}^{*}&		\,\,\text{Sums}\\
-	\hline
-	C_1&		n_{11}&		n_{12}&		\dots&		n_{1S}&		a_1\\
-	C_2&		n_{21}&		n_{22}&		\dots&		n_{2S}&		a_2\\
-	\vdots&		\vdots&		\vdots&		\ddots&		\vdots&		\vdots\\
-	C_K&		n_{K1}&		n_{K2}&		\cdots&		n_{KS}&		a_K\\
-	\hline
-	\,\,\text{Sums}&		b_1&		b_2&		\dots&		b_S&		n\\
-\end{array}
-\]
-
-其中$n_{ij}$表示簇$C_{i}$和簇$C_{i}^{*}$之间共同存在的对象个数，即$n_{i j}=\left|X_{i} \cap Y_{j}\right|$。ARI指数定义如下：
-\begin{equation}
-\label{ARI}
-ARI=\frac{\sum_{ij}{\left( \begin{array}{c}
-	n_{ij}\\
-	2\\
-\end{array} \right)}-\left[ \sum_i{\left( \begin{array}{c}
-	a_i\\
-	2\\
-\end{array} \right)}\sum_j{\left( \begin{array}{c}
-	b_j\\
-	2\\
-\end{array} \right)} \right] /\left( \begin{array}{c}
-	n\\
-	2\\
-\end{array} \right)}{\frac{1}{2}\left[ \sum_i{\left( \begin{array}{c}
-	a_i\\
-	2\\
-\end{array} \right)}+\sum_j{\left( \begin{array}{c}
-	b_j\\
-	2\\
-\end{array} \right)} \right] -\left[ \sum_i{\left( \begin{array}{c}
-	a_i\\
-	2\\
-\end{array} \right)}\sum_j{\left( \begin{array}{c}
-	b_j\\
-	2\\
-\end{array} \right)} \right] /\left( \begin{array}{c}
-	n\\
-	2\\
-\end{array} \right)}
-\end{equation}
-
 
 \subsubsection{内部指标}
 
