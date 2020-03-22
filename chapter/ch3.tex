@@ -20,7 +20,7 @@
 
 \section{基于复合采样的的分布式轨迹聚类算法}
 
-\subsection{问题定义}
+\subsection{问题建模}
 首先简述基本的符号定义和距离定义，然后是隐私相关描述并给出设计目标。
 
 假设多属地分布式系统中，有k个跨地理分布的属地中心节点，包含一个中心服务器。每个属地中心节点拥有m条时空轨迹数据。对于每条时空轨迹，其中有n个数据点，表示数据对象以时间顺序经过了n个空间位置。
@@ -124,14 +124,14 @@ f\left( x \right) =\sum_{i=0}^n{\frac{f^{\left( i \right)}\left( 0 \right)}{i!}}
 \subsection{属地轨迹拟合}
 对第i区间含有k个数据点，$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \ldots,\left(x_{k}, y_{k}\right)\right\}$，定义损失函数：
 \[
-\mathrm{L}\left(y_{i}, \mathrm{\hat{f}}\left(x_{i}\right)\right)=\left(\mathrm{y_i}-\mathrm{\hat{f}}\left(x_{i}\right)\right)^{2}
+\mathrm{L}\left(y_{i}, \hat{f}\left(x_{i}\right)\right)=\left(\mathrm{y_i}-\hat{f}\left(x_{i}\right)\right)^{2}
 \]
 
 其中$\hat{f(x)}$表示轨迹拟合函数模型。\\
 将代价函数定义成经验风险函数：
 \begin{equation}
 \label{ch3costwithoutl1}
-\operatorname{cost}(\mathrm{f})=\frac{1}{k} \sum_{j=1}^{k} \mathrm{L}\left(y_{j}, \mathrm{\hat{f}}\left(x_{j}\right)\right)
+\operatorname{cost}(f)=\frac{1}{k} \sum_{j=1}^{k} \mathrm{L}\left(y_{j}, \hat{f}\left(x_{j}\right)\right)
 \end{equation}
 
 若$\hat(f)(x)$为n-1次多项式，系数分别为$a_0,a_1,…,a_{n-1}$。
@@ -141,7 +141,7 @@ f\left( x \right) =\sum_{i=0}^n{\frac{f^{\left( i \right)}\left( 0 \right)}{i!}}
 \hat{f}\left( \text{x} \right) =a_0+a_1x+\cdots +a_{k-1}x^{k-1}
 \]
 
-以此拟合该区间的曲线，将区间的k个坐标带入$\hat(f)(x)$可以得到k个等式，将这k个等式写成矩阵形式即：
+以此拟合该区间的曲线，将区间的k个坐标带入$\hat{f}(x)$可以得到k个等式，将这k个等式写成矩阵形式即：
 \[
 \left[\begin{array}{cccc}
 {1} & {x_{1}} & {\dots} & {x_{1}^{k-1}} \\
@@ -311,7 +311,7 @@ k-means++初始化操作如下：\\
 
 （2）带宽消耗
 
-对于带宽分析，若对于每个节点，若轨迹数量抽样率为$\gamma$，轨迹点数抽样率为$\alpha$；对于n个数据点进行轨迹拟合后的参数向量通过稀疏表示后的压缩率为$\beta$（即需要n*α参数拟合），则对于一个含有m条轨迹、每条轨迹拥有n个数据点、每个数据点维度为2的节点来说，将其传递给中心节点的网络通信量为$(m*n)/(\gamma*\alpha*\beta)$；若是传输数据，则网络通信量为m*n*2，故网络通信量的压缩比为$2*\gamma*\alpha*\beta$，在此压缩比下，聚类准确度分析将在第五章详细介绍。
+对于带宽分析，若对于每个节点，若轨迹数量抽样率为$\gamma$，轨迹点数抽样率为$\alpha$；，则对于一个含有m条轨迹、每条轨迹拥有n个数据点、每个数据点维度为2的节点来说，将其传递给中心节点的网络通信量为$(m*n)/(\gamma*\alpha)$；若是传输数据，则网络通信量为m*n*2，故网络通信量的压缩比为$2*\gamma*\alpha$，在此压缩比下，聚类准确度分析将在第五章详细介绍。
 
 （3）隐私性
 
