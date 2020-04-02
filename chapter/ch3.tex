@@ -9,7 +9,7 @@
 \section{引言}
 目前针对分布式聚类算法的研究已经取得了一些成果，一部分研究方法是以数据聚合为前提的，比如文献\cite{FanA}和文献\cite{Wang2018A}提出的方法，这类方法首先需要将分布式中的数据集合在一起，然后以特定的方式将数据集划分给各个属地节点以提高聚类准确度和计算高效性，这类方法在聚类准确度上和数据集中式聚类相当，但是由于需要原始数据在网络中传输，这使得该算法在很多需要考虑数据隐私性的场景下变得不适用；鉴于数据隐私层面的考虑，一部分研究基于安全多方计算提出了自定义用于分布式计算加密协议，这类方法虽然在数据隐私层面和聚类准确度上表现良好，但却消耗了大量的带宽资源，特别是对于在数据量爆炸式增长的今天。
 
-另一部分研究主流思路是基于局部聚类和全局聚类相结合的方式\citing{Januzaj2004Scalable}\citing{郑苗苗2007DK}\citing{merugu2003privacy}，其主要思想为：在分布式框架中有两种角色，若干个属地节点和一个中心节点，属地节点基于本地的数据先进行局部聚类，然后依据局部聚类结果和一些额外的统计信息组成特定的数据结构，各个属地节点将由局部聚类结果和统计信息组成的数据结构通过网络传输给中心节点，中心节点利用局部聚类结果进行全局聚类，然后将全局聚类结果传输给各个属地节点。这类方法由于其在计算准确度、带宽和隐私性层面三方面的平衡，受到了很多学者的青睐，但这类算法的计算准确度不太稳定，造成这种不稳定的原因是这类方法在网络中传输的数据结构与数据的真实分布不是一一映射的关系，一个属地节点利用局部聚类结果和统计信息组成的数据结构可能对应多种数据分布，而这种映射到数据分布的多样性将给后续的全局聚类造成影响，数据结构到数据分布的多样性如图\ref{diversity}
+另一部分研究主流思路是基于局部聚类和全局聚类相结合的方式\citing{Januzaj2004Scalable}\citing{郑苗苗2007DK}\citing{merugu2003privacy}，其主要思想为：在分布式框架中有两种角色，若干个属地节点和一个中心节点，属地节点基于本地的数据先进行局部聚类，然后依据局部聚类结果和一些额外的统计信息组成特定的数据结构，各个属地节点将由局部聚类结果和统计信息组成的数据结构通过网络传输给中心节点，中心节点利用局部聚类结果进行全局聚类，然后将全局聚类结果传输给各个属地节点。这类方法由于其在计算准确度、带宽和隐私性层面三方面的平衡，受到了很多学者的青睐，但这类算法的计算准确度不太稳定，造成这种不稳定的原因是这类方法在网络中传输的数据结构与数据的真实分布不是一一映射的关系，一个属地节点利用局部聚类结果和统计信息组成的数据结构可能对应多种数据分布，而这种映射到数据分布的多样性将给后续的全局聚类造成影响，数据结构到数据分布的多样性如图\ref{diversity}所示。
 \begin{figure}[h]
 	\includegraphics[width=0.6\textwidth]{diversity.png}
 	\caption{数据结构到数据分布映射的多样性}
@@ -349,27 +349,6 @@ k-means++初始化操作如下：\\
 
 从图\ref{differentS}可以看出，上面的那幅图显示当S=12时，拟合曲线的$X∈(6,20)$,下面那幅图显示当S=5时，拟合曲线的$X∈(15,20)$,根据这个结果可以看出，当S越小，曲线拟合得越好。
 
-\begin{comment}
-
-各个属地节点完成模型训练完成后，将CSTD-Unit传递给中心节点，中心节点依据算法\ref{ch3gen}生成轨迹数据，生成后的轨迹数据与原始轨迹数据如图\ref{ch3GenAndOrigin}所示，其中图\ref{gen3All}展示了生成轨迹数据，图\ref{originAll}展示了原始轨迹数据。
-\begin{figure}[H]
-\subfigure[]{
-\label{gen3All}
-\includegraphics[width=0.4\textwidth]{gen3All.png}}
-\subfigure[]{
-\label{originAll}
-\includegraphics[width=0.4\textwidth]{originAll.png}}
-\caption{轨迹生成效果对比图}
-\label{ch3GenAndOrigin}
-\end{figure}
-
-
-实验中选取不同的K值其损失函数值变化情况如图\ref{ck}。
-\begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{ck1.png}
-	\caption{不同K值损失函数变化}
-	\label{ck}
-\end{figure}
 
 \end{comment}
 
@@ -402,11 +381,14 @@ k-means++初始化操作如下：\\
 \label{genTrForDifferentAlpha}
 \end{figure}
 
+% N = [50,20,10,5,2]
+% RI = [ 0.854 , 0.899 , 0.911 , 0.931 , 0.959]
+% CR = [56.017, 26.452, 14.063 , 7.341, 3.008]
 
-对于不同轨迹点数抽样率，聚类结果如表\ref{differentALPHA}所示，可以看出随着$\alpha$的增加，算法聚类效果越好。
+对于不同轨迹点数抽样率，聚类结果如表\ref{differentALPHA}所示，可以看出随着$\alpha$的增加，RI值随之增大，CR值则随之减小。
 \begin{table}[H]
 \caption{不同轨迹点数抽样率对比}
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|}
 \hline
 \diagbox{评价指标}{$\alpha$} & 1/50 & 1/20 & 1/10  & 1/5 & 1/2 \\ \hline
 RI   & 0.854 & 0.899 & 0.911 & 0.931 & 0.959\\ \hline
@@ -415,11 +397,11 @@ CR   & 56.017  & 26.452 & 14.063 & 7.341 & 3.008\\ \hline
 \label{differentALPHA}
 \end{table}
 
-然而，更高的轨迹点数抽样率意味着更多的轨迹分段，模型对应的参数数量则越多，这将会消耗更多的网络带宽，不同轨迹抽样率对应RI值和CR值的变化如图\ref{ch3ricr}所示，RI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。其中N表示每间隔N个点进行抽样一个点。
+更高的轨迹点数抽样率意味着更多的轨迹分段，模型对应的参数数量则越多，这将会消耗更多的网络带宽，不同轨迹抽样率对应RI值和CR值的变化如图\ref{ch3ricr1}所示，RI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。其中N表示每间隔N个点进行抽样一个点。
 \begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{ch3ex1.png}
 	\caption{不同轨迹点数抽样率下RI和CR变化曲线图}
-	\label{ch3ricr}
+	\label{ch3ricr1}
 \end{figure}
 
 
@@ -445,12 +427,28 @@ CR   & 56.017  & 26.452 & 14.063 & 7.341 & 3.008\\ \hline
 \label{genTrForDifferentGamma}
 \end{figure}
 
+% γ = [0.1,0.3,0.5,0.7,0.9]
+% RI = [0.845 , 0.862 , 0.905 , 0.915 , 0.916]
+% CR = [70.168,22.750,13.548,9.689,7.541]
 
-对于不同轨迹点数抽样率，聚类结果和网络带宽压缩率如图\ref{differentGAMMA}可以看出，随着$\gamma$的增加，聚类的精度也不断增加。同时，随着$\gamma$的增加，也将会带来更大的网络带宽消耗。
+对于不同轨迹数量抽样率，结果数值如表\ref{differentGAMMA}所示，可以看出随着$\gamma$的增加，RI值越来越大，CR则越来越小。
+\begin{table}[H]
+\caption{不同轨迹数量抽样率对比}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\diagbox{评价指标}{$\gamma$} & 0.1 & 0.3 & 0.5  & 0.7 & 0.9 \\ \hline
+RI   & 0.845 & 0.862 & 0.905 & 0.915 & 0.916\\ \hline
+CR   & 70.168  & 13.548 & 13.548 & 9.689 & 7.541\\ \hline
+\end{tabular}
+\label{differentGAMMA}
+\end{table}
+
+
+对于不同轨迹数量抽样率，聚类结果和网络带宽压缩率如图\ref{ch3ricr2}可以看出，随着$\gamma$的增加，聚类的精度也不断增加。同时，随着$\gamma$的增加，也将会带来更大的网络带宽消耗。
 \begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{differentGAMMA.png}
+	\includegraphics[width=0.8\textwidth]{ch3ex2.png}
 	\caption{不同轨迹数量采样率对比}
-	\label{differentGAMMA}
+	\label{ch3ricr2}
 \end{figure}
 
 \section{本章小结}
