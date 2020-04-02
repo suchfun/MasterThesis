@@ -349,6 +349,8 @@ k-means++初始化操作如下：\\
 
 从图\ref{differentS}可以看出，上面的那幅图显示当S=12时，拟合曲线的$X∈(6,20)$,下面那幅图显示当S=5时，拟合曲线的$X∈(15,20)$,根据这个结果可以看出，当S越小，曲线拟合得越好。
 
+\begin{comment}
+
 各个属地节点完成模型训练完成后，将CSTD-Unit传递给中心节点，中心节点依据算法\ref{ch3gen}生成轨迹数据，生成后的轨迹数据与原始轨迹数据如图\ref{ch3GenAndOrigin}所示，其中图\ref{gen3All}展示了生成轨迹数据，图\ref{originAll}展示了原始轨迹数据。
 \begin{figure}[H]
 \subfigure[]{
@@ -363,17 +365,45 @@ k-means++初始化操作如下：\\
 
 
 实验中选取不同的K值其损失函数值变化情况如图\ref{ck}。
-
 \begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{ck1.png}
 	\caption{不同K值损失函数变化}
 	\label{ck}
 \end{figure}
 
+\end{comment}
 
-通过上述实验过程，我们设定参数S的取值为5，C取值为1，将K的值设为7。
+首先针对原始轨迹数据聚类情况确定全局聚类K值选取，实验中选取不同的K值其损失函数值变化如图\ref{ck}所示，其中损失函数采用均方误差，其表达式如式\ref{kmeanscost}所示。
+\begin{figure}[H]
+	\includegraphics[width=0.8\textwidth]{ck1.png}
+	\caption{不同K值损失函数变化}
+	\label{ck}
+\end{figure}
 
-当我们固定轨迹数量抽样率$\gamma$=1，为轨迹点数抽样率$\alpha$设置不同值。根据表\ref{differentALPHA}，随着$\alpha$的增加，聚类算法baseline II的结果逐渐接近baseline I。然而，更高的RI值会造成CR值变低，导致消耗更多的网络带宽。
+通过上述实验过程，在后续实验中，设定C取值为1，将K的值设为7。
+
+为了表明轨迹点数抽样率$\alpha$对实验结果的影响，在该实验中，固定轨迹数量抽样率$\gamma=1$，即所有轨迹参与全局聚类，然后将轨迹点数抽样率设置为：1/50、1/20、1/10、1/5和1/2，为了避免在拟合轨迹模型过程中轨迹模型过于复杂，将分段策略设定为固定每段轨迹的点数，本次实验设置分段轨迹点数为5，即轨迹点数抽样率的高低不改变段内轨迹点数，而是改变轨迹分段数。
+
+对于不同轨迹点数抽样率，中心节点生成的轨迹数据与原始轨迹数据对比如图\ref{genTrForDifferentAlpha}所示，其中，图\ref{gen50}表示轨迹点数抽样率为1/50时中心节点生成的轨迹数据，图\ref{gen20}表示轨迹点数抽样率为1/20时中心节点生成的轨迹数据，图\ref{gen5}表示轨迹点数抽样率为1/5时中心节点生成的轨迹数据，图\ref{origin}则表示原始轨迹数据。从图中可以看出，随着轨迹点数抽样率$\alpha$增大，中心轨迹依据参数生成的轨迹数据越接近原始轨迹数据。
+\begin{figure}[H]
+\subfigure[]{
+\label{gen50}
+\includegraphics[width=0.4\textwidth]{sample_rate_50.png}}
+\subfigure[]{
+\label{gen20}
+\includegraphics[width=0.4\textwidth]{sample_rate_20.png}}
+\subfigure[]{
+\label{gen5}
+\includegraphics[width=0.4\textwidth]{sample_rate_5.png}}
+\subfigure[]{
+\label{origin}
+\includegraphics[width=0.4\textwidth]{ch3original.png}}
+\caption{不同轨迹点数抽样率下生成轨迹效果对比}
+\label{genTrForDifferentAlpha}
+\end{figure}
+
+
+对于不同轨迹点数抽样率，聚类结果如表\ref{differentALPHA}所示，可以看出随着$\alpha$的增加，算法聚类效果越好。
 \begin{table}[H]
 \caption{不同轨迹点数抽样率对比}
 \begin{tabular}{|c|c|c|c|c|}
@@ -385,25 +415,38 @@ CR   & 56.017  & 26.452 & 14.063 & 7.341 & 3.008\\ \hline
 \label{differentALPHA}
 \end{table}
 
+然而，更高的轨迹点数抽样率意味着更多的轨迹分段，模型对应的参数数量则越多，这将会消耗更多的网络带宽，不同轨迹抽样率对应RI值和CR值的变化如图\ref{ch3ricr}所示，RI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。其中N表示每间隔N个点进行抽样一个点。
+\begin{figure}[H]
+	\includegraphics[width=0.8\textwidth]{ch3ex1.png}
+	\caption{不同轨迹点数抽样率下RI和CR变化曲线图}
+	\label{ch3ricr}
+\end{figure}
 
-随着轨迹点数抽样率$\alpha$的增加，CSD-Clustering聚类的RI值起初上升然后稍微降低，这是由于轨迹点数抽样率的提升将直接导致多项式模型的更加准确，所以RI值起初会上升，而轨迹点数抽样率的提升也会使得多项式模型更加复杂，过于复杂的拟合模型也会影响轨迹拟合准确度，虽然在损失函数中加入了正则项，但当抽样率后续继续增加时RI值会呈现下降的趋势。当轨迹数量抽样率$\alpha$相同时，我们的算法在RI值和CR两个指标上表现比baselineII要好。
 
-从表\ref{sameDK}可以看出，baseline II和CSD-Clustering算法在有相同CR值时，我们的算法精度更高。此外，我们的算法避免了原始数据的网络传输，保护了数据的隐私。
-\begin{table}[H]
-\caption{相同带宽下的对比实验}
-\begin{tabular}{|c|c|c|}
-\hline
-\multirow{2}{*}{评价指标} & \multicolumn{2}{c|}{实验组}     \\ \cline{2-3} 
-                      & baseline II & CSD-Clustering \\ \hline
-RI                   & 0.795       & 0.926          \\ \hline
-CR                    & 10          & 10             \\ \hline
-\end{tabular}
-\label{sameDK}
-\end{table}
+然后实验测试轨迹数量采样率对实验的影响。
 
-然后我们测试轨迹数量采样率对实验的影响。
+此处，设定轨迹点数抽样率$\alpha$=1/5，为轨迹数量抽样率$\gamma$设置不同值：0.1、0.3、0.5、0.7和0.9，验证不同抽样率大小对实验结果的影响。
 
-此处，设定轨迹点数抽样率$\alpha$=0.2，为轨迹数量抽样率$\gamma$设置不同值来验证不同抽样率大小对实验结果的影响。从图\ref{differentGAMMA}可以看出，随着$\gamma$的增加，聚类的精度也不断增加。同时，随着$\gamma$的增加，带宽消耗的效率较低。
+对于不同轨迹数量抽样率$\gamma$，中心节点生成的轨迹数据与原始轨迹数据对比如图\ref{genTrForDifferentGamma}所示，其中，图\ref{gen01}表示轨迹数量抽样率为0.1时中心节点生成的轨迹数据，图\ref{gen05}表示轨迹数量抽样率为0.5时中心节点生成的轨迹数据，图\ref{gen09}表示轨迹数量抽样率为0.9时中心节点生成的轨迹数据，图\ref{origin}则表示原始轨迹数据。从图中可以看出，随着轨迹点数抽样率$\alpha$增大，中心轨迹依据参数生成的轨迹数据越接近原始轨迹数据。
+\begin{figure}[H]
+\subfigure[]{
+\label{gen01}
+\includegraphics[width=0.4\textwidth]{tr_rate_01.png}}
+\subfigure[]{
+\label{gen05}
+\includegraphics[width=0.4\textwidth]{tr_rate_05.png}}
+\subfigure[]{
+\label{gen09}
+\includegraphics[width=0.4\textwidth]{tr_rate_09.png}}
+\subfigure[]{
+\label{origin}
+\includegraphics[width=0.4\textwidth]{ch3original.png}}
+\caption{不同轨迹数量抽样率下生成轨迹效果对比}
+\label{genTrForDifferentGamma}
+\end{figure}
+
+
+对于不同轨迹点数抽样率，聚类结果和网络带宽压缩率如图\ref{differentGAMMA}可以看出，随着$\gamma$的增加，聚类的精度也不断增加。同时，随着$\gamma$的增加，也将会带来更大的网络带宽消耗。
 \begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{differentGAMMA.png}
 	\caption{不同轨迹数量采样率对比}
