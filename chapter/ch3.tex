@@ -50,7 +50,7 @@ Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_
 
 其中$a_x^i$表示轨迹a第i个点在x维度上的数值，$a_y^i$表示轨迹a第i个点在y维度上的数值，$b_x^i$ 、$b_y^i$则分别代表轨迹b第i个点在x、y维度上的数值。	
 
-我们的基本目标是对分布的轨迹数据进行联合处理，快速获取精确的聚类结果，同时减少数据处理的带宽消耗，并保持每条轨迹数据的隐私安全性。为了衡量聚类算法的精度，我们采用了RI指数，其计算方式如式\ref{RI}所示，RI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。
+我们的基本目标是对分布的轨迹数据进行联合处理，快速获取精确的聚类结果，同时减少数据处理的带宽消耗，并保持每条轨迹数据的隐私安全性。为了衡量聚类算法的精度，我们采用了ARI指数，其计算方式如式\ref{ARI}所示，ARI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。
 
 假设每个数据点有2个特征维度，每个属地节点拥有的时空数据大小可以定义为IF=2*m*n。同时，在多属地分布式系统中，将必要的信息传输到中心节点所产生的相应网络流量标记为TF。最后，将网络通信量与总数据量的比值标记为压缩比(compression ratio, CR)，即:
 \begin{equation}
@@ -179,7 +179,7 @@ Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_
 而如果我们使用0阶多项式，即常数函数去拟合这条曲线是，此时经验风险非常大，而拟合函数复杂度则很小。为了在满足模型拟合精度的同时避免模型复杂度过高，我们借助最优化理论思想采用经验风险加正则化项的方式，于是代价函数定义为：
 \begin{equation}
 \label{ch3costL1}
-\operatorname{cost}(\mathrm{\hat{f}})=\frac{1}{k} \sum_{j=1}^{k} \mathrm{L}\left(y_{j}, \mathrm{\hat{f}}\left(x_{j}\right)\right)+\mathrm{C} * J(\hat{f})
+\operatorname{cost}(\hat{f})=\frac{1}{k} \sum_{j=1}^{k} \mathrm{L}\left(y_{j}, \hat{f}\left(x_{j}\right)\right)+\mathrm{C} * J(\hat{f})
 \end{equation}
 
 式\ref{ch3costL1}前一项是经验风险，后一项$J(\hat{f})$则是正则化项，也称作结构风险,用来表示轨迹拟合函数$\hat{f}(x)$的复杂度，C为常量，用来调整两者之间关系，若C=0，则代价函数退化成经验损失函数，若C取值很大，则函数模型倾向于选择更简单的模型而不顾拟合准确度。
@@ -323,11 +323,11 @@ k-means++初始化操作如下：\\
 不确定性通过生成轨迹数据与原始属地轨迹数据之间的相似度进行度量，首先，拟合轨迹的多项式模型是通过最小化代价函数得到，而代价函数是由经验损失和正则化构成，所以拟合出的的多项式模型是不经过所有训练数据点的，故原始属地轨迹数据不可能由多项式轨迹准确还原；再者，由于生成轨迹数据是拟合多项式模型在指定区间均匀采样得到，故与原始属地轨迹数据存在一定的差异；但生成轨迹数据与原始轨迹数据在轨迹走向上相似度较高。算法在隐私性的覆盖率方面，由于属地节点在属地轨迹预处理阶段经过了轨迹数量抽样处理，故生成的轨迹数据是无法覆盖所有原始数据的，覆盖率的大小取决于轨迹数量抽样操作的抽样率，抽样率越低则覆盖率越低，反之，覆盖率则越高。
 
 \subsection{实验与分析}
-实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了位置x、位置y、人物id字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了4939条轨迹作为原始数据集，每条轨迹包含500个点。
+实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了位置x、位置y、人物id字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了549条轨迹作为原始数据集，每条轨迹包含500个点。
 
-实验系统由三个属地节点和一个中心节点组成。将该算法与集中式聚类方法进行了比较。集中式聚类算法对整个网格化数据集执行标准的k-means算法(baseline)， baseline的结果视为最优结果，后续试验中使用的RI指数则是以 baseline聚类结果作为标签。另一种算法则是本章提出的CSD-Clustering算法。
+实验系统由三个属地节点和一个中心节点组成。将该算法与集中式聚类方法进行了比较。集中式聚类算法对整个网格化数据集执行标准的k-means算法(baseline)， baseline的结果视为最优结果，后续试验中使用的ARI指数则是以 baseline聚类结果作为标签。另一种算法则是本章提出的CSD-Clustering算法。
 
-聚类评估采用两个指标：CR，表示算法的数据压缩能力；RI，表示聚类结果的精度。
+聚类评估采用两个指标：CR，表示算法的数据压缩能力；ARI，表示聚类结果的精度。
 
 在拟合轨迹曲线前，需要为轨迹区间划分阶段的参数S赋值及拟合轨迹曲线上的结构风险惩罚系数C赋值。
 
@@ -367,13 +367,13 @@ k-means++初始化操作如下：\\
 \begin{figure}[H]
 \subfigure[]{
 \label{gen50}
-\includegraphics[width=0.4\textwidth]{sample_rate_50.png}}
+\includegraphics[width=0.4\textwidth]{point_sample_50.png}}
 \subfigure[]{
 \label{gen20}
-\includegraphics[width=0.4\textwidth]{sample_rate_20.png}}
+\includegraphics[width=0.4\textwidth]{point_sample_20.png}}
 \subfigure[]{
 \label{gen5}
-\includegraphics[width=0.4\textwidth]{sample_rate_5.png}}
+\includegraphics[width=0.4\textwidth]{point_sample_5.png}}
 \subfigure[]{
 \label{origin}
 \includegraphics[width=0.4\textwidth]{ch3original.png}}
@@ -381,26 +381,28 @@ k-means++初始化操作如下：\\
 \label{genTrForDifferentAlpha}
 \end{figure}
 
-% N = [50,20,10,5,2]
-% RI = [ 0.854 , 0.899 , 0.911 , 0.931 , 0.959]
+% alpha = [1/50,1/20,1/10,1/5,1/2]
+% RI = [0.950 , 0.987 , 0.995 , 0.990 , 0.988]
+% ARI = [0.834, 0.958,0.984,0.969,0.963]
 % CR = [56.017, 26.452, 14.063 , 7.341, 3.008]
 
-对于不同轨迹点数抽样率，聚类结果如表\ref{differentALPHA}所示，可以看出随着$\alpha$的增加，RI值随之增大，CR值则随之减小。
+对于不同轨迹点数抽样率，聚类结果如表\ref{differentALPHA}所示，可以看出随着$\alpha$的增加，ARI指数在轨迹采样率为1/50时表现欠佳，当采样率高于1/10后，聚类效果与单中心聚类结果相似程度维持在很高的水平
+，而随着轨迹采样率的升高，CR值则随之减小。
 \begin{table}[H]
 \caption{不同轨迹点数抽样率对比}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 \diagbox{评价指标}{$\alpha$} & 1/50 & 1/20 & 1/10  & 1/5 & 1/2 \\ \hline
-RI   & 0.854 & 0.899 & 0.911 & 0.931 & 0.959\\ \hline
+ARI   & 0.834 & 0.958 & 0.984 & 0.969 & 0.970\\ \hline
 CR   & 56.017  & 26.452 & 14.063 & 7.341 & 3.008\\ \hline
 \end{tabular}
 \label{differentALPHA}
 \end{table}
 
-更高的轨迹点数抽样率意味着更多的轨迹分段，模型对应的参数数量则越多，这将会消耗更多的网络带宽，不同轨迹抽样率对应RI值和CR值的变化如图\ref{ch3ricr1}所示，RI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。其中N表示每间隔N个点进行抽样一个点。
+更高的轨迹点数抽样率意味着更多的轨迹分段，模型对应的参数数量则越多，这将会消耗更多的网络带宽，不同轨迹抽样率对应ARI值和CR值的变化如图\ref{ch3ricr1}所示，ARI用来评价聚类质量，针对网络带宽的压缩率，我们通过自定义的CR指标来衡量。
 \begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{ch3ex1.png}
-	\caption{不同轨迹点数抽样率下RI和CR变化曲线图}
+	\caption{不同轨迹点数抽样率下ARI和CR变化曲线图}
 	\label{ch3ricr1}
 \end{figure}
 
@@ -413,13 +415,13 @@ CR   & 56.017  & 26.452 & 14.063 & 7.341 & 3.008\\ \hline
 \begin{figure}[H]
 \subfigure[]{
 \label{gen01}
-\includegraphics[width=0.4\textwidth]{tr_rate_01.png}}
+\includegraphics[width=0.4\textwidth]{tr_sample_01.png}}
 \subfigure[]{
 \label{gen05}
-\includegraphics[width=0.4\textwidth]{tr_rate_05.png}}
+\includegraphics[width=0.4\textwidth]{tr_sample_05.png}}
 \subfigure[]{
 \label{gen09}
-\includegraphics[width=0.4\textwidth]{tr_rate_09.png}}
+\includegraphics[width=0.4\textwidth]{tr_sample_09.png}}
 \subfigure[]{
 \label{origin}
 \includegraphics[width=0.4\textwidth]{ch3original.png}}
@@ -428,16 +430,17 @@ CR   & 56.017  & 26.452 & 14.063 & 7.341 & 3.008\\ \hline
 \end{figure}
 
 % γ = [0.1,0.3,0.5,0.7,0.9]
-% RI = [0.845 , 0.862 , 0.905 , 0.915 , 0.916]
+% ARI = [0.691,0.787,0.838, 0.949, 0.982]
+% RI = [0.892 ,0.933 , 0.951 , 0.984 , 0.994]
 % CR = [70.168,22.750,13.548,9.689,7.541]
 
-对于不同轨迹数量抽样率，结果数值如表\ref{differentGAMMA}所示，可以看出随着$\gamma$的增加，RI值越来越大，CR则越来越小。
+对于不同轨迹数量抽样率，结果数值如表\ref{differentGAMMA}所示，可以看出随着$\gamma$的增加，ARI值越来越大，CR则越来越小。
 \begin{table}[H]
 \caption{不同轨迹数量抽样率对比}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 \diagbox{评价指标}{$\gamma$} & 0.1 & 0.3 & 0.5  & 0.7 & 0.9 \\ \hline
-RI   & 0.845 & 0.862 & 0.905 & 0.915 & 0.916\\ \hline
+ARI   & 0.691 & 0.787 & 0.838 & 0.949 & 0.982\\ \hline
 CR   & 70.168  & 13.548 & 13.548 & 9.689 & 7.541\\ \hline
 \end{tabular}
 \label{differentGAMMA}

@@ -47,7 +47,7 @@ d_{\text{H}}\left( A,B \right) =\max \left\{ \mathop{\text{sup}}_a\in A\mathop{\
 
 其中a,b分别表示轨迹A和B上的点，d(a,b)表示a点和b点之间的欧氏距离。
 
-本章的设计目的是解决高维轨迹数据分布描述不准确问题，改进CSD-Clustering算法在网络带宽消耗和隐私保护方面存在的不足。为了衡量聚类算法的精度，我们采用了RI指数，其计算方式如式\ref{RI}所示，RI用来评价聚类质量；针对网络带宽的压缩率，我们通过自定义的CR指标来衡量，CR表达式如式\ref{CR}所示。
+本章的设计目的是解决高维轨迹数据分布描述不准确问题，改进CSD-Clustering算法在网络带宽消耗和隐私保护方面存在的不足。为了衡量聚类算法的精度，我们采用了ARI指数，其计算方式如式\ref{ARI}所示，ARI用来评价聚类质量；针对网络带宽的压缩率，我们通过自定义的CR指标来衡量，CR表达式如式\ref{CR}所示。
 
 对于算法隐私保护层面的评价指标，我们从两个方面进行刻画：不确定性和覆盖度。
 
@@ -88,7 +88,7 @@ $$
 \begin{aligned}
 f\left( x \right) =\left\{ \begin{array}{c}
 	sign\left( x \right) *\left( \lfloor x \rfloor +1 \right) \,\,if\,\,|x-\lfloor x \rfloor |>0.5\\
-	sign\left( x \right) *\left( \lfloor x \rfloor -1 \right) \,\,if\,\,|x-\lfloor x \rfloor |\leqslant 0.5|\\
+	sign\left( x \right) *\left( \lfloor x \rfloor -1 \right) \,\,if\,\,|x-\lfloor x \rfloor |\leqslant 0.5\\
 \end{array} \right\\
 \varPhi \left( \left( x,y \right) \right) =\left( f\left( x \right) ,f\left( y \right) \right)\\
 g\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_l,y_l \right) \right\} =\left( x_1,y_1 \right) \,\, \\
@@ -166,7 +166,7 @@ P=\begin{array}{c|cccc}
 L=p_{11}^{n_{11}}*p_{12}^{n_{12}}*p_{1|s|}^{n_{1|s|}}*...*p_{|s||s|}^{n_{|s||s|}}
 \]
 
-对上式对数似然函数取对数不影响似然函数取最大值时的参数取值，故轨迹子簇C对应的对数似然函数可以表示为：
+对上式似然函数取对数不影响似然函数取最大值时的参数取值，故轨迹子簇C对应的对数似然函数可以表示为：
 \begin{equation}
 \label{ch4ll}
 LL=n_{11}\ln \left( p_{11} \right) +n_{12}\ln \left( p_{12} \right) +...+n_{|s||s|}\ln \left( p_{|s||s|} \right) 
@@ -223,46 +223,88 @@ LL(A)分别对$p_1$和$p_2$求导：
 
 针对指定的轨迹子簇，其马尔科夫链模型的转移矩阵可以表示为式\ref{transitionmatrix}，其状态与轨迹子簇中轨迹坐标点对应，若将马尔科夫链通过图模型表示：所有状态构成图中的点集，状态与状态之间的所有转移构成了图的边集。显然，用于估计轨迹生成模型的马尔科夫链模型对应的图模型不是一个完全图，而是一个稀疏图，因为任意一个状态只能向其在网格空间中相邻的网格点对应的状态进行转移，即任意一个状态只能向极其有限的状态进行转移，这使得马尔科夫链的转移矩阵中存在大量的零元素。于是我们可以通过稀疏矩阵存储方法来代替转移概率矩阵，从而可以减少一部分带宽传输的压力。稀疏矩阵存储方法有很多种，本文采用CSR稀疏矩阵存储方式表示转移矩阵。
 
-% cPara['firstP']
-%maxLength = cPara['maxL']
-% transMatrix = cPara['transM']
-% allState = cPara['allS']
+
+% paraDict['lastP'] = lastPoints
+% paraDict['firstP'] = firstPoints
+% paraDict['transM'] = csr_matrix(transMat)
+% paraDict['allS'] = allState
+% paraDict['minmaxL'] = [minLength,maxLength]
 
 为了中心节点能够对轨迹数据进行有效的还原，除了传输转移矩阵，还需传输一些额外的信息，包括状态集合、初始状态分布和长度限制。将这些额外信息和转移矩阵打包成的指定的数据包称为基于马尔科夫链的轨迹数据单元（MTD-Unit），其格式如下：
 $$
-\begin{tabular}{|c|c|c|c|}
-\hline States&InitSD&LenMax&TransMat\\
+\begin{tabular}{|c|c|c|c|c|}
+\hline firstP&lastP&transM&allS&minmaxL\\
 \hline
 \end{tabular}
 $$
 
 数据单元格式字段含义如下：
 \begin{itemize}
-\item \textbf{States}：此字段包含了转移矩阵中的所有状态，每一个状态代表了网格空间中的一个坐标点，以二元组的形式表示
-\item \textbf{InitSD}：此字段表示轨迹初始状态分布情况
-\item \textbf{LenMax}：此字段限制了生成轨迹序列时的最大序列长度
-\item \textbf{TransMat}：此字段表示马尔科夫链对应的转移矩阵的稀疏表示
+\item \textbf{allS}：此字段包含了转移矩阵中的所有状态，每一个状态代表了网格空间中的一个坐标点，以二元组的形式表示
+\item \textbf{firstP}：此字段表示轨迹初始状态分布情况
+\item \textbf{lastP}：此字段表示每条轨迹截至坐标点集合
+\item \textbf{minmaxL}：此字段限制了生成轨迹序列时的最大序列长度和最小序列长度
+\item \textbf{transM}：此字段表示马尔科夫链对应的转移矩阵的稀疏表示
 \end{itemize}
 
 各个属地节点将所有子簇对应的马尔科夫链模型转化成许多MTD-Unit传递给中心节点，中心节点通过这种特殊的数据包能够将轨迹数据进行还原。
 
 \subsection{综合求解和属地模型应用}
 
-各个属地节点将所有轨迹子簇对应的MTD-Unit传输给中心节点，中心节点接收到属地节点传递来的各种参数后，首先将转移概率矩阵稀疏表示还原出原始的轨迹转移矩阵，中心节点通过转移概率矩阵来生成轨迹。假设我们将还原的转移概率矩阵记为A，状态初始概率分布记为$\pi$，轨迹子簇包含的轨迹数量记为N，生成轨迹过程主要流程如下：\\
+各个属地节点将所有轨迹子簇对应的MTD-Unit传输给中心节点，中心节点接收到属地节点传递来的各种参数后，首先将转移概率矩阵稀疏表示还原出原始的轨迹转移矩阵，中心节点通过转移概率矩阵来生成轨迹。
+在生成轨迹的过程中，由于多条轨迹之间存在相互交错的情形，故状态转移至原始离散化轨迹对应的截止坐标点不一定意味着生成过程的停止，本算法在生成轨迹停止判断上采用了如下策略：\\
+若当前状态对应的概率分布是无效的（该状态不会转移至任何其他的状态），判断此时生成的轨迹的长度，如果此时长度满足minmaxL字段规定的长度限制，则该轨迹的生成过程停止；如果不满足，则从初始分布开始重新生成轨迹。\\
+若当前状态是截止状态（lastP集合中的状态），判断此时生成的轨迹的长度，如果此时的长度满足minmaxL字段规定的长度限制，则该轨迹的生成过程停止；如果此时生成的轨迹的长度小于minmaxL字段规定的最小长度，则将该状态对应的网格坐标点加入该生成的轨迹中，并继续执行轨迹的生成过程；如果此时生成的轨迹的长度大于minmaxL字段规定的最大长度，则从初始分布开始重新生成轨迹。\\
+若当前状态不是截止状态，则将该状态对应的网格坐标点加入该生成的轨迹中，然后判断此时的生成的轨迹长度是否超过了minmaxL规定的最大长度，若超过了此时生成的轨迹长度超过了最大长度限制，则从初始分布开始重新生成轨迹；若未超过，则继续执行轨迹的生成过程。
+生成轨迹过程主要流程如下：\\
+
 \begin{algorithm}[H]
 	\label{markovGen}
+	\KwData{MTD-Unit}
 	 \KwData{转移概率矩阵A，状态初始概率分布$\pi$，轨迹数量N}
-	 \KwResult{生成轨迹集合G}
+	 \KwResult{生成轨迹集合Grs}
+	 转移概率矩阵A = MTD-Unit.get('transM');\\
+	 状态初始概率分布$\pi$ = MTD-Unit.get('firstP');\\
+	 轨迹数量N = $\pi$.getTrNum();\\
+	 轨迹截止点集合lastP = MTD-Unit.get('lasatP');\\
+	 生成轨迹长度范围：\\
+	 最小长度minLength = MTD-Unit.get('minmaxL').getMin();\\
+	 最大长度maxLength = MTD-Unit.get('minmaxL').getMax();\\
+	初始化轨迹序列集合Grs;\\
 	 \For{i=1,2,,...,N}{
-	 	按照状态初始状态分布$\pi$产生状态$s_1$\;\\
-	 	状态$\s_1$在转移概率矩阵中对应的概率分布记为S\;\\
-	 	轨迹序列L\;\\
-	 	\Repeat{若概率分布S中存在非零元素}{
-	 		依据概率分布产生状态s\;\\
-	 		将状态s加入轨迹序列L\;\\
-	 		S=状态s在转移概率矩阵中对应的概率分布\;\\
+	 	按照状态初始状态分布$\pi$产生状态$now$\;\\
+	 	初始化轨迹序列Gr，并将状态$now$加入Gr;\\
+	 	\While{True}{
+	 		找到状态$now$对应的概率分布$P_{now}$;\\
+	 		\If{$P_{now}$不符合概率分布的归一约束}{
+	 			\If{len(Gr)满足轨迹长度限制}{
+	 				break;
+	 			}
+	 			\Else{
+	 				Gr = [];\\
+	 				将状态$now$加入Gr;\\
+	 				continue;\\
+	 			}
+	 		}
+	 		依据概率分布$P_{now}$生成下一个状态$next$;\\
+	 		\If{next in lastP}{
+	 			将状态$next$加入Gr;\\
+	 			\If{len(Gr) < minLength}{
+	 				$now$ = $next$;\\
+	 				continue;\\
+	 			}
+	 			\Elif{len(Gr) > maxLength}{
+	 				Gr = [];\\
+	 				将状态$now$加入Gr;\\
+	 				continue;\\	 				
+	 			}
+	 			\Else{
+	 				break;\\
+	 			}
+	 		}
+	 		$now$ = $next$;\\
 	 	}
-	 	将轨迹序列L纳入生成轨迹集合G\;\\
+	 	将Gr加入到Grs;\\
 	 }
 	 \caption{马尔科夫链模型轨迹生成过程}
 \end{algorithm}
@@ -332,9 +374,9 @@ $$
 
 \subsection{实验与分析}
 
-实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了时间、位置x、位置y、人物id等字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了696条轨迹作为原始数据集，每条轨迹包含500个点。
+实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了时间、位置x、位置y、人物id等字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了532条轨迹作为原始数据集，每条轨迹包含500个点。
 
-实验系统由三个属地节点和一个中心节点组成。将该算法与集中式聚类方法进行了比较。集中式聚类算法对整个网格化数据集执行标准的k-medoids算法(baseline)， baseline的结果视为最优结果，后续试验中使用的RI指数则是以 baseline聚类结果作为标签。另一种算法则是本章提出的MCD-Clustering算法。
+实验系统由三个属地节点和一个中心节点组成。将该算法与集中式聚类方法进行了比较。集中式聚类算法对整个网格化数据集执行标准的k-medoids算法(baseline)， baseline的结果视为最优结果，后续试验中使用的ARI指数则是以 baseline聚类结果作为标签。另一种算法则是本章提出的MCD-Clustering算法。
 
 对于两种聚类方案中，都需要对簇个数进行选择，我们以baseline实验中选取的k视为标准，在baseline实验中选取不同的k值其损失函数值变化情况如图\ref{differentK}。
 \begin{figure}[H]
@@ -349,25 +391,62 @@ $$
 \begin{figure}[H]
 \subfigure[]{
 \label{gen4All}
-\includegraphics[width=0.4\textwidth]{gen4All.png}}
+\includegraphics[width=0.4\textwidth]{ch4disc.png}}
 \subfigure[]{
 \label{originAll}
-\includegraphics[width=0.4\textwidth]{originAll.png}}
+\includegraphics[width=0.4\textwidth]{ch4original.png}}
 \caption{轨迹生成效果对比图}
 \label{ch4GenAndOrigin}
 \end{figure}
 
+% Ks = [3,8,10,15,20]
+% RI = [0.844,0.878,0.911,0.931,0.981]
+% ARI = [0.659, 0.738,0.805, 0.850,0.957]
+% CR = [7.344,5.47,5.12,3.96,3.49]
 
-在MCD-Clustering算法中的局部聚类过程，K值选取将会影响马尔科夫链对轨迹生成模型的估计，图\ref{kricr}展示了局部聚类不同K值下的RI指数变化。（保持全局聚类的K值不变）
+
+
+在MCD-Clustering算法中的局部聚类过程，K值选取将会影响马尔科夫链对轨迹生成模型的估计，对于不同K值选取，聚类结果如表\ref{ch4differentK}所示，可以看出随着K的增加，ARI指数稳步上升，但K值的上升同时以为着转移矩阵的个数增加，故网络带宽将会增加，使得CR值有所降低；同时从表\ref{ch4differentK}也可以看出ARI指数相对RI指数在区分粒度上的优势。
+\begin{table}[H]
+\caption{不同K值对实验效果的影响}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\diagbox{评价指标}{$\alpha$} & 3 & 8 & 10  & 15 & 20 \\ \hline
+RI   & 0.844 & 0.878 & 0.911 & 0.931 & 0.981\\ \hline
+ARI   & 0.659 & 0.738 & 0.805 & 0.85 & 0.957\\ \hline
+CR   & 7.344  & 5.47 & 5.12 & 3.96 & 3.49\\ \hline
+\end{tabular}
+\label{ch4differentK}
+\end{table}
+
+图\ref{ch4karicr}展示了局部聚类不同K值下的ARI指数、RI指数和CR值的变化趋势。（保持全局聚类的K值不变）
 \begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{K_RI_CR.png}
-	\caption{不同K值对实验结果的影响}
-	\label{kricr}
+	\includegraphics[width=0.8\textwidth]{ch4ex1.png}
+	\caption{不同K值下ARI指数、RI指数和CR值的变化趋势}
+	\label{ch4karicr}
 \end{figure}
 
-依据上图，可以看到，随着K值增大，RI指数也会随之增大，即聚类效果更好。这是因为当K值很小时，轨迹子簇中的轨迹相似性不高，可能会有多种走势形状的轨迹存在，通过这样的轨迹子簇数据训练出来的生成模型会生成多种走势形状混合的轨迹数据，而走势性形状混合的轨迹数据在原始轨迹数据中可能是不存在的，这样就会给后续全局聚类操作造成影响。但随着K值增大，需要在网络中传输更多的转移矩阵，也因此会使网络信息传输压缩率有所降低,但K值增大的同时，子簇更具有相似性，故而转移矩阵也会相应减小，可以看到当K大于等于6时，CR值变化放缓。
+依据图\ref{ch4karicr}和表\ref{ch4differentK}，可以看到，随着K值增大，ARI指数也会随之增大，即聚类效果更好。这是因为当K值很小时，轨迹子簇中的轨迹相似性不高，可能会有多种走势形状的轨迹存在，通过这样的轨迹子簇数据训练出来的生成模型会生成多种走势形状混合的轨迹数据，而走势性形状混合的轨迹数据在原始轨迹数据中可能是不存在的，这样就会给后续全局聚类操作造成影响。但随着K值增大，需要在网络中传输更多的转移矩阵，也因此会使网络信息传输压缩率有所降低,但K值增大的同时，子簇更具有相似性，故而转移矩阵也会相应减小。
 
-为了网络带宽消耗和聚类准确度的平衡，对于局部聚类的K值选择，我们依据K值与损失函数的变化曲线来决定K的取值，实验结果如图\ref{ch4nodeck}所示,图中分别展示了三个属地节点局部聚类K值选择过程:
+局部聚类不同K值下，中心节点生成的轨迹数据如图\ref{genTrForDifferentK}所示，其中，图\ref{genk3}表示局部聚类K值取3时中心节点生成的离散化轨迹，图\ref{genk8}表示局部聚类K值取8时中心节点生成的离散化轨迹，图\ref{genk15}表示局部聚类K值取15时中心节点生成的离散化轨迹，图\ref{genk120}表示局部聚类K值取20时中心节点生成的离散化轨迹。通过与图\ref{ch4GenAndOrigin}对比可看出，随着局部聚类K值增大，生成的离散轨迹集合更加接近于原始轨迹数据。
+\begin{figure}[H]
+\subfigure[]{
+\label{genk3}
+\includegraphics[width=0.4\textwidth]{gen_disc_k3.png}}
+\subfigure[]{
+\label{genk8}
+\includegraphics[width=0.4\textwidth]{gen_disc_k8.png}}
+\subfigure[]{
+\label{genk15}
+\includegraphics[width=0.4\textwidth]{gen_disc_k15.png}}
+\subfigure[]{
+\label{genk20}
+\includegraphics[width=0.4\textwidth]{gen_disc_k20.png}}
+\caption{局部聚类不同K值下生成轨迹效果对比}
+\label{genTrForDifferentK}
+\end{figure}
+
+为了网络带宽消耗和聚类准确度的平衡，对于局部聚类的K值选择，可以依据K值与损失函数的变化曲线来决定K的取值，实验结果如图\ref{ch4nodeck}所示,图中分别展示了三个属地节点局部聚类K值选择过程:
 \begin{figure}[H]
 \subfigure[]{
 \includegraphics[width=0.3\textwidth]{ch4node1ck.png}}
@@ -379,12 +458,6 @@ $$
 \label{ch4nodeck}
 \end{figure}
 
-依据上图，确定三个属地节点K值取值分别为7,7,9。在此基础上，中心节点进行全局聚类的K值选择也采用同样的方法，实验结果如图\ref{ch4centerck}所示：
-\begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{ch4centerck.png}
-	\caption{全局部聚类K值与损失函数曲线}
-	\label{ch4centerck}
-\end{figure}
 
 
 %在 MCD-Clustering 算法中对轨迹数据进行了网格化处理，假设网格化粒度记为$\delta$，若$\delta$越大则表示网格化粒度越粗，反之，则网格化粒度越精细。我们对不同网格化粒度情况下 MCD-Clustering 算法的聚类效果进行了实验，实验结果如图\ref{deltRIcr}。

@@ -91,6 +91,52 @@ k-means算法要求所有元素维度相同且距离度量必须基于欧式距�
 
 RI指数取值范围为[0,1]，其值越大表示聚类效果越好，反之，则聚类效果越差。
 
+但是Rand指数对于不同聚类结果的区分度不高，于是基于Rand指数，提出了Adjusted Rand Index\citing{rand1971objective}。
+\[
+\begin{matrix}{c|ccccc}
+	&		C_{1}^{*}&		C_{2}^{*}&		\dots&		C_{S}^{*}&		\,\,\text{Sums}\\
+	\hline
+	C_1&		n_{11}&		n_{12}&		\dots&		n_{1S}&		a_1\\
+	C_2&		n_{21}&		n_{22}&		\dots&		n_{2S}&		a_2\\
+	\vdots&		\vdots&		\vdots&		\ddots&		\vdots&		\vdots\\
+	C_K&		n_{K1}&		n_{K2}&		\cdots&		n_{KS}&		a_K\\
+	\,\,\text{Sums}&		b_1&		b_2&		\dots&		b_S&		\\
+\end{matrix}
+\]
+
+其中$n_{ij}$表示簇$C_{i}$和簇$C_{i}^{*}$之间共同存在的对象个数，即$n_{i j}=\left|X_{i} \cap Y_{j}\right|$。ARI指数定义如下：
+\begin{equation}
+\label{ARI}
+ARI=\frac{\sum_{ij}{\left( \begin{array}{c}
+	n_{ij}\\
+	2\\
+\end{array} \right)}-\left[ \sum_i{\left( \begin{array}{c}
+	a_i\\
+	2\\
+\end{array} \right)}\sum_j{\left( \begin{array}{c}
+	b_j\\
+	2\\
+\end{array} \right)} \right] /\left( \begin{array}{c}
+	n\\
+	2\\
+\end{array} \right)}{\frac{1}{2}\left[ \sum_i{\left( \begin{array}{c}
+	a_i\\
+	2\\
+\end{array} \right)}+\sum_j{\left( \begin{array}{c}
+	b_j\\
+	2\\
+\end{array} \right)} \right] -\left[ \sum_i{\left( \begin{array}{c}
+	a_i\\
+	2\\
+\end{array} \right)}\sum_j{\left( \begin{array}{c}
+	b_j\\
+	2\\
+\end{array} \right)} \right] /\left( \begin{array}{c}
+	n\\
+	2\\
+\end{array} \right)}
+\end{equation}
+
 \subsubsection{内部指标}
 
 若直接评估聚类结果本身，则需要考虑内部指标，同样设定聚类算法得到的簇划分为$C=\left\{C_1,C_2,...,C_K\right\}$。在定义内部指标之前，先定义几种距离公式：
