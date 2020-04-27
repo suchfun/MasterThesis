@@ -16,26 +16,26 @@ k-means算法由文献\cite{hartigan1979algorithm}正式提出，现已成为数
 现有样本集$D=\left\{x_1,x_2,...,x_m\right\}$，k-means算法将数据集划分成互不相交的K个簇$C=\left\{C_1,C_2,...,C_K\right\}$,且满足$C_1\bigcup{C_2\bigcup{...\bigcup{C_m=D}}}$，每个簇的簇心$\mu _i=\frac{1}{|C_i|}\sum_{\mathbf{x}\in C_i}{\mathbf{x}}$。
 算法流程如下：\\
 \begin{algorithm}[H]
-	\label{kmeans}
 	 \KwData{样本集$D=\left\{x_1,x_2,...,x_m\right\}$，簇个数K}
 	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_k\right\}$}
 	 从数据集D中随机初始化K个样本，将其作为K个初始簇心\;
 	 \Repeat{所有簇心不再更新或更新值小于一定阈值}{
-		 将所有的簇置为空，$C_i=\varPhi \,\,\left( 1\leqslant i\leqslant K \right)$\\
+		 将所有的簇置为空，$C_i=\varPhi \,\,\left( 1\leqslant i\leqslant K \right)$\;
 		 \For{i=1,2,...,m}{
-		 	计算样本$x_i$与所有簇心之间的距离，并将$x_i$归为第$\alpha _i$类，使其满足：
+		 	计算样本$x_i$与所有簇心之间的距离，并将$x_i$归为第$\alpha _i$类，使其满足：\\
 		 	$\alpha _i=arg\,\,\min \left( d_{i\alpha _i} \right) $\\其中：
-		 	$d_{i\alpha _i}=||x_i-\mu _{\alpha _i}||_2$\\
-		 	将样本$x_i$划入簇$C_{\alpha _i}$
+		 	$d_{i\alpha _i}=||x_i-\mu _{\alpha _i}||_2$\;
+		 	将样本$x_i$划入簇$C_{\alpha _i}$\;
 		 }
 		 \For{i=1,2,...,K}{
-		 	$\hat{\mu}_i=\frac{1}{|C_i|}\sum_{x\in C_i}{x}$\\
+		 	$\hat{\mu}_i=\frac{1}{|C_i|}\sum_{x\in C_i}{x}$\;
 		 	\If{$\hat{\mu}_i\ne \mu _i$}{
-		 		$\mu _i$=$\hat{\mu}_i$
+		 		$\mu _i$=$\hat{\mu}_i$\;
 		 	}
 		 }
 	 }
 	 \caption{k-means算法}
+	\label{kmeans}
 \end{algorithm}
 
 从上述流程可以得到，k-means算法复杂度为O(n*k*t)，其中n表示样本数目，k表示簇个数，t是平均迭代次数。k-meas算法的收敛性可参考论文\cite{neal1998view}。
@@ -47,15 +47,15 @@ k-means算法要求所有元素维度相同且距离度量必须基于欧式距�
 	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_k\right\}$}
 	 随机初始化K个样本，将其对应的序号作为K个初始簇心\;
 	 \Repeat{所有簇心不再更新或更新值小于一定阈值}{
-		 将所有的簇置为空，$C_i=\varPhi \,\,\left( 1\leqslant i\leqslant K \right)$\\
+		 将所有的簇置为空，$C_i=\varPhi \,\,\left( 1\leqslant i\leqslant K \right)$\;
 		 \For{i=1,2,...,m}{
-		 	依据距离矩阵，计算序号为i的样本与所有簇心之间的距离，并将序号为i的样本归为第$\alpha _i$类，使其满足：
-		 	$\alpha _i=arg\,\,\min \left( M[i\，\mu_{\alpha _i}] \right) $\\
+		 	依据距离矩阵，计算序号为i的样本与所有簇心之间的距离，并将序号为i的样本归为第$\alpha _i$类，使其满足：\\
+		 	$\alpha _i=arg\,\,\min \left( M[i\，\mu_{\alpha _i}] \right) $\;
 		 }
 		 \For{i=1,2,...,K}{
-		 	$\hat{\mu }_i=arg\,\,\min_{x\in C_i} \left( \sum_{j\in C_i}{M\left[ x,j \right]} \right) $\\
+		 	$\hat{\mu }_i=arg\,\,\min_{x\in C_i} \left( \sum_{j\in C_i}{M\left[ x,j \right]} \right) $\;
 		 	\If{$\hat{\mu}_i\ne \mu _i$}{
-		 		$\mu _i$=$\hat{\mu}_i$
+		 		$\mu _i$=$\hat{\mu}_i$\;
 		 	}
 		 }
 	 }
@@ -74,10 +74,10 @@ k-means算法要求所有元素维度相同且距离度量必须基于欧式距�
 \begin{equation}
 \label{abcd}
 \begin{aligned}
-&\left.a=|S S|, \quad S S=\left\{(x_{i}, x_{j}) | \lambda_{i}=\lambda_{j}, \lambda_{i}^{*}=\lambda_{j}^{*}, i<j)\right\}\\
-&\left.b=|S D|, \quad S D=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i}=\lambda_{j}, \lambda_{i}^{*} \neq \lambda_{j}^{*}, i<j)\right\}\\
-&\left.c=|D S|, \quad D S=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i} \neq \lambda_{j}, \lambda_{i}^{*}=\lambda_{j}^{*}, i<j)\right\}\\
-&\left.d=|D D|, \quad D D=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i} \neq \lambda_{j}, \lambda_{i}^{*} \neq \lambda_{j}^{*}, i<j)\right\}
+&a=|S S|, \quad S S=\left\{(x_{i}, x_{j}) | \lambda_{i}=\lambda_{j}, \lambda_{i}^{*}=\lambda_{j}^{*}, i<j)\right.\\
+&b=|S D|, \quad S D=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i}=\lambda_{j}, \lambda_{i}^{*} \neq \lambda_{j}^{*}, i<j)\right.\\
+&c=|D S|, \quad D S=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i} \neq \lambda_{j}, \lambda_{i}^{*}=\lambda_{j}^{*}, i<j)\right.\\
+&d=|D D|, \quad D D=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i} \neq \lambda_{j}, \lambda_{i}^{*} \neq \lambda_{j}^{*}, i<j)\right.
 \end{aligned}
 \end{equation}
 
@@ -93,7 +93,7 @@ RI指数取值范围为[0,1]，其值越大表示聚类效果越好，反之，�
 
 但是Rand指数对于不同聚类结果的区分度不高，于是基于Rand指数，提出了Adjusted Rand Index\citing{rand1971objective}。
 \[
-\begin{matrix}{c|ccccc}
+\begin{array}{c|ccccc}
 	&		C_{1}^{*}&		C_{2}^{*}&		\dots&		C_{S}^{*}&		\,\,\text{Sums}\\
 	\hline
 	C_1&		n_{11}&		n_{12}&		\dots&		n_{1S}&		a_1\\
@@ -101,7 +101,7 @@ RI指数取值范围为[0,1]，其值越大表示聚类效果越好，反之，�
 	\vdots&		\vdots&		\vdots&		\ddots&		\vdots&		\vdots\\
 	C_K&		n_{K1}&		n_{K2}&		\cdots&		n_{KS}&		a_K\\
 	\,\,\text{Sums}&		b_1&		b_2&		\dots&		b_S&		\\
-\end{matrix}
+\end{array}
 \]
 
 其中$n_{ij}$表示簇$C_{i}$和簇$C_{i}^{*}$之间共同存在的对象个数，即$n_{i j}=\left|X_{i} \cap Y_{j}\right|$。ARI指数定义如下：

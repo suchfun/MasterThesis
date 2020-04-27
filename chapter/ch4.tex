@@ -89,7 +89,7 @@ $$
 f\left( x \right) =\left\{ \begin{array}{c}
 	sign\left( x \right) *\left( \lfloor x \rfloor +1 \right) \,\,if\,\,|x-\lfloor x \rfloor |>0.5\\
 	sign\left( x \right) *\left( \lfloor x \rfloor -1 \right) \,\,if\,\,|x-\lfloor x \rfloor |\leqslant 0.5\\
-\end{array} \right\\
+\end{array} \right.\\
 \varPhi \left( \left( x,y \right) \right) =\left( f\left( x \right) ,f\left( y \right) \right)\\
 g\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_l,y_l \right) \right\} =\left( x_1,y_1 \right) \,\, \\
 if\,\,\left( x_1,y_1 \right) =\left( x_2,y_2 \right) =...=\left( x_l,y_l \right)
@@ -116,31 +116,31 @@ $$
 
 	 \Repeat{i=1,2,...,l-1}{
 	 	\If{$x_i==x_{i+1}$ && $|y_i-y_{i+1}|>1$}{
-	 		s = sign($y_{i+1}-y_{i}$)
-	 		在坐标$(x_i,y_i)$后面填充坐标$(x_i,y_i+s),(x_i,y_i+2*s),...,(x_i,y_{i+1}-s)$
+	 		s = sign($y_{i+1}-y_{i}$)\;
+	 		在坐标$(x_i,y_i)$后面填充坐标$(x_i,y_i+s),(x_i,y_i+2*s),...,(x_i,y_{i+1}-s)$\;
 	 	}
 	 	\ElseIf{$y_i==y_{i+1}$ && $|x_i-x_{i+1}|>1$}{
 	 		s = sign($x_{i+1}-x_i$)
-	 		在坐标$(x_i,y_i)$后面填充坐标$(x_i+s,y_i),(x_i+2*s,y_i),...,(x_{i+1}-s,y_{i})$
+	 		在坐标$(x_i,y_i)$后面填充坐标$(x_i+s,y_i),(x_i+2*s,y_i),...,(x_{i+1}-s,y_{i})$\;
 	 	} 
 	 	\ElseIf{$|x_i-x_{i+1}| \geqslant 1$ && $|y_i-y_{i+1}| \geqslant 1$}{
-	 		xs = sign($x_{i+1}-x_i$)
-	 		ys = sign($y_{i+1}-y_{i}$)
-	 		在坐标$(x_i,y_i)$后面填充坐标$(x_i+xs,y_i),(x_i+xs,y_i+ys)$
+	 		xs = sign($x_{i+1}-x_i$)\;
+	 		ys = sign($y_{i+1}-y_{i}$)\;
+	 		在坐标$(x_i,y_i)$后面填充坐标$(x_i+xs,y_i),(x_i+xs,y_i+ys)$\;
 	 		\While{假设最后填充的坐标$(x_t,y_t)$不满足：$x_t==x_{i+1}$ || $y_t==y_{i+1}$ || ($|x_t-x_{i+1}|==1$ && $|y_t-y_{i+1}|==1$) }{
-	 			在坐标$(x_t,y_t)$后面填充坐标$(x_t+xs,y_t),(x_t+xs,y_t+ys)$
+	 			在坐标$(x_t,y_t)$后面填充坐标$(x_t+xs,y_t),(x_t+xs,y_t+ys)$\;
 	 		}
 	 		\If{$x_t==x_{i+1}$ && $|y_t-y_{i+1}|>1$}{
-	 			s = sign($y_{i+1}-y_{t}$)
-	 			在坐标$(x_t,y_t)$后面填充坐标$(x_t,y_t+s),(x_t,y_t+2*s),...,(x_t,y_{i+1}-s)$
+	 			s = sign($y_{i+1}-y_{t}$)\;
+	 			在坐标$(x_t,y_t)$后面填充坐标$(x_t,y_t+s),(x_t,y_t+2*s),...,(x_t,y_{i+1}-s)$\;
 	 		}
 	 		\ElseIf{$y_t==y_{i+1}$ && $|x_t-x_{i+1}|>1$}{
-	 			s = sign($x_{i+1}-x_t$)
-	 			在坐标$(x_t,y_t)$后面填充坐标$(x_t+s,y_t),(x_t+2*s,y_t),...,(x_{i+1}-s,y_{t})$
+	 			s = sign($x_{i+1}-x_t$)\;
+	 			在坐标$(x_t,y_t)$后面填充坐标$(x_t+s,y_t),(x_t+2*s,y_t),...,(x_{i+1}-s,y_{t})$\;
 	 		}
 	 		\ElseIf{$|x_t-x_{i+1}|==1$ && $|y_t-y_{i+1}|==1$}{
-	 			s = sign($x_{i+1}-x_t$)
-	 			在坐标$(x_t,y_t)$后面填充坐标$(x_t+s,y_t)$
+	 			s = sign($x_{i+1}-x_t$)\;
+	 			在坐标$(x_t,y_t)$后面填充坐标$(x_t+s,y_t)$\;
 	 		}
 	 	}
 	 }
@@ -252,99 +252,99 @@ $$
 \subsection{综合求解和属地模型应用}
 
 各个属地节点将所有轨迹子簇对应的MTD-Unit传输给中心节点，中心节点接收到属地节点传递来的各种参数后，首先将转移概率矩阵稀疏表示还原出原始的轨迹转移矩阵，中心节点通过转移概率矩阵来生成轨迹。
-在生成轨迹的过程中，由于多条轨迹之间存在相互交错的情形，故状态转移至原始离散化轨迹对应的截止坐标点不一定意味着生成过程的停止，本算法在生成轨迹停止判断上采用了如下策略：\\
-若当前状态对应的概率分布是无效的（该状态不会转移至任何其他的状态），判断此时生成的轨迹的长度，如果此时长度满足minmaxL字段规定的长度限制，则该轨迹的生成过程停止；如果不满足，则从初始分布开始重新生成轨迹。\\
-若当前状态是截止状态（lastP集合中的状态），判断此时生成的轨迹的长度，如果此时的长度满足minmaxL字段规定的长度限制，则该轨迹的生成过程停止；如果此时生成的轨迹的长度小于minmaxL字段规定的最小长度，则将该状态对应的网格坐标点加入该生成的轨迹中，并继续执行轨迹的生成过程；如果此时生成的轨迹的长度大于minmaxL字段规定的最大长度，则从初始分布开始重新生成轨迹。\\
-若当前状态不是截止状态，则将该状态对应的网格坐标点加入该生成的轨迹中，然后判断此时的生成的轨迹长度是否超过了minmaxL规定的最大长度，若超过了此时生成的轨迹长度超过了最大长度限制，则从初始分布开始重新生成轨迹；若未超过，则继续执行轨迹的生成过程。
-生成轨迹过程主要流程如下：\\
+在生成轨迹的过程中，由于多条轨迹之间存在相互交错的情形，故状态转移至原始离散化轨迹对应的截止坐标点不一定意味着生成过程的停止，本算法在生成轨迹停止判断上采用了如下策略：
+\begin{itemize}
+\item 若当前状态对应的概率分布是无效的（该状态不会转移至任何其他的状态），判断此时生成的轨迹的长度，如果此时长度满足minmaxL字段规定的长度限制，则该轨迹的生成过程停止；如果不满足，则从初始分布开始重新生成轨迹。
+\item 若当前状态是截止状态（lastP集合中的状态），判断此时生成的轨迹的长度，如果此时的长度满足minmaxL字段规定的长度限制，则该轨迹的生成过程停止；如果此时生成的轨迹的长度小于minmaxL字段规定的最小长度，则将该状态对应的网格坐标点加入该生成的轨迹中，并继续执行轨迹的生成过程；如果此时生成的轨迹的长度大于minmaxL字段规定的最大长度，则从初始分布开始重新生成轨迹。
+\item 若当前状态不是截止状态，则将该状态对应的网格坐标点加入该生成的轨迹中，然后判断此时的生成的轨迹长度是否超过了minmaxL规定的最大长度，若超过了此时生成的轨迹长度超过了最大长度限制，则从初始分布开始重新生成轨迹；若未超过，则继续执行轨迹的生成过程。
+\end{itemize}
 
+生成轨迹过程主要流程如下算法\ref{markovGen}所示。\\
 \begin{algorithm}[H]
-	\label{markovGen}
+\begin{spacing}{1}
 	\KwData{MTD-Unit}
-	 \KwData{转移概率矩阵A，状态初始概率分布$\pi$，轨迹数量N}
-	 \KwResult{生成轨迹集合Grs}
-	 转移概率矩阵A = MTD-Unit.get('transM');\\
-	 状态初始概率分布$\pi$ = MTD-Unit.get('firstP');\\
-	 轨迹数量N = $\pi$.getTrNum();\\
-	 轨迹截止点集合lastP = MTD-Unit.get('lasatP');\\
-	 生成轨迹长度范围：\\
-	 最小长度minLength = MTD-Unit.get('minmaxL').getMin();\\
-	 最大长度maxLength = MTD-Unit.get('minmaxL').getMax();\\
-	初始化轨迹序列集合Grs;\\
+	\KwResult{生成轨迹集合Grs}
+	 转移概率矩阵A = MTD-Unit.get('transM')\;
+	 状态初始概率分布$\pi$ = MTD-Unit.get('firstP')\;
+	 轨迹数量N = $\pi$.getTrNum()\;
+	 轨迹截止点集合lastP = MTD-Unit.get('lasatP')\;
+	 最小长度minLength = MTD-Unit.get('minmaxL').getMin()\;
+	 最大长度maxLength = MTD-Unit.get('minmaxL').getMax()\;
+	初始化轨迹序列集合Grs\;
 	 \For{i=1,2,,...,N}{
-	 	按照状态初始状态分布$\pi$产生状态$now$\;\\
-	 	初始化轨迹序列Gr，并将状态$now$加入Gr;\\
+	 	按照状态初始状态分布$\pi$产生状态$now$\;
+	 	初始化轨迹序列Gr，并将状态$now$加入Gr\;
 	 	\While{True}{
-	 		找到状态$now$对应的概率分布$P_{now}$;\\
+	 		找到状态$now$对应的概率分布$P_{now}$\;
 	 		\If{$P_{now}$不符合概率分布的归一约束}{
 	 			\If{len(Gr)满足轨迹长度限制}{
-	 				break;
+	 				break\;
 	 			}
 	 			\Else{
-	 				Gr = [];\\
-	 				将状态$now$加入Gr;\\
-	 				continue;\\
+	 				Gr = []\;
+	 				将状态$now$加入Gr\;
+	 				continue\;
 	 			}
 	 		}
-	 		依据概率分布$P_{now}$生成下一个状态$next$;\\
+	 		依据概率分布$P_{now}$生成下一个状态$next$\;
 	 		\If{next in lastP}{
-	 			将状态$next$加入Gr;\\
+	 			将状态$next$加入Gr\;
 	 			\If{len(Gr) < minLength}{
-	 				$now$ = $next$;\\
-	 				continue;\\
+	 				$now$ = $next$\;
+	 				continue\;
 	 			}
 	 			\Elif{len(Gr) > maxLength}{
-	 				Gr = [];\\
-	 				将状态$now$加入Gr;\\
-	 				continue;\\	 				
+	 				Gr = []\;
+	 				将状态$now$加入Gr\;
+	 				continue\; 				
 	 			}
 	 			\Else{
-	 				break;\\
+	 				break\;
 	 			}
 	 		}
-	 		$now$ = $next$;\\
+	 		$now$ = $next$\;
 	 	}
-	 	将Gr加入到Grs;\\
+	 	将Gr加入到Grs\;
 	 }
 	 \caption{马尔科夫链模型轨迹生成过程}
+	 \label{markovGen}
+\end{spacing}
 \end{algorithm}
 
-依据上述流程即还原出轨迹数据，而此时的轨迹数据长度是不一致的，所以式\ref{ch4dist}定义的距离度量将不再适用，此时我们将采用霍夫曼距离来度量两条轨迹之间的距离，距离度量如式\ref{hausdorffdist}所示。将式\ref{hausdorffdist}定义的距离替换 kmedoids 算法中的欧氏距离，则可以对生成的轨迹数据集进行k-medoids算法聚类操作了。具体聚类流程如算法\ref{kmediodspp}所示。
-
+依据上述流程即还原出轨迹数据，而此时的轨迹数据长度是不一致的，所以式\ref{ch4dist}定义的距离度量将不再适用，此时我们将采用霍夫曼距离来度量两条轨迹之间的距离，距离度量如式\ref{hausdorffdist}所示。将式\ref{hausdorffdist}定义的距离替换 kmedoids 算法中的欧氏距离，则可以对生成的轨迹数据集进行k-medoids算法聚类操作了。具体聚类流程如算法\ref{kmediodspp}所示。\\
 \begin{algorithm}[H]
 	 \KwData{样本距离矩阵$M_{nn}$，簇个数K}
 	 \KwResult{簇心向量序号$\mu=\left\{\mu_1,\mu_2,...,\mu_K\}\right\}$}
-	 从0到n-1中随机选取一个整数$\mu_1$，将其作为第一个簇心对应的元素序号，此时$\mu={\mu_1}$\;\\
-	 D={1,2,...,n-1};\\
+	 从0到n-1中随机选取一个整数$\mu_1$，将其作为第一个簇心对应的元素序号，此时$\mu={\mu_1}$\;
+	 D={1,2,...,n-1}\;
 	 \Repeat{k=2,3,...,K}{
-	 	R=D-$\mu$
+	 	R=D-$\mu$\;
 	 	\For{$t_i$ in R}{
-	 		计算$P(t_i)$，$P\left( t_i \right) =\omega \sum_{\mu _i\in \mu}{M_{t_i,\mu_i}^2}$，其中$\omega$是归一化系数\;\\
+	 		计算$P(t_i)$，$P\left( t_i \right) =\omega \sum_{\mu _i\in \mu}{M_{t_i,\mu_i}^2}$，其中$\omega$是归一化系数\;
 	 	}
-	 	按照R集合中所有点的概率分布选出$\mu_k$，将其加入集合$\mu$\;\\
+	 	按照R集合中所有点的概率分布选出$\mu_k$，将其加入集合$\mu$\;
 	 }
 	 \caption{kmedoidspp初始化}
 \end{algorithm}
-
 \begin{algorithm}[H]
-	\label{kmediodspp}
 	 \KwData{样本距离矩阵$M_{nn}$，簇个数K}
 	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_k\}\right\}$}
-	 kmdoidsspp\_initialization($M_{nn}$,K)\;\\
+	 kmdoidsspp\_initialization($M_{nn}$,K)\;
 	 \Repeat{所有簇心不再更新或更新值小于一定阈值}{
-		 将所有的簇置为空，$C_i=\phi \,\,\left( 1\leqslant i\leqslant K \right)$\\
+		 将所有的簇置为空，$C_i=\phi \,\,\left( 1\leqslant i\leqslant K \right)$\;
 		 \For{j=1,2,...,m}{
 		 	依据距离矩阵，计算序号为i的样本与所有簇心之间的距离，并将序号为i的样本归为第$\alpha _i$类，使其满足：
-		 	$\alpha _i=arg\,\,\min \left( M[i，alpha _i] \right) $\\
+		 	$\alpha _i=arg\,\,\min \left( M[i，alpha _i] \right) $\;
 		 }
 		 \For{i=1,2,...,K}{
 		 	$\hat{\mu }_i=arg\,\,\min_{x\in C_i} \left( \sum_{j\in C_i}{M\left[ x,j \right]} \right) $\\
 		 	\If{$\hat{\mu}_i\ne \mu _i$}{
-		 		$\mu _i$=$\hat{\mu}_i$
+		 		$\mu _i$=$\hat{\mu}_i$\;
 		 	}
 		 }
 	 }
 	 \caption{k-medoids++ 算法}
+	 \label{kmediodspp}
 \end{algorithm}
 
 中心节点计算出k个均簇心向量后，将k个簇心向量回传给各个属地节点，当属地节点侦查到新轨迹时，判断其与回传的k个簇心向量的距离来判定是否为异常轨迹：若新轨迹与所有均值向量距离都超过了设定的阈值，则可以判定为轨迹为异常轨迹。
@@ -374,7 +374,7 @@ $$
 
 \subsection{实验与分析}
 
-实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了时间、位置x、位置y、人物id等字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了532条轨迹作为原始数据集，每条轨迹包含500个点。
+实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了时间、位置x、位置y、人物id等字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了2097条轨迹作为原始数据集，每条轨迹包含500个点。
 
 实验系统由三个属地节点和一个中心节点组成。将该算法与集中式聚类方法进行了比较。集中式聚类算法对整个网格化数据集执行标准的k-medoids算法(baseline)， baseline的结果视为最优结果，后续试验中使用的ARI指数则是以 baseline聚类结果作为标签。另一种算法则是本章提出的MCD-Clustering算法。
 
@@ -411,7 +411,7 @@ $$
 \caption{不同K值对实验效果的影响}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
-\diagbox{评价指标}{$\alpha$} & 3 & 8 & 10  & 15 & 20 \\ \hline
+\diagbox{评价指标}{K} & 3 & 8 & 10  & 15 & 20 \\ \hline
 RI   & 0.844 & 0.878 & 0.911 & 0.931 & 0.981\\ \hline
 ARI   & 0.659 & 0.738 & 0.805 & 0.85 & 0.957\\ \hline
 CR   & 7.344  & 5.47 & 5.12 & 3.96 & 3.49\\ \hline
@@ -428,7 +428,7 @@ CR   & 7.344  & 5.47 & 5.12 & 3.96 & 3.49\\ \hline
 
 依据图\ref{ch4karicr}和表\ref{ch4differentK}，可以看到，随着K值增大，ARI指数也会随之增大，即聚类效果更好。这是因为当K值很小时，轨迹子簇中的轨迹相似性不高，可能会有多种走势形状的轨迹存在，通过这样的轨迹子簇数据训练出来的生成模型会生成多种走势形状混合的轨迹数据，而走势性形状混合的轨迹数据在原始轨迹数据中可能是不存在的，这样就会给后续全局聚类操作造成影响。但随着K值增大，需要在网络中传输更多的转移矩阵，也因此会使网络信息传输压缩率有所降低,但K值增大的同时，子簇更具有相似性，故而转移矩阵也会相应减小。
 
-局部聚类不同K值下，中心节点生成的轨迹数据如图\ref{genTrForDifferentK}所示，其中，图\ref{genk3}表示局部聚类K值取3时中心节点生成的离散化轨迹，图\ref{genk8}表示局部聚类K值取8时中心节点生成的离散化轨迹，图\ref{genk15}表示局部聚类K值取15时中心节点生成的离散化轨迹，图\ref{genk120}表示局部聚类K值取20时中心节点生成的离散化轨迹。通过与图\ref{ch4GenAndOrigin}对比可看出，随着局部聚类K值增大，生成的离散轨迹集合更加接近于原始轨迹数据。
+局部聚类不同K值下，中心节点生成的轨迹数据如图\ref{genTrForDifferentK}所示，其中，图\ref{genk3}表示局部聚类K值取3时中心节点生成的离散化轨迹，图\ref{genk8}表示局部聚类K值取8时中心节点生成的离散化轨迹，图\ref{genk15}表示局部聚类K值取15时中心节点生成的离散化轨迹，图\ref{genk20}表示局部聚类K值取20时中心节点生成的离散化轨迹。通过与图\ref{ch4GenAndOrigin}对比可看出，随着局部聚类K值增大，生成的离散轨迹集合更加接近于原始轨迹数据。
 \begin{figure}[H]
 \subfigure[]{
 \label{genk3}

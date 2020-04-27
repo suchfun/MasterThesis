@@ -117,7 +117,7 @@ Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_
 
 现假设有子轨迹段$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \dots,\left(x_{N}, y_{N}\right)\right\}$，如果将分段轨迹分成三个轨迹区间：$\left\{\left(x_{1}, y_{1}\right),\left(x_{2}, y_{2}\right), \dots,\left(x_{i}, y_{i}\right)\right\}$，$\left\{\left(x_{i+1}, y_{i+1}\right),\left(x_{i+2}, y_{i+2}\right), \ldots,\left(x_{j}, y_{j}\right)\right\}$和$\left\{\left(x_{j+1}, y_{j+1}\right),\left(x_{j+2}, y_{j+2}\right), \dots,\left(x_{N}, y_{N}\right)\right\}$，则分割坐标i和j应满足：
 \[
-\left|x_{i+1}-x_{1}\right|>S\\
+\left|x_{i+1}-x_{1}\right|>S\\\
 \left|x_{j+1}-x_{i+1}\right|>S
 \]
 
@@ -226,51 +226,48 @@ $$
 
 在接收到信息后，中心节点根据各个属地节点传输的CSTD-Unit数据单元还原轨迹拟合函数，然后在还原出来的轨迹函数上依照原始数据的采样频率进行等间隔抽样，得到还原出的数据点，以此组成还原数据，从CSTD-Unit数据单元中还原轨迹数据的过程称为轨迹生成过程，轨迹生成过程操作流程如算法\ref{ch3gen}所示。
 \begin{algorithm}[H]
-	\label{ch3gen}
 	 \KwData{CSTD-Unit数据单元集合U}
 	 \KwResult{生成轨迹集合G}
 	 \For{unit in U}{
-	 		初始化序列ys;\\
-	 		id = unit['ID'];\\
-	 		para = unit['Prament'];\\
-	 		xmin = unit['StartX'];\\
-	 		xmax = unit['EndX'];\\
-	 		以一定采样率在区间[xmin,xmax]上进行均匀采样，得到序列xs;\\
+	 		初始化序列ys\;
+	 		id = unit['ID']\;
+	 		para = unit['Prament']\;
+	 		xmin = unit['StartX']\;
+	 		xmax = unit['EndX']\;
+	 		以一定采样率在区间[xmin,xmax]上进行均匀采样，得到序列xs\;
 	 		\For{x in xs}{
-	 			lx = np.array([x**i for i in range(len(params))]);\\
-    			y = np.dot(x,params);\\
-    			将y纳入ys;\\
+	 			lx = np.array([x**i for i in range(len(params))])\;
+    			y = np.dot(x,params)\;
+    			将y纳入ys\;
 	 		}
-	 		利用序列xs和序列ys组成轨迹序列L;\\
+	 		利用序列xs和序列ys组成轨迹序列L\;
 	 	
-	 	将轨迹序列L纳入生成轨迹集合G\;\\
+	 	将轨迹序列L纳入生成轨迹集合G\;
 	 }
 	 \caption{轨迹生成过程}
+	\label{ch3gen}
 \end{algorithm}
 
-将恢复的轨迹数据集输入到聚类模型中，本文选择的是K-means++算法，在第二章中描述了k-means算法的具体流程，k-means++只是在k-means基础上针对开始k个均值向量的初始化提供了具体的方法。k-means++方法，尽可能地使初始聚类中心分散开。这种方法首先随机产生一个初始聚类中心点，然后按照概率$P=\omega \sum_i{\left( x-c_i \right) ^2}$选取其他的聚类中心点。其中$\omega$是归一化系数。
-
-k-means++初始化操作如下：\\
+将恢复的轨迹数据集输入到聚类模型中，本文选择的是K-means++算法，在第二章中描述了k-means算法的具体流程，k-means++只是在k-means基础上针对开始k个均值向量的初始化提供了具体的方法。k-means++方法，尽可能地使初始聚类中心分散开。这种方法首先随机产生一个初始聚类中心点，然后按照概率$P=\omega \sum_i{\left( x-c_i \right) ^2}$选取其他的聚类中心点。其中$\omega$是归一化系数。k-means++初始化操作如下：\\
 \begin{algorithm}[H]
 	 \KwData{样本集$D=\left\{t_1,t_2,...,t_n\}\right\}$，簇个数K}
 	 \KwResult{簇心向量$\mu=\left\{\mu_1,\mu_2,...,\mu_K\}\right\}$}
 	 从数据集D中随机初始化1个样本，将其作为第一个簇的簇心$\mu={\mu_1}$\;
 	 \Repeat{k=2,3,...,K}{
-	 	R=D-$\mu$\;\\
+	 	R=D-$\mu$\;
 	 	\For{$t_i$ in R}{
-	 		计算$P(x_i)$，$P\left( t_i \right) =\omega \sum_{\mu _i\in \mu}{\left( t_i-\mu _i \right) ^2}$，其中$\omega$是归一化系数\;\\
+	 		计算$P(x_i)$，$P\left( t_i \right) =\omega \sum_{\mu _i\in \mu}{\left( t_i-\mu _i \right) ^2}$，其中$\omega$是归一化系数\;
 	 	}
-	 	按照R集合中所有点的概率分布选出$\mu_k$，将其加入集合$\mu$\;\\
+	 	按照R集合中所有点的概率分布选出$\mu_k$，将其加入集合$\mu$\;
 	 }
 	 \caption{kmeanspp初始化}
 \end{algorithm}
 
 全局聚类的具体流程如下：\\
 \begin{algorithm}[H]
-	\label{kmeanspp}
 	 \KwData{样本集$D=\left\{t_1,t_2,...,t_n\}\right\}$，簇个数K，阈值S}
 	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_K\}\right\}$，簇心向量$\mu=\left\{\mu_1,\mu_2,...,\mu_K\}\right\}$}
-	 K=2\;\\
+	 K=2\;
 	 kmeanspp\_initialization\(D,K\)\;
 	 C,$\mu$=kmeans\(D,K\)\;
 	 $DI_K$=DI(C)\;
@@ -285,6 +282,7 @@ k-means++初始化操作如下：\\
 	 	}	
 	 }
 	 \caption{全局聚类流程}
+	\label{kmeanspp}
 \end{algorithm}
 
 对于k值的选择，在上面的讨论中，我们一直把k当做已经给定的参数。但是在实际操作中，聚类类别数通常都是未知的。如何确定超参数k我们采用如下方法。
@@ -323,7 +321,7 @@ k-means++初始化操作如下：\\
 不确定性通过生成轨迹数据与原始属地轨迹数据之间的相似度进行度量，首先，拟合轨迹的多项式模型是通过最小化代价函数得到，而代价函数是由经验损失和正则化构成，所以拟合出的的多项式模型是不经过所有训练数据点的，故原始属地轨迹数据不可能由多项式轨迹准确还原；再者，由于生成轨迹数据是拟合多项式模型在指定区间均匀采样得到，故与原始属地轨迹数据存在一定的差异；但生成轨迹数据与原始轨迹数据在轨迹走向上相似度较高。算法在隐私性的覆盖率方面，由于属地节点在属地轨迹预处理阶段经过了轨迹数量抽样处理，故生成的轨迹数据是无法覆盖所有原始数据的，覆盖率的大小取决于轨迹数量抽样操作的抽样率，抽样率越低则覆盖率越低，反之，覆盖率则越高。
 
 \subsection{实验与分析}
-实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了位置x、位置y、人物id字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了549条轨迹作为原始数据集，每条轨迹包含500个点。
+实验是在真实的数据集上进行的，这些数据集包含了在大阪的ATC购物中心的游客的轨迹。在我们的实验中，我们应用了位置x、位置y、人物id字段\footnote[1]{https://irc.atr.jp/crest2010_HRI/ATC_dataset/}。经过预处理后，我们选择了2097条轨迹作为原始数据集，每条轨迹包含500个点。
 
 实验系统由三个属地节点和一个中心节点组成。将该算法与集中式聚类方法进行了比较。集中式聚类算法对整个网格化数据集执行标准的k-means算法(baseline)， baseline的结果视为最优结果，后续试验中使用的ARI指数则是以 baseline聚类结果作为标签。另一种算法则是本章提出的CSD-Clustering算法。
 
@@ -350,7 +348,6 @@ k-means++初始化操作如下：\\
 从图\ref{differentS}可以看出，上面的那幅图显示当S=12时，拟合曲线的$X∈(6,20)$,下面那幅图显示当S=5时，拟合曲线的$X∈(15,20)$,根据这个结果可以看出，当S越小，曲线拟合得越好。
 
 
-\end{comment}
 
 首先针对原始轨迹数据聚类情况确定全局聚类K值选取，实验中选取不同的K值其损失函数值变化如图\ref{ck}所示，其中损失函数采用均方误差，其表达式如式\ref{kmeanscost}所示。
 \begin{figure}[H]
@@ -373,7 +370,7 @@ k-means++初始化操作如下：\\
 \includegraphics[width=0.4\textwidth]{point_sample_20.png}}
 \subfigure[]{
 \label{gen5}
-\includegraphics[width=0.4\textwidth]{point_sample_5.png}}
+\includegraphics[width=0.4\textwidth]{pic/point_sample_05.png}}
 \subfigure[]{
 \label{origin}
 \includegraphics[width=0.4\textwidth]{ch3original.png}}
@@ -411,17 +408,17 @@ CR   & 56.017  & 26.452 & 14.063 & 7.341 & 3.008\\ \hline
 
 此处，设定轨迹点数抽样率$\alpha$=1/5，为轨迹数量抽样率$\gamma$设置不同值：0.1、0.3、0.5、0.7和0.9，验证不同抽样率大小对实验结果的影响。
 
-对于不同轨迹数量抽样率$\gamma$，中心节点生成的轨迹数据与原始轨迹数据对比如图\ref{genTrForDifferentGamma}所示，其中，图\ref{gen01}表示轨迹数量抽样率为0.1时中心节点生成的轨迹数据，图\ref{gen05}表示轨迹数量抽样率为0.5时中心节点生成的轨迹数据，图\ref{gen09}表示轨迹数量抽样率为0.9时中心节点生成的轨迹数据，图\ref{origin}则表示原始轨迹数据。从图中可以看出，随着轨迹点数抽样率$\alpha$增大，中心轨迹依据参数生成的轨迹数据越接近原始轨迹数据。
+对于不同轨迹数量抽样率$\gamma$，中心节点生成的轨迹数据与原始轨迹数据对比如图\ref{genTrForDifferentGamma}所示，其中，图\ref{gen01}表示轨迹数量抽样率为0.1时中心节点生成的轨迹数据，图\ref{gen03}表示轨迹数量抽样率为0.3时中心节点生成的轨迹数据，图\ref{gen09}表示轨迹数量抽样率为0.9时中心节点生成的轨迹数据，图\ref{origin}则表示原始轨迹数据。从图中可以看出，随着轨迹点数抽样率$\alpha$增大，中心轨迹依据参数生成的轨迹数据越接近原始轨迹数据。
 \begin{figure}[H]
 \subfigure[]{
 \label{gen01}
-\includegraphics[width=0.4\textwidth]{tr_sample_01.png}}
+\includegraphics[width=0.4\textwidth]{pic/tr_sample_01.png}}
 \subfigure[]{
-\label{gen05}
-\includegraphics[width=0.4\textwidth]{tr_sample_05.png}}
+\label{gen03}
+\includegraphics[width=0.4\textwidth]{tr_sample_03.png}}
 \subfigure[]{
 \label{gen09}
-\includegraphics[width=0.4\textwidth]{tr_sample_09.png}}
+\includegraphics[width=0.4\textwidth]{pic/tr_sample_09.png}}
 \subfigure[]{
 \label{origin}
 \includegraphics[width=0.4\textwidth]{ch3original.png}}
