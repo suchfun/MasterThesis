@@ -105,15 +105,7 @@
 
 \section{平台展示}
 
-本系统基于B/S架构设计，系统登录界面如图\ref{login}所示，各个属地中心都通过分配的账号访问系统。
-\begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{system/login.png}
-	\caption{系统登录界面}
-	\label{login}
-\end{figure}
-
-
-登入系统，系统首页如图\ref{index}所示，系统首页展示了数据中心的地理分布。除此之外，系统总共分为六个部分：系统展示屏、业务操作平台、任务管理、系统管理、数据管理和内部威胁检测。本章节将针对本文涉及算法介绍其中的业务操作平台和任务管理两部分。
+本系统基于B/S架构设计，系统首页如图\ref{index}所示，系统首页展示了数据中心的地理分布。除此之外，系统总共分为六个部分：系统展示屏、业务操作平台、任务管理、系统管理、数据管理和内部威胁检测。本章节将针对本文涉及算法介绍其中的业务操作平台和任务管理两部分。
 \begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{system/index.png}
 	\caption{系统主界面}
@@ -129,21 +121,15 @@
 
 任务管理模块如图\ref{taskManage}所示，该模块功能由两部分组成：查看历史任务和编辑任务。查看历史任务可以查看平台上所有已发布任务以及任务相关信息，包括任务编号、任务发起单位、任务当前状态、任务完成时间和数据源数目。
 \begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{system/taskManage.png}
+	\includegraphics[width=0.8\textwidth]{system/task_manage.png}
 	\caption{任务管理模块}
 	\label{taskManage}
 \end{figure}
 
-若任务正在执行，点击单个任务则可以查看任务相关节点信息，展示信息包括：分中心任务编号、所属集群IP、所属任务ID、当前运行状态和任务类型，如图\ref{taskInfo}所示。
-\begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{system/taskInfo.png}
-	\caption{查看任务相关信息}
-	\label{taskInfo}
-\end{figure}
 
 若任务已经执行完成，则点击任务则可查看任务结果，如图\ref{result}所示，图中展示了轨迹聚类完成的效果图。
 \begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{system/result.png}
+	\includegraphics[width=0.8\textwidth]{system/task_detail.png}
 	\caption{任务执行结果展示}
 	\label{result}
 \end{figure}

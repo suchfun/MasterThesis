@@ -1,4 +1,4 @@
-\chapter{基于复合抽样的的分布式轨迹聚类算法}
+\chapter{基于复合抽样的分布式轨迹聚类算法}
 
 %已研究的缺点：
 %1.需要数据聚集，不符合场景和隐私
@@ -75,7 +75,7 @@ Dist(\mathrm{a}, \mathrm{b})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_
 
 该算法主要包括四个步骤：首先，属地轨迹建模，在各个属地节点对本地的每条轨迹数据进行预处理和抽样（包含轨迹数量抽样和每条轨迹坐标点抽样），并采用多项式函数拟合各抽样轨迹曲线；第二步，轨迹数据重构，每个属地节点将拟合的轨迹函数参数信息发送到中心节点上。第三步，综合模型求解，中心节点根据从接收参数中恢复的轨迹计算聚类结果。最后，模型应用，中心节点将聚类结果返回给每个属地节点，属地节点利用聚类结果应用至不同的业务场景。 
 
-\subsection{属轨迹地数据预处理}
+\subsection{属地轨迹地数据预处理}
 
 属地数据预处理可以分为四个步骤，轨迹数量抽样，轨迹点数抽样，分段和分区。如图\ref{ch3pre}所示。
 \begin{figure}[H]
@@ -206,8 +206,8 @@ J(\heat{f})=\sum_{i}^{k}\left|a_{i}\right|_2^2
 
 将通过以上方法可以得到指定区间的函数参数。为了在中心节点能够还原出轨迹数据，除了传递函数参数信息，还需要传输必要的元信息，将元信息和参数信息打包形成的数据结构成为基于复合抽样的轨迹数据单元（CSTD-Unit），其格式如下：
 $$
-\begin{tabular}{|c|c|c|c|}
-\hline ID&StartX&EndX&Parament\\
+\begin{tabular}{|c|c|c|c|c|}
+\hline ID&StartX&EndX&Parament&Alpha\\
 \hline
 \end{tabular}
 $$
@@ -218,6 +218,7 @@ $$
 \item \textbf{StartX}：此区间x轴上最小值
 \item \textbf{EndX}：此区间x轴上最大值
 \item \textbf{Parament}：此区间轨迹拟合函数参数
+\item \textbf{Alpha}：节点采用的轨迹点数抽样率
 \end{itemize}
 
 各个属地节点把轨迹所有分区坐标信息转化成许多CSTD-Unit传递给中心节点，中心节点通过这种特殊的数据结构能够将轨迹数据进行还原。
@@ -234,7 +235,8 @@ $$
 	 		para = unit['Prament']\;
 	 		xmin = unit['StartX']\;
 	 		xmax = unit['EndX']\;
-	 		以一定采样率在区间[xmin,xmax]上进行均匀采样，得到序列xs\;
+	 		alpha = unit['Alpha']\;
+	 		以1/alpha采样率在区间[xmin,xmax]上进行均匀采样，得到序列xs\;
 	 		\For{x in xs}{
 	 			lx = np.array([x**i for i in range(len(params))])\;
     			y = np.dot(x,params)\;
@@ -345,7 +347,7 @@ $$
 	\label{differentS}
 \end{figure}
 
-从图\ref{differentS}可以看出，上面的那幅图显示当S=12时，拟合曲线的$X∈(6,20)$,下面那幅图显示当S=5时，拟合曲线的$X∈(15,20)$,根据这个结果可以看出，当S越小，曲线拟合得越好。
+从图\ref{differentS}可以看出，上面的那幅图显示当S=12时，拟合曲线的$X\in(6,20)$,下面那幅图显示当S=5时，拟合曲线的$X\in(15,20)$,根据这个结果可以看出，当S越小，曲线拟合得越好。
 
 
 
