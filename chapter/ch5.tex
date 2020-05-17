@@ -11,6 +11,26 @@
 	\label{ch5frame}
 \end{figure}
 
+本系统利用论文中的CSD-Clustering算法进行分布式的轨迹聚类，从而实现轨迹异常检测任务。系统利用程序生成了飞机的飞行轨迹在地面的二维投影，因为飞机的飞行轨迹必然是一条光滑而富有弯曲的闭合或非闭合曲线，为了快速生成大量特点不同的飞行轨迹投影，系统利用贝塞尔曲线库来生成轨迹，其效果如图\ref{bezier}所示。
+\begin{figure}[H]
+	\includegraphics[width=0.8\textwidth]{Bezier.png}
+	\caption{轨迹曲线生成}
+	\label{bezier}
+\end{figure}
+
+生成轨迹的坐标点有三个字段，字段描述如下：
+\begin{table}[H]
+\begin{tabular}{|l|l|l|}
+\hline
+字段名        & 数据类型   & 说明     \\ \hline
+object\_id & Number & 飞机ID编号 \\ \hline
+x          & Number & x轴上的坐标 \\ \hline
+y          & Number & y轴上的坐标 \\ \hline
+\end{tabular}
+\end{table}
+
+利用如上轨迹生成方式生成系统演示的轨迹数据集，其中包含了923条轨迹，每条轨迹包含500个坐标点，每个坐标点由object\_id,x,y三个字段构成。
+
 \section{总体设计}
 基于原位计算的多中心大数据分析系统旨在为分布式各类计算任务提供解决方案，轨迹聚类计算是此平台中重点攻克的计算任务之一。本节提出了基于原位计算的多中心大数据分析系统中轨迹聚类计算部分所涉及到的模块，主要由五个模块组成：模型训练模块、网络通信模块、综合计算模块、聚类评估模块和可视化展示模块。各模块层级结构如图\ref{ch5module}所示。
 \begin{figure}[H]
@@ -105,29 +125,24 @@
 
 \section{平台展示}
 
-本系统基于B/S架构设计，系统首页如图\ref{index}所示，系统首页展示了数据中心的地理分布。除此之外，系统总共分为六个部分：系统展示屏、业务操作平台、任务管理、系统管理、数据管理和内部威胁检测。本章节将针对本文涉及算法介绍其中的业务操作平台和任务管理两部分。
-\begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{system/index.png}
-	\caption{系统主界面}
-	\label{index}
-\end{figure}
+本系统基于B/S架构设计，系统总共分为六个部分：系统展示屏、业务操作平台、任务管理、系统管理、数据管理和内部威胁检测。本章节将针对本文涉及算法介绍其中的业务操作平台和任务管理两部分。
 
 业务操作模块页面如图\ref{taskRelease3}所示，该模块通过可视化移拖拽、连接算子来完成自定义任务的组成，页面分为三个部分，左边部分用来展示可使用的算子，其中异常轨迹查询需要使用分布式轨迹聚类算法；页面的中间部分则为算子操作空间，专业人员可以通过组合算子来形成自定义任务；页面的右侧为算子属性参数，在这一栏可以定义算法所需参数。
 \begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{system/taskRelease.png}
+	\includegraphics[width=0.8\textwidth]{system/taskR.png}
 	\caption{业务操作模块界面}
 	\label{taskRelease3}
 \end{figure}
 
-任务管理模块如图\ref{taskManage}所示，该模块功能由两部分组成：查看历史任务和编辑任务。查看历史任务可以查看平台上所有已发布任务以及任务相关信息，包括任务编号、任务发起单位、任务当前状态、任务完成时间和数据源数目。
+任务管理模块如图\ref{taskManage}所示，该模块功能由两部分组成：查看历史任务和编辑任务。查看历史任务可以查看平台上所有已发布任务以及任务相关信息，包括任务编号、任务名称、任务类型、任务当前状态、任务完成时间、发布人。
 \begin{figure}[H]
-	\includegraphics[width=0.8\textwidth]{system/task_manage.png}
+	\includegraphics[width=0.8\textwidth]{system/taskM.png}
 	\caption{任务管理模块}
 	\label{taskManage}
 \end{figure}
 
 
-若任务已经执行完成，则点击任务则可查看任务结果，如图\ref{result}所示，图中展示了轨迹聚类完成的效果图。
+若任务已经执行完成，则点击任务则可查看任务结果，如图\ref{result}所示，任务结果分为两部分：属地节点计算结果和中心节点计算结果。属地节点计算结果呈现了各个属地节点平均分区轨迹的拟合误差、数据压缩比以及参与轨迹模型拟合的轨迹数据覆盖率；中心节点计算结果展现了还原的轨迹数据以及通过颜色分类展现了轨迹聚类结果，然后计算了全局聚类簇内平均均方误差来评估此次聚类结果。
 \begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{system/task_detail.png}
 	\caption{任务执行结果展示}

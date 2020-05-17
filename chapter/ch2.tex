@@ -11,9 +11,7 @@
 
 k-means算法由文献\cite{hartigan1979algorithm}正式提出，现已成为数据挖掘中常用的聚类算法，其算法主要思路是一种启发性算法，求解过程利用了EM算法\citing{AMaximum}，通过不断迭代优化直到满足停止迭代的条件。
 
-\subsubsection{算法流程及复杂度分析}
-
-现有样本集$D=\left\{x_1,x_2,...,x_m\right\}$，k-means算法将数据集划分成互不相交的K个簇$C=\left\{C_1,C_2,...,C_K\right\}$,且满足$C_1\bigcup{C_2\bigcup{...\bigcup{C_m=D}}}$，每个簇的簇心$\mu _i=\frac{1}{|C_i|}\sum_{\mathbf{x}\in C_i}{\mathbf{x}}$。
+假设现有样本集$D=\left\{x_1,x_2,...,x_m\right\}$，k-means算法将数据集划分成互不相交的K个簇$C=\left\{C_1,C_2,...,C_K\right\}$,且满足$C_1\bigcup{C_2\bigcup{...\bigcup{C_m=D}}}$，每个簇的簇心$\mu _i=\frac{1}{|C_i|}\sum_{\mathbf{x}\in C_i}{\mathbf{x}}$。
 算法流程如下：\\
 \begin{algorithm}[H]
 	 \KwData{样本集$D=\left\{x_1,x_2,...,x_m\right\}$，簇个数K}
@@ -70,14 +68,14 @@ k-means算法要求所有元素维度相同且距离度量必须基于欧式距�
 一类是将聚类结果与某个“参考模型”进行比较，度量这种比较结果的评估指标称为“外部指标”；另一种不依赖标签数据，针对聚类计算后簇内与簇间的距离度量得到的评价指标，称之为“内部指标”。
 
 \subsubsection{外部指标}
-假设通过聚类算法将数据集D划分成簇集$C=\left\{C_1,C_2,...,C_K\}\right\}$，参考模型将数据集D划分的簇集$C^*=\left\{ C_{1}^{*},C_{2}^{*},...,C_{K}^{*} \right\} $，相应地，令$\lambda$和$\lambda^{*}$分别表示与C和$C^{*}$对应的簇标记。我们将样本两两配对，定义：
+假设通过聚类算法将数据集D划分成簇集$C=\left\{C_1,C_2,...,C_K\right\}$，参考模型将数据集D划分的簇集$C^*=\left\{ C_{1}^{*},C_{2}^{*},...,C_{K}^{*} \right\} $，相应地，令$\lambda$和$\lambda^{*}$分别表示与C和$C^{*}$对应的簇标记。我们将样本两两配对，定义：
 \begin{equation}
 \label{abcd}
 \begin{aligned}
-&a=|S S|, \quad S S=\left\{(x_{i}, x_{j}) | \lambda_{i}=\lambda_{j}, \lambda_{i}^{*}=\lambda_{j}^{*}, i<j)\right.\\
-&b=|S D|, \quad S D=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i}=\lambda_{j}, \lambda_{i}^{*} \neq \lambda_{j}^{*}, i<j)\right.\\
-&c=|D S|, \quad D S=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i} \neq \lambda_{j}, \lambda_{i}^{*}=\lambda_{j}^{*}, i<j)\right.\\
-&d=|D D|, \quad D D=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i} \neq \lambda_{j}, \lambda_{i}^{*} \neq \lambda_{j}^{*}, i<j)\right.
+&a=|S S|, \quad S S=\left\{(x_{i}, x_{j}) | \lambda_{i}=\lambda_{j}, \lambda_{i}^{*}=\lambda_{j}^{*}, i<j)\}\right.\\
+&b=|S D|, \quad S D=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i}=\lambda_{j}, \lambda_{i}^{*} \neq \lambda_{j}^{*}, i<j)\}\right.\\
+&c=|D S|, \quad D S=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i} \neq \lambda_{j}, \lambda_{i}^{*}=\lambda_{j}^{*}, i<j)\}\right.\\
+&d=|D D|, \quad D D=\left\{(\boldsymbol{x}_{i}, \boldsymbol{x}_{j}) | \lambda_{i} \neq \lambda_{j}, \lambda_{i}^{*} \neq \lambda_{j}^{*}, i<j)\}\right.
 \end{aligned}
 \end{equation}
 

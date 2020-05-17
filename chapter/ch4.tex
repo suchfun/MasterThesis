@@ -24,9 +24,11 @@
 
 假设属地节点的轨迹数据集记为D，轨迹数据集包含有n条轨迹，每条轨迹由m个坐标点构成，坐标点的维度为2，即：
 \[
-D=\left\{ t_1,t_2,...,t_n \right\} 
+\begin{aligned}
+D=&\left\{ t_1,t_2,...,t_n \right\} 
 \\
-t=\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_m,y_m \right) \right\} 
+t=&\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_m,y_m \right) \right\} 
+\end{aligned}
 \]
 
 轨迹数据通过聚类算法产生的簇集合记为$C=\left\{ C_1,C_2,...,C_k \right\} $，其对应的簇心向量记为$\mu =\left\{ \mu _1,\mu _2,...,\mu _k \right\} $。
@@ -42,7 +44,7 @@ Dist(\mathrm{A}, \mathrm{B})=\frac{1}{n} \sum_{i=1}^{n} \sqrt{\left(a_{x}^{i}-b_
 若轨迹A和轨迹B长度不相等，则两条轨迹距离采用hausdorff距离，其间的距离记为$d_H(A,B)$，表示为：
 \begin{equation}
 \label{hausdorffdist}
-d_{\text{H}}\left( A,B \right) =\max \left\{ \mathop{\text{sup}}_a\in A\mathop{\text{inf}}_b\in Bd\left( a,b \right) ,\mathop{\text{sup}}_b\in B\mathop{\text{inf}}_a\in Ad\left( a,b \right) \right\} 
+d_{\text{H}}\left( A,B \right) =\max \left\{ \mathop{sup}_{a\in A}\ \mathop{inf}_{b\in B}\ d\left( a,b \right) ,\mathop{sup}_{b\in B}\ \mathop{inf}_{a\in A}\ d\left( a,b \right) \right\} 
 \end{equation}
 
 其中a,b分别表示轨迹A和B上的点，d(a,b)表示a点和b点之间的欧氏距离。
@@ -109,8 +111,10 @@ $$
 \label{gridization}
 \end{figure}
 
-由于传感器在采样运动物体轨迹时存在不同物体间速度的差异，所以经常会出现一条轨迹时间上相邻的坐标点在网格空间中并不相邻，此时需要在这两个网格中不相邻的点之间通过指定的操作填充一些坐标点，使得所有轨迹中在时间上相邻的点在网格空间中也相邻，这种保证了网格空间数据相邻性的操作称之为轨迹数据填充操作。假设一条网格化后的轨迹数据记为$g=\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_l,y_l \right) \right\} $,轨迹数据填充操作流程如下：\\
+由于传感器在采样运动物体轨迹时存在不同物体间速度的差异，所以经常会出现一条轨迹时间上相邻的坐标点在网格空间中并不相邻，此时需要在这两个网格中不相邻的点之间通过指定的操作填充一些坐标点，使得所有轨迹中在时间上相邻的点在网格空间中也相邻，这种保证了网格空间数据相邻性的操作称之为轨迹数据填充操作。假设一条网格化后的轨迹数据记为$g=\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_l,y_l \right) \right\} $,轨迹数据填充操作流程如下：
+
 \begin{algorithm}[H]
+\begin{spacing}{1.2}
  	\KwData{一条网格化的轨迹$g=\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_l,y_l \right) \right\} $}
  	\KwResult{轨迹数据填充后的轨迹数据$\hat{g}=\left\{ \left( x_1,y_1 \right) ,\left( x_2,y_2 \right) ,...,\left( x_s,y_s \right) \right\} $}
 
@@ -127,7 +131,7 @@ $$
 	 		xs = sign($x_{i+1}-x_i$)\;
 	 		ys = sign($y_{i+1}-y_{i}$)\;
 	 		在坐标$(x_i,y_i)$后面填充坐标$(x_i+xs,y_i),(x_i+xs,y_i+ys)$\;
-	 		\While{假设最后填充的坐标$(x_t,y_t)$不满足：$x_t==x_{i+1}$ || $y_t==y_{i+1}$ || ($|x_t-x_{i+1}|==1$ && $|y_t-y_{i+1}|==1$) }{
+	 		\While{假设最后填充的坐标$(x_t,y_t)$不满足：$x_t==x_{i+1}$ || $y_t==y_{i+1}$ || $\left(|x_t-x_{i+1}|==1$ \&\& $|y_t-y_{i+1}|==1\right)$ }{
 	 			在坐标$(x_t,y_t)$后面填充坐标$(x_t+xs,y_t),(x_t+xs,y_t+ys)$\;
 	 		}
 	 		\If{$x_t==x_{i+1}$ && $|y_t-y_{i+1}|>1$}{
@@ -145,6 +149,7 @@ $$
 	 	}
 	 }
 	 \caption{轨迹数据填充操作}
+\end{spacing}
 \end{algorithm}
 
 \subsection{属地轨迹生成模型估计}
@@ -328,16 +333,16 @@ $$
 \end{algorithm}
 \begin{algorithm}[H]
 	 \KwData{样本距离矩阵$M_{nn}$，簇个数K}
-	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_k\}\right\}$}
-	 kmdoidsspp\_initialization($M_{nn}$,K)\;
+	 \KwResult{簇划分$C=\left\{C_1,C_2,...,C_k\right\}$}
+	 $\mu$=kmdoidsspp\_initialization($M_{nn}$,K)\;
 	 \Repeat{所有簇心不再更新或更新值小于一定阈值}{
 		 将所有的簇置为空，$C_i=\phi \,\,\left( 1\leqslant i\leqslant K \right)$\;
 		 \For{j=1,2,...,m}{
 		 	依据距离矩阵，计算序号为i的样本与所有簇心之间的距离，并将序号为i的样本归为第$\alpha _i$类，使其满足：
-		 	$\alpha _i=arg\,\,\min \left( M[i，alpha _i] \right) $\;
+		 	$\alpha _i=arg\ \ \mathop{min}_{\alpha_i \in \mu} M\left[i,\alpha _i\right]$ \;
 		 }
 		 \For{i=1,2,...,K}{
-		 	$\hat{\mu }_i=arg\,\,\min_{x\in C_i} \left( \sum_{j\in C_i}{M\left[ x,j \right]} \right) $\\
+		 	$\hat{\mu }_i=arg\,\,\mathmathop{min}_{x\in C_i} \left( \sum_{j\in C_i}{M\left[ x,j \right]} \right) $\\
 		 	\If{$\hat{\mu}_i\ne \mu _i$}{
 		 		$\mu _i$=$\hat{\mu}_i$\;
 		 	}
