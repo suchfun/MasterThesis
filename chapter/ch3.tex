@@ -255,7 +255,7 @@ $$
 	\label{ch3gen}
 \end{algorithm}
 
-将恢复的轨迹数据集输入到聚类模型中，本文选择的是K-means++算法，在第二章中描述了k-means算法的具体流程，k-means++只是在k-means基础上针对开始k个均值向量的初始化提供了具体的方法。k-means++方法，尽可能地使初始聚类中心分散开。这种方法首先随机产生一个初始聚类中心点，然后按照概率$P=\omega \sum_i{\left( x-c_i \right) ^2}$选取其他的聚类中心点。其中$\omega$是归一化系数。k-means++初始化操作如下：\\
+将恢复的轨迹数据集输入到聚类模型中，本文考虑到应用至系统中的实用场景，需要聚类模型的表示方式尽可能的简单，故本文选择了k-means++算法，在第二章中描述了k-means算法的具体流程，k-means++只是在k-means基础上针对开始k个均值向量的初始化提供了具体的方法。k-means++方法，尽可能地使初始聚类中心分散开。这种方法首先随机产生一个初始聚类中心点，然后按照概率$P=\omega \sum_i{\left( x-c_i \right) ^2}$选取其他的聚类中心点。其中$\omega$是归一化系数。k-means++初始化操作如下：\\
 \begin{algorithm}[H]
 	 \KwData{样本集$D=\left\{t_1,t_2,...,t_n\right\}$，簇个数K}
 	 \KwResult{簇心向量$\mu=\left\{\mu_1,\mu_2,...,\mu_K\right\}$}
